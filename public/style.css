@@ -1,0 +1,80 @@
+input.edit {
+    max-width: 150px;
+}
+td {
+    vertical-align: middle;
+}
+#clonexForm input,
+#clonexForm button {
+    min-height: 38px;
+}
+
+body.dark-mode {
+    background-color: #121212 !important;
+    color: #e0e0e0 !important;
+}
+
+.dark-mode .table {
+    color: #fff;
+}
+
+.dark-mode .table-hover tbody tr:hover {
+    background-color: #2a2a2a;
+}
+
+.dark-mode .form-control,
+.dark-mode .btn,
+.dark-mode .alert {
+    background-color: #1f1f1f;
+    color: #e0e0e0;
+    border-color: #444;
+}
+
+.dark-mode .btn-outline-dark {
+    color: #fff;
+    border-color: #888;
+}
+
+.dark-mode .table tbody tr {
+    background-color: #1c1c1c;
+}
+
+.dark-mode .table,
+.dark-mode .table thead th,
+.dark-mode .table tbody td {
+    background-color: #1c1c1c !important;
+    color: #e0e0e0 !important;
+    border-color: #444;
+}
+
+.dark-mode .table thead th {
+    background-color: #2a2a2a !important;
+}
+
+
+.dark-mode .table-light {
+    background-color: #2a2a2a !important;
+    color: #e0e0e0 !important;
+}
+
+.dark-mode ::placeholder {
+    color: #bbbbbb !important;
+    opacity: 1;
+}
+
+.dark-mode .form-control:focus {
+    background-color: #1f1f1f !important;
+    color: #e0e0e0 !important;
+    border-color: #666 !important;
+    box-shadow: none !important;
+}
+
+.dark-mode input[type="number"]::-webkit-inner-spin-button,
+.dark-mode input[type="number"]::-webkit-outer-spin-button,
+.dark-mode input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+.dark-mode input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.7;
+}
+
+

@@ -5,8 +5,8 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "run": "npx ts-node src/main.ts"
-
+    "run": "npx ts-node src/main.ts",
+    "build": "echo \"No build needed. Static files are already in place.\""
   },
   "keywords": [],
   "author": "",
@@ -17,6 +17,7 @@
     "@nestjs/core": "^11.1.0",
     "@nestjs/platform-express": "^11.1.0",
     "@nestjs/typeorm": "^11.0.0",
+    "express": "^5.1.0",
     "mysql2": "^3.14.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",

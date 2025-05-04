@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { join } from 'path';
-import * as express from 'express';
+import express from 'express';
 import {AppModule} from "./src/app.module";
 
 async function bootstrap() {

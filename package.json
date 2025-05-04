@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "run": "npx ts-node src/main.ts",
     "build": "echo \"No build needed. Static files are already in place.\"",
+    "dev": "npx ts-node main.ts",
     "start": "ts-node main.ts"
   },
   "keywords": [],

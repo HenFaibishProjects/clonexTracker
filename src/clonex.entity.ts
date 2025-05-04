@@ -3,17 +3,17 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 @Entity('clonex_entry')
 export class ClonexEntry {
     @PrimaryGeneratedColumn()
-    id: number;
+    id?: number;
 
     @Column('float')
-    dosageMg: number;
+    dosageMg: number | undefined;
 
     @Column({ type: 'datetime' })
-    takenAt: Date;
+    takenAt?: Date;
 
     @Column({ nullable: true })
-    reason: string;
+    reason?: string;
 
     @Column({ nullable: true })
-    comments: string;
+    comments?: string;
 }

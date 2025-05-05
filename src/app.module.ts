@@ -5,6 +5,8 @@ import { AppService } from './app.service';
 import { ClonexEntry } from './clonex.entity';
 import { ClonexController } from './clonex.controller';
 import { ClonexService } from './clonex.service';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 @Module({
     imports: [

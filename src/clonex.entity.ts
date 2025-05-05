@@ -8,7 +8,7 @@ export class ClonexEntry {
     @Column('float')
     dosageMg: number | undefined;
 
-    @Column({ type: 'datetime' })
+    @Column({ type: 'timestamp' })
     takenAt?: Date;
 
     @Column({ nullable: true })

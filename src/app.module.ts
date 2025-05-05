@@ -9,16 +9,13 @@ import { ClonexService } from './clonex.service';
 @Module({
     imports: [
         TypeOrmModule.forRoot({
-            type: 'mysql',
-            host: 'clonextrackerhost',
-            port: 3306,
-            username: 'ClonexTracker',
-            password: 'Zoomaccount1!',
-            database: 'clonex',
-            entities: [ClonexEntry],
+            type: 'postgres',
+            url: process.env.DATABASE_URL,
             synchronize: true,
+            autoLoadEntities: true,
         }),
-        TypeOrmModule.forFeature([ClonexEntry])],
+        TypeOrmModule.forFeature([ClonexEntry]),
+    ],
     controllers: [AppController, ClonexController],
     providers: [AppService, ClonexService],
 })

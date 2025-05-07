@@ -6,10 +6,13 @@ import { ClonexEntry } from './clonex.entity';
 import { ClonexController } from './clonex.controller';
 import { ClonexService } from './clonex.service';
 import * as dotenv from 'dotenv';
+import {User} from "./auth/user.entity";
+import {AuthModule} from "./auth/auth.module";
 dotenv.config();
 
 @Module({
     imports: [
+        AuthModule,
         TypeOrmModule.forRoot({
             type: 'postgres',
             host: process.env.DB_HOST,
@@ -20,7 +23,7 @@ dotenv.config();
             autoLoadEntities: true,
             synchronize: true,
         }),
-        TypeOrmModule.forFeature([ClonexEntry]),
+        TypeOrmModule.forFeature([ClonexEntry, User]),
     ],
     controllers: [AppController, ClonexController],
     providers: [AppService, ClonexService],

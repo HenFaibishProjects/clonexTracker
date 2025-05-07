@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {Entity, PrimaryGeneratedColumn, Column, ManyToOne} from 'typeorm';
+import {User} from "./auth/user.entity";
 
 @Entity('clonex_entry')
 export class ClonexEntry {
@@ -9,11 +10,14 @@ export class ClonexEntry {
     dosageMg: number | undefined;
 
     @Column({ type: 'timestamp' })
-    takenAt?: Date;
+    takenAt: Date | undefined;
 
-    @Column({ nullable: true })
+    @Column({ type: 'text', nullable: true })
     reason?: string;
 
-    @Column({ nullable: true })
+    @Column({ type: 'text', nullable: true })
     comments?: string;
+
+    @ManyToOne(() => User, (user) => user.entries)
+    user: User | undefined;
 }

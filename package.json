@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "run": "npx ts-node src/main.ts",
     "build": "tsc",
-    "dev": "npx ts-node src/main.ts",
+    "dev": "npx ts-node -r dotenv/config src/main.ts",
     "start": "node dist/main.js",
     "start:prod": "node dist/main.js"
   },
@@ -18,10 +18,15 @@
   "dependencies": {
     "@nestjs/common": "^11.1.0",
     "@nestjs/core": "^11.1.0",
+    "@nestjs/jwt": "^11.0.0",
+    "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.1.0",
     "@nestjs/typeorm": "^11.0.0",
+    "bcrypt": "^5.1.1",
     "express": "^5.1.0",
     "mysql2": "^3.14.1",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
     "pg": "^8.15.6",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
@@ -29,8 +34,10 @@
     "typeorm": "^0.3.22"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.1",
     "@types/node": "^22.15.3",
+    "@types/passport-jwt": "^4.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },

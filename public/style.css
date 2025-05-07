@@ -78,3 +78,44 @@ body.dark-mode {
 }
 
 
+/* style.css */
+
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.auth-container {
+    max-width: 380px;
+    margin: 80px auto;
+    padding: 25px 30px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #333333;
+}
+
+.nav-tabs .nav-link {
+    font-weight: 500;
+    color: #555;
+}
+
+.nav-tabs .nav-link.active {
+    color: #0d6efd;
+}
+
+.btn {
+    font-weight: 600;
+}
+
+.form-label {
+    font-weight: 500;
+}
+
+
+

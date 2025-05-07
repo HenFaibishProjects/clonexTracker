@@ -1,8 +1,20 @@
+
 const API = '/api/clonex';
 let lastRenderedEntries = [];
 let dosageChart;
 let isPageActive = true;
 let lastTakenAt;
+
+$('#logoutBtn').click(function () {
+    localStorage.removeItem('token');
+    window.location.href = 'index.html';
+});
+
+$.ajaxSetup({
+    headers: {
+        Authorization: `Bearer ${token}`
+    }
+});
 
 document.addEventListener('visibilitychange', () => {
     isPageActive = !document.hidden;
@@ -97,6 +109,9 @@ $(document).ready(function () {
         $.ajax({
             url: API,
             method: 'POST',
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            },
             contentType: 'application/json',
             data: JSON.stringify(entry),
             success: function () {
@@ -111,20 +126,20 @@ $(document).ready(function () {
         });
     });
 
-    // Delete one
     $('#entriesTable').on('click', '.delete-btn', function () {
         const id = $(this).data('id');
         if (confirm('Delete this entry?')) {
             $.ajax({
                 url: `${API}/${id}`,
                 type: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                },
                 success: loadEntries
             });
         }
     });
 
-
-    // Initial load
     loadEntries();
 });
 
@@ -170,6 +185,9 @@ $('#entriesTable').on('click', '.save-btn', function () {
     $.ajax({
         url: `${API}/${id}`,
         type: 'PATCH',
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
         contentType: 'application/json',
         data: JSON.stringify(updated),
         success: loadEntries,

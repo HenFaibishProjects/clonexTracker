@@ -8,7 +8,7 @@ $(document).ready(function () {
         const password = $('#loginPassword').val().trim();
 
         $.ajax({
-            url: '/auth/login',
+            url: '/api/auth/login',
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ email, password }),
@@ -32,21 +32,19 @@ $(document).ready(function () {
         const password = $('#registerPassword').val().trim();
 
         $.ajax({
-            url: '/auth/signup',
+            url: '/api/auth/register',
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ name, email, password }),
-            success: function (response) {
-                alert('Registration successful! You can now log in.');
-                $('#registerForm')[0].reset();
-                // Optionally, switch to the login tab:
-                var loginTab = new bootstrap.Tab(document.getElementById('login-tab'));
-                loginTab.show();
-                $('#loginForm')[0].reset();
-                $('#loginError').addClass('d-none').text('');
+            success: function () {
+                window.location.href = 'activate.html';
             },
             error: function (xhr) {
-                alert('Registration failed: ' + xhr.responseJSON.message);
+                const msg = xhr.responseJSON?.message || 'Registration failed';
+                $('#authMessage')
+                    .removeClass('d-none alert-success')
+                    .addClass('alert-danger')
+                    .text('❌ ' + msg);
             }
         });
     });

@@ -17,4 +17,10 @@ export class User {
 
     @OneToMany(() => ClonexEntry, (entry: ClonexEntry) => entry.user)
     entries: ClonexEntry[] | undefined;
+
+    @Column({ type: 'boolean', default: false })
+    isActive!: boolean;
+
+    @Column({ type: 'varchar', nullable: true })
+    activationToken: string | undefined | null;
 }

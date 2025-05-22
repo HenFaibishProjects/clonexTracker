@@ -7,6 +7,8 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 import { User } from './user.entity';
+import {MailService} from "./mail.service";
+import {ActivationController} from "./activation.controller";
 
 @Module({
     imports: [
@@ -17,7 +19,7 @@ import { User } from './user.entity';
             signOptions: { expiresIn: '7d' },
         }),
     ],
-    providers: [AuthService, JwtStrategy],
-    controllers: [AuthController],
+    providers: [AuthService, JwtStrategy, MailService],
+    controllers: [ActivationController, AuthController],
 })
 export class AuthModule {}

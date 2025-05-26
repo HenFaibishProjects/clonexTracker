@@ -58,8 +58,16 @@ export class AuthService {
             throw new BadRequestException('This email is already Exists.');
         }
 
+        if (!dto.password) {
+            throw new BadRequestException('Password is required');
+        }
+
+        const hashed = await bcrypt.hash(dto.password, 10);
+
+
         const user = this.usersRepo.create({
             ...dto,
+            password: hashed,
             isActive: false,
             activationToken: uuidv4(),
         });

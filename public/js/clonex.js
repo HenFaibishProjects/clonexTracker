@@ -205,11 +205,32 @@ function updateFilterStats(entries) {
         return;
     }
 
-    const avg = (entries.reduce((sum, e) => sum + e.dosageMg, 0) / entries.length).toFixed(2);
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    const lastWeekEntries = entries.filter(e => new Date(e.takenAt) >= oneWeekAgo);
+
+    const avgWeek = lastWeekEntries.length
+        ? (lastWeekEntries.reduce((sum, e) => sum + e.dosageMg, 0) / lastWeekEntries.length).toFixed(2)
+        : '0.00';
+
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
+
+    const lastMonthEntries = entries.filter(e => new Date(e.takenAt) >= oneMonthAgo);
+
+    const avgMonth = lastMonthEntries.length
+        ? (lastMonthEntries.reduce((sum, e) => sum + e.dosageMg, 0) / lastMonthEntries.length).toFixed(2)
+        : '0.00';
+
+
 
     $('#filterStatsBox')
         .removeClass('d-none')
-        .html(`<strong>Filtered Average Dosage:</strong> ${avg} mg`);
+        .html(`
+            <strong>Average Dosage in Last Week:</strong> ${avgWeek} mg<br/>
+            <strong>Average Dosage in Last Month:</strong> ${avgMonth} mg
+        `);
 }
 
 function updateStats(entries) {
@@ -220,6 +241,24 @@ function updateStats(entries) {
 
     const total = entries.length;
     const lastEntry = entries[0];
+
+    // Last 7 days
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    const weekEntries = entries.filter(e => new Date(e.takenAt) >= oneWeekAgo);
+    const avgWeek = weekEntries.length
+        ? (weekEntries.reduce((sum, e) => sum + e.dosageMg, 0) / weekEntries.length).toFixed(2)
+        : '0.00';
+
+    // Last 30 days
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
+    const monthEntries = entries.filter(e => new Date(e.takenAt) >= oneMonthAgo);
+    const avgMonth = monthEntries.length
+        ? (monthEntries.reduce((sum, e) => sum + e.dosageMg, 0) / monthEntries.length).toFixed(2)
+        : '0.00';
+
+
     const averageDosage = (entries.reduce((sum, e) => sum + e.dosageMg, 0) / total).toFixed(3);
 
     if (lastEntry.takenAt.includes(':')) {
@@ -237,7 +276,10 @@ function updateStats(entries) {
         minute: '2-digit'
     })}<br/>
         <strong>Last Dosage:</strong> ${lastEntry.dosageMg} mg
-        <strong>Average Dosage:</strong> ${averageDosage} mg<br/>
+        <br>
+        <strong>Average Dosage in Last Week:</strong> ${avgWeek} mg<br/>
+  
+        <strong>Average Dosage in Last Month:</strong> ${avgMonth} mg<br/>
         <strong id="runningTimer">🕒 Time from Last Dosage: ...</strong>
     `);
 }

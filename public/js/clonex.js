@@ -5,6 +5,12 @@ let isPageActive = true;
 let lastTakenAt;
 
 $(document).ready(function () {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        alert('You must be logged in to access this page.');
+        window.location.href = 'index.html';
+        return;
+    }
     const saved = localStorage.getItem('darkMode');
     if (saved === '1') applyDarkMode(true);
 
@@ -106,6 +112,9 @@ $(document).ready(function () {
         $.ajax({
             url: API,
             method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
             contentType: 'application/json',
             data: JSON.stringify(entry),
             success: function () {

@@ -18,7 +18,7 @@ interface AuthenticatedRequest extends Request {
     user: User;
 }
 
-@Controller('api/clonex')
+@Controller('clonex')
 @UseGuards(JwtAuthGuard)
 export class ClonexController {
     constructor(private readonly clonexService: ClonexService) {}

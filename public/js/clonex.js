@@ -1,27 +1,39 @@
-
 const API = '/api/clonex';
 let lastRenderedEntries = [];
 let dosageChart;
 let isPageActive = true;
 let lastTakenAt;
 
-$('#logoutBtn').click(function () {
-    localStorage.removeItem('token');
-    window.location.href = 'index.html';
-});
-
-$.ajaxSetup({
-    headers: {
-        Authorization: `Bearer ${token}`
-    }
-});
-
-document.addEventListener('visibilitychange', () => {
-    isPageActive = !document.hidden;
-});
-
 $(document).ready(function () {
-    const API = '/api/clonex';
+    const saved = localStorage.getItem('darkMode');
+    if (saved === '1') applyDarkMode(true);
+
+    $('#logoutBtn').click(function () {
+        localStorage.removeItem('token');
+        window.location.href = 'index.html';
+    });
+
+    $('#toggleDarkMode').click(function () {
+        const isDark = $('body').hasClass('dark-mode');
+        applyDarkMode(!isDark);
+    });
+
+    $('#nowBtn').click(function () {
+        const now = new Date();
+        const tzOffset = now.getTimezoneOffset() * 60000; // in ms
+        const localISO = new Date(now - tzOffset).toISOString().slice(0, 16);
+        $('#takenAt').val(localISO);
+    });
+
+    $.ajaxSetup({
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        isPageActive = !document.hidden;
+    });
 
     $('#exportCsvBtn').click(function () {
         exportToCSV(lastRenderedEntries);
@@ -35,10 +47,7 @@ $(document).ready(function () {
         const reasonFilter = $('#filterReason').val().trim().toLowerCase();
         const commentFilter = $('#filterComment').val().trim().toLowerCase();
 
-        // Call backend only if date filters are present
         const shouldFilterDates = from || to;
-
-        // If no dates, get all entries
         const endpoint = shouldFilterDates
             ? `${API}/between?from=${from || '1900-01-01'}&to=${to || '2100-12-31'}`
             : API;
@@ -46,7 +55,6 @@ $(document).ready(function () {
         $.get(endpoint, function (entries) {
             let filtered = entries;
 
-            // Dosage filter (optional)
             if (!isNaN(dosageMin)) {
                 filtered = filtered.filter(e => e.dosageMg >= dosageMin);
             }
@@ -54,7 +62,6 @@ $(document).ready(function () {
                 filtered = filtered.filter(e => e.dosageMg <= dosageMax);
             }
 
-            // Text filters
             if (reasonFilter) {
                 filtered = filtered.filter(e => (e.reason || '').toLowerCase().includes(reasonFilter));
             }
@@ -71,23 +78,13 @@ $(document).ready(function () {
     });
 
     $('#clearFilterBtn').click(function () {
-        $('#filterFrom').val('');
-        $('#filterTo').val('');
-        $('#filterDosageFrom').val('');
-        $('#filterDosageTo').val('');
-        $('#filterReason').val('');
-        $('#filterComment').val('');
+        $('#filterFrom, #filterTo, #filterDosageFrom, #filterDosageTo, #filterReason, #filterComment').val('');
         loadEntries();
         renderChart(lastRenderedEntries);
         $('#filterStatsBox').addClass('d-none').html('');
         $('#statsBox').removeClass('d-none');
-
     });
 
-
-
-
-    // Submit new entry
     $('#clonexForm').submit(function (e) {
         e.preventDefault();
 
@@ -109,14 +106,10 @@ $(document).ready(function () {
         $.ajax({
             url: API,
             method: 'POST',
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            },
             contentType: 'application/json',
             data: JSON.stringify(entry),
             success: function () {
                 $('#clonexForm')[0].reset();
-                //lastTakenAt = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' }));
                 loadEntries();
             },
             error: function (err) {
@@ -132,67 +125,49 @@ $(document).ready(function () {
             $.ajax({
                 url: `${API}/${id}`,
                 type: 'DELETE',
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                },
                 success: loadEntries
             });
         }
     });
 
-    loadEntries();
-});
-
-$('#nowBtn').click(function () {
-    const now = new Date();
-    const tzOffset = now.getTimezoneOffset() * 60000; // in ms
-    const localISO = new Date(now - tzOffset).toISOString().slice(0, 16);
-    $('#takenAt').val(localISO);
-});
-
-$('#toggleDarkMode').click(function () {
-    const isDark = $('body').hasClass('dark-mode');
-    applyDarkMode(!isDark);
-});
-
-$('#entriesTable').on('click', '.edit-btn', function () {
-    const $row = $(this).closest('tr');
-    $row.find('.value').addClass('d-none');
-    $row.find('.edit').removeClass('d-none');
-    $row.find('.edit-btn').addClass('d-none');
-    $row.find('.save-btn').removeClass('d-none');
-});
-
-$('#entriesTable').on('click', '.save-btn', function () {
-    const $row = $(this).closest('tr');
-    const id = $row.data('id');
-
-    const dosageValue = $row.find('input.dosage').val().replace(',', '.').trim();
-    const dosageMg = Number(dosageValue);
-
-    if (isNaN(dosageMg) || dosageMg < 0.1) {
-        alert("Dosage must be a number and at least 0.1 mg.");
-        return;
-    }
-
-    const updated = {
-        dosageMg: Number($row.find('input.dosage').val().replace(',', '.').trim()),
-        takenAt: $row.find('input.takenAt').val(),
-        reason: $row.find('input.reason').val(),
-        comments: $row.find('input.comments').val()
-    };
-
-    $.ajax({
-        url: `${API}/${id}`,
-        type: 'PATCH',
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-        },
-        contentType: 'application/json',
-        data: JSON.stringify(updated),
-        success: loadEntries,
-        error: () => alert('Error saving edit')
+    $('#entriesTable').on('click', '.edit-btn', function () {
+        const $row = $(this).closest('tr');
+        $row.find('.value').addClass('d-none');
+        $row.find('.edit').removeClass('d-none');
+        $row.find('.edit-btn').addClass('d-none');
+        $row.find('.save-btn').removeClass('d-none');
     });
+
+    $('#entriesTable').on('click', '.save-btn', function () {
+        const $row = $(this).closest('tr');
+        const id = $row.data('id');
+
+        const dosageValue = $row.find('input.dosage').val().replace(',', '.').trim();
+        const dosageMg = Number(dosageValue);
+
+        if (isNaN(dosageMg) || dosageMg < 0.1) {
+            alert("Dosage must be a number and at least 0.1 mg.");
+            return;
+        }
+
+        const updated = {
+            dosageMg,
+            takenAt: $row.find('input.takenAt').val(),
+            reason: $row.find('input.reason').val(),
+            comments: $row.find('input.comments').val()
+        };
+
+        $.ajax({
+            url: `${API}/${id}`,
+            type: 'PATCH',
+            contentType: 'application/json',
+            data: JSON.stringify(updated),
+            success: loadEntries,
+            error: () => alert('Error saving edit')
+        });
+    });
+
+    loadEntries();
 });
 
 setInterval(() => {
@@ -221,7 +196,7 @@ function updateFilterStats(entries) {
         return;
     }
 
-    const avg = (entries.reduce((sum, e) => sum + e.dosageMg.toFixed(3), 0) / entries.length).toFixed(2);
+    const avg = (entries.reduce((sum, e) => sum + e.dosageMg, 0) / entries.length).toFixed(2);
 
     $('#filterStatsBox')
         .removeClass('d-none')
@@ -236,15 +211,11 @@ function updateStats(entries) {
 
     const total = entries.length;
     const lastEntry = entries[0];
-    const averageDosage = (entries.reduce((sum, e) => sum + e.dosageMg.toFixed(3), 0) / total).toFixed(3);
+    const averageDosage = (entries.reduce((sum, e) => sum + e.dosageMg, 0) / total).toFixed(3);
 
-    // Fix: Parse the date correctly depending on the format
-    // Check if lastEntry.takenAt already includes time information
     if (lastEntry.takenAt.includes(':')) {
-        // If it has time info (format like "2023-05-01T15:30"), just create the date
         lastTakenAt = new Date(lastEntry.takenAt);
     } else {
-        // If it's just a date (format like "2023-05-01"), append time and timezone
         lastTakenAt = new Date(`${lastEntry.takenAt}:00:00+03:00`);
     }
 
@@ -272,13 +243,13 @@ function exportToCSV(entries) {
     const rows = entries.map(e => {
         const date = new Date(e.takenAt);
 
-        const formattedDate = date.toLocaleDateString('he-IL'); // e.g. 29.04.2025
+        const formattedDate = date.toLocaleDateString('he-IL');
         const formattedTime = date.toLocaleTimeString('he-IL', {
             hour: '2-digit',
             minute: '2-digit'
         });
 
-        const fullDateTime = `${formattedDate} ${formattedTime}`; // e.g. 29.04.2025 17:51
+        const fullDateTime = `${formattedDate} ${formattedTime}`;
 
         return [
             e.dosageMg.toFixed(3),
@@ -313,12 +284,12 @@ function renderEntries(entries) {
         <td><span class="value dosage">${entry.dosageMg}</span><input type="number" step="0.01" class="form-control form-control-sm edit dosage d-none" value="${entry.dosageMg}" /></td>
         <td>
           <span class="value takenAt">${new Date(entry.takenAt).toLocaleString('he-IL', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                })}</span>
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        })}</span>
           <input type="datetime-local" class="form-control form-control-sm edit takenAt d-none" value="${entry.takenAt.slice(0, 16)}" />
         </td> 
         <td><span class="value reason">${entry.reason || ''}</span><input type="text" class="form-control form-control-sm edit reason d-none" value="${entry.reason || ''}" /></td>
@@ -399,8 +370,3 @@ function applyDarkMode(enabled) {
     $('#toggleDarkMode').text(enabled ? '☀️ Light Mode' : '🌙 Dark Mode');
     localStorage.setItem('darkMode', enabled ? '1' : '0');
 }
-
-$(function () {
-    const saved = localStorage.getItem('darkMode');
-    if (saved === '1') applyDarkMode(true);
-});

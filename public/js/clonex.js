@@ -4,6 +4,32 @@ let dosageChart;
 let isPageActive = true;
 let lastTakenAt;
 
+function batchImport(entries) {
+    const promises = entries.map(entry =>
+        $.ajax({
+            url: API,
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            },
+            contentType: 'application/json',
+            data: JSON.stringify(entry)
+        })
+    );
+
+    Promise.all(promises)
+        .then(() => {
+            alert('✅ Import complete!');
+            loadEntries();
+            setTimeout(() => {
+                location.reload();
+                setTimeout(() => location.reload(), 500); // second refresh after 0.5 sec
+            }, 300);
+        })
+        .catch(() => alert('⚠️ Some entries failed to import.'));
+}
+
+
 $(document).ready(function () {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -13,6 +39,92 @@ $(document).ready(function () {
     }
     const saved = localStorage.getItem('darkMode');
     if (saved === '1') applyDarkMode(true);
+
+    $('#importCsvBtn').click(function () {
+        $('#csvFileInput').click();
+    });
+
+    $('#csvFileInput').on('change', function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            const csv = event.target.result;
+            const lines = csv.split('\n').filter(Boolean).slice(1); // skip header
+
+            const importedEntries = lines.map(line => {
+                const parts = line
+                    .split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
+                    .map(s => s.replace(/^"|"$/g, '').trim());
+
+                if (parts.length < 2) return null;
+
+                const [dosageStr, datetimeStr, reason = '', comments = ''] = parts;
+
+                if (!dosageStr || !datetimeStr) return null;
+
+                const dosage = parseFloat(dosageStr);
+                if (isNaN(dosage)) return null;
+
+                try {
+                    const [datePart, timePart] = datetimeStr.split(' ');
+                    const [day, month, year] = datePart.split('.');
+                    const [hour, minute] = timePart.split(':');
+                    const iso = new Date(
+                        `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`
+                    ).toISOString();
+
+                    return {
+                        dosageMg: dosage,
+                        takenAt: iso,
+                        reason,
+                        comments
+                    };
+                } catch (err) {
+                    console.warn('⚠️ Bad datetime:', datetimeStr);
+                    return null;
+                }
+            });
+
+
+            const validEntries = importedEntries.filter(Boolean);
+            console.log(`✅ Parsed ${validEntries.length} valid entries`);
+
+            if (!validEntries.length) {
+                alert('CSV appears empty or malformed.');
+                return;
+            }
+
+            const modal = new bootstrap.Modal(document.getElementById('importChoiceModal'));
+            modal.show();
+
+            $('#deleteAndImportBtn').off('click').on('click', function () {
+                modal.hide();
+                $.ajax({
+                    url: `${API}/delete-many`,
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    },
+                    contentType: 'application/json',
+                    data: JSON.stringify({ ids: lastRenderedEntries.map(e => e.id) }),
+                    success: () => batchImport(validEntries),
+                    error: () => alert('Failed to delete existing entries')
+                });
+            });
+
+            $('#mergeImportBtn').off('click').on('click', function () {
+                modal.hide();
+                batchImport(validEntries);
+            });
+
+
+            $('#csvFileInput').val('');
+        };
+        reader.readAsText(file);
+    });
+
 
     $('#logoutBtn').click(function () {
         localStorage.removeItem('token');
@@ -509,3 +621,4 @@ function applyDarkMode(enabled) {
     $('#toggleDarkMode').text(enabled ? '☀️ Light Mode' : '🌙 Dark Mode');
     localStorage.setItem('darkMode', enabled ? '1' : '0');
 }
+

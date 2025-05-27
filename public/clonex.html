@@ -64,6 +64,12 @@
         <button class="btn btn-success" id="exportCsvBtn">⬇️ Export to CSV</button>
     </div>
 
+    <div class="mb-3">
+        <button class="btn btn-warning" id="importCsvBtn">⬆️ Import from CSV</button>
+        <input type="file" id="csvFileInput" accept=".csv" style="display: none;" />
+    </div>
+
+
 
     <!-- List -->
     <table class="table table-bordered table-hover" id="entriesTable">
@@ -95,8 +101,40 @@
 
 </div>
 
+<!-- Import Modal -->
+<!-- Import Modal -->
+<div class="modal fade" id="importChoiceModal" tabindex="-1" aria-labelledby="importChoiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-dark" id="importChoiceModalLabel">
+                    📥 <strong>Import CSV Options</strong>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-dark">
+                <p class="mb-3">How do you want to handle the imported data?</p>
+                <div class="d-flex justify-content-between gap-2">
+                    <button type="button" class="btn btn-outline-danger flex-fill" id="deleteAndImportBtn">
+                        🗑 Delete All & Import
+                    </button>
+                    <button type="button" class="btn btn-outline-primary flex-fill" id="mergeImportBtn">
+                        ➕ Merge with Existing
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary flex-fill" data-bs-dismiss="modal">
+                        ❌ Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="./js/clonex.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

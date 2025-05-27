@@ -31,6 +31,11 @@ $(document).ready(function () {
         $('#takenAt').val(localISO);
     });
 
+    $('#dailyRange').on('change', function () {
+        const selected = $(this).val();
+        renderDailyChart(lastRenderedEntries, selected);
+    });
+
     $.ajaxSetup({
         headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -196,6 +201,7 @@ function loadEntries() {
         renderEntries(entries);
         updateStats(entries);
         renderChart(entries);
+        renderDailyChart(entries);
     });
 }
 
@@ -415,6 +421,88 @@ function renderChart(entries) {
         }
     });
 }
+
+let dailyChart;
+
+function renderDailyChart(entries, range = 'all') {
+    const today = new Date();
+    const filtered = entries.filter(e => {
+        if (range === 'all') return true;
+        const daysAgo = parseInt(range);
+        const date = new Date(e.takenAt);
+        return date >= new Date(today.getTime() - daysAgo * 24 * 60 * 60 * 1000);
+    });
+
+    const dailyMap = {};
+
+    filtered.forEach(e => {
+        const day = new Date(e.takenAt).toISOString().split('T')[0]; // YYYY-MM-DD
+        if (!dailyMap[day]) dailyMap[day] = [];
+        dailyMap[day].push(e.dosageMg);
+    });
+
+    // Build all dates in range
+    const start = range === 'all'
+        ? new Date(Math.min(...entries.map(e => new Date(e.takenAt))))
+        : new Date(today.getTime() - parseInt(range) * 24 * 60 * 60 * 1000);
+
+    const dateLabels = [];
+    const dateSums = [];
+
+    for (let d = new Date(start); d <= today; d.setDate(d.getDate() + 1)) {
+        const key = d.toISOString().split('T')[0];
+        const avg = dailyMap[key]
+            ? (dailyMap[key].reduce((sum, val) => sum + val, 0)).toFixed(3)
+            : 0;
+        dateLabels.push(key);
+        dateSums.push(avg);
+    }
+
+    if (dailyChart) {
+        dailyChart.destroy();
+    }
+
+    const ctx = document.getElementById('dailyChart').getContext('2d');
+    dailyChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dateLabels,
+            datasets: [{
+                label: 'Daily Dosage (mg)',
+                data: dateSums,
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    ticks: {
+                        color: $('body').hasClass('dark-mode') ? '#aaa' : '#000',
+                        autoSkip: true,
+                        maxTicksLimit: 15
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: $('body').hasClass('dark-mode') ? '#aaa' : '#000'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: $('body').hasClass('dark-mode') ? '#e0e0e0' : '#000'
+                    }
+                }
+            }
+        }
+    });
+}
+
 
 function applyDarkMode(enabled) {
     $('body').toggleClass('dark-mode', enabled);

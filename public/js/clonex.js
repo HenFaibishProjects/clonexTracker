@@ -328,6 +328,9 @@ function updateFilterStats(entries) {
 
     const lastWeekEntries = entries.filter(e => new Date(e.takenAt) >= oneWeekAgo);
 
+    const avgPerDayWeek = calculateAveragePerDay(entries, 7);
+    const avgPerDayMonth = calculateAveragePerDay(entries, 30);
+
     const avgWeek = lastWeekEntries.length
         ? (lastWeekEntries.reduce((sum, e) => sum + e.dosageMg, 0) / lastWeekEntries.length).toFixed(2)
         : '0.00';
@@ -367,6 +370,7 @@ function updateStats(entries) {
     const avgWeek = weekEntries.length
         ? (weekEntries.reduce((sum, e) => sum + e.dosageMg, 0) / weekEntries.length).toFixed(2)
         : '0.00';
+    const avgPerDayWeek = (weekEntries.reduce((sum, e) => sum + e.dosageMg, 0) / 7).toFixed(2);
 
     // Last 30 days
     const oneMonthAgo = new Date();
@@ -375,7 +379,7 @@ function updateStats(entries) {
     const avgMonth = monthEntries.length
         ? (monthEntries.reduce((sum, e) => sum + e.dosageMg, 0) / monthEntries.length).toFixed(2)
         : '0.00';
-
+    const avgPerDayMonth = (monthEntries.reduce((sum, e) => sum + e.dosageMg, 0) / 30).toFixed(2);
 
     const averageDosage = (entries.reduce((sum, e) => sum + e.dosageMg, 0) / total).toFixed(3);
 
@@ -538,6 +542,7 @@ let dailyChart;
 
 function renderDailyChart(entries, range = 'all') {
     const today = new Date();
+
     const filtered = entries.filter(e => {
         if (range === 'all') return true;
         const daysAgo = parseInt(range);
@@ -545,17 +550,23 @@ function renderDailyChart(entries, range = 'all') {
         return date >= new Date(today.getTime() - daysAgo * 24 * 60 * 60 * 1000);
     });
 
-    const dailyMap = {};
+    if (!filtered.length) {
+        if (dailyChart) dailyChart.destroy();
+        $('#dailyAverageBox').addClass('d-none');
+        return;
+    }
 
+    const dailyMap = {};
     filtered.forEach(e => {
-        const day = new Date(e.takenAt).toISOString().split('T')[0]; // YYYY-MM-DD
+        const day = new Date(e.takenAt).toISOString().split('T')[0];
         if (!dailyMap[day]) dailyMap[day] = [];
         dailyMap[day].push(e.dosageMg);
     });
 
-    // Build all dates in range
     const start = range === 'all'
-        ? new Date(Math.min(...entries.map(e => new Date(e.takenAt))))
+        ? entries.length
+            ? new Date(Math.min(...entries.map(e => new Date(e.takenAt))))
+            : new Date(today)
         : new Date(today.getTime() - parseInt(range) * 24 * 60 * 60 * 1000);
 
     const dateLabels = [];
@@ -613,6 +624,15 @@ function renderDailyChart(entries, range = 'all') {
             }
         }
     });
+
+    // ✅ Daily average display
+    const totalDosage = filtered.reduce((sum, e) => sum + e.dosageMg, 0);
+    const totalDays = Math.max(1, Math.ceil((today - start) / (1000 * 60 * 60 * 24)));
+    const avgPerDay = (totalDosage / totalDays).toFixed(2);
+
+    $('#dailyAverageBox')
+        .removeClass('d-none')
+        .html(`<strong>Daily Avg for Selected Range:</strong> ${avgPerDay} mg/day`);
 }
 
 
@@ -622,3 +642,17 @@ function applyDarkMode(enabled) {
     localStorage.setItem('darkMode', enabled ? '1' : '0');
 }
 
+function calculateAveragePerDay(entries, daysBack) {
+    const today = new Date();
+    const startDate = new Date(today);
+    startDate.setDate(today.getDate() - daysBack + 1); // inclusive range
+
+    const filtered = entries.filter(e => {
+        const takenDate = new Date(e.takenAt);
+        return takenDate >= startDate && takenDate <= today;
+    });
+
+    const totalDosage = filtered.reduce((sum, e) => sum + e.dosageMg, 0);
+    const avgPerDay = (totalDosage / daysBack).toFixed(2);
+    return avgPerDay;
+}

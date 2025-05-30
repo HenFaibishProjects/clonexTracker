@@ -1,6 +1,7 @@
 
 
 $(document).ready(function () {
+    const apiBase = location.port === '8080' ? 'http://localhost:3000' : '';
     // Login form submission
     $('#loginForm').submit(function (e) {
         e.preventDefault();
@@ -8,7 +9,7 @@ $(document).ready(function () {
         const password = $('#loginPassword').val().trim();
 
         $.ajax({
-            url: '/api/auth/login',
+            url: `${apiBase}/api/auth/login`,
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ email, password }),
@@ -32,7 +33,7 @@ $(document).ready(function () {
         const password = $('#registerPassword').val().trim();
 
         $.ajax({
-            url: '/api/auth/register',
+            url: `${apiBase}/api/auth/register`,
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ name, email, password }),

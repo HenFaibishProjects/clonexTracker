@@ -9,8 +9,14 @@ async function bootstrap() {
 
     app.useStaticAssets(join(__dirname, '..', 'public'));
 
+    app.enableCors({
+        origin: 'http://localhost:8080', // Allow frontend server
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+        credentials: true               // Allow cookies/headers if used
+    });
+
     app.setGlobalPrefix('api', {
-        exclude: [{ path: 'activate', method: RequestMethod.GET }],
+        exclude: [{ path: 'auth/activate', method: RequestMethod.GET }],
     });
 
     await app.listen(3000);

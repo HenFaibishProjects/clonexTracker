@@ -14,9 +14,20 @@ body.dark-mode {
     color: #e0e0e0 !important;
 }
 
+body.dark-mode ::selection {
+    background-color: #444;  /* dark gray highlight */
+    color: #dd5656;              /* white text */
+}
+
+body:not(.dark-mode) ::selection {
+    background-color: #237ddc; /* soft blue highlight */
+    color: #000;               /* black text */
+}
+
 .dark-mode .table {
     color: #fff;
 }
+
 
 .dark-mode .table-hover tbody tr:hover {
     background-color: #2a2a2a;
@@ -115,6 +126,67 @@ h1 {
 
 .form-label {
     font-weight: 500;
+}
+
+body.dark-mode ::selection {
+    background: #444 !important;
+    color: #dd5656 !important;
+}
+
+body:not(.dark-mode) ::selection {
+    background: #b3d4fc !important;
+    color: #000 !important;
+}
+
+.dark-mode input::selection {
+    background: #666 !important;
+    color: #b31414 !important;
+}
+
+/* Highlight for normal text */
+body.dark-mode ::selection {
+    background: #444 !important;
+    color: #dd5656 !important;
+}
+
+/* Highlight inside inputs */
+body.dark-mode input::selection,
+body.dark-mode textarea::selection {
+    background: #666 !important;
+    color: #fff !important;
+}
+
+/* Custom highlight for elements with .custom-selection */
+.custom-selection::selection {
+    background-color: #444 !important;
+    color: #dd5656 !important;
+}
+
+/* Optional: for dark-mode input/textarea fields */
+.custom-selection input::selection,
+.custom-selection textarea::selection {
+    background-color: #666 !important;
+    color: #c90000 !important;
+}
+
+.dropdown-toggle::after {
+    display: inline-block;
+    margin-left: 0.255em;
+    vertical-align: 0.255em;
+    content: "";
+    border-top: 0.3em solid;
+    border-right: 0.3em solid transparent;
+    border-bottom: 0;
+    border-left: 0.3em solid transparent;
+}
+
+body:not(.dark-mode) .dropdown-toggle {
+    color: #333 !important;  /* dark gray text */
+}
+
+body:not(.dark-mode) .btn-dark.dropdown-toggle {
+    color: #fff !important;
+    background-color: #343a40 !important;
 }
 
 

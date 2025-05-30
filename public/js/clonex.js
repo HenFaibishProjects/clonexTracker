@@ -1,4 +1,6 @@
-const API = '/api/clonex';
+const baseUrl = location.port === '8080'
+    ? 'http://localhost:3000/api/'
+    : '/api/clonex';
 let lastRenderedEntries = [];
 let dosageChart;
 let isPageActive = true;
@@ -7,7 +9,7 @@ let lastTakenAt;
 function batchImport(entries) {
     const promises = entries.map(entry =>
         $.ajax({
-            url: API,
+            url: baseUrl,
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -102,7 +104,7 @@ $(document).ready(function () {
             $('#deleteAndImportBtn').off('click').on('click', function () {
                 modal.hide();
                 $.ajax({
-                    url: `${API}/delete-many`,
+                    url: `${baseUrl}/delete-many`,
                     method: 'POST',
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -172,8 +174,8 @@ $(document).ready(function () {
 
         const shouldFilterDates = from || to;
         const endpoint = shouldFilterDates
-            ? `${API}/between?from=${from || '1900-01-01'}&to=${to || '2100-12-31'}`
-            : API;
+            ? `${baseUrl}/between?from=${from || '1900-01-01'}&to=${to || '2100-12-31'}`
+            : baseUrl;
 
         $.get(endpoint, function (entries) {
             let filtered = entries;
@@ -227,7 +229,7 @@ $(document).ready(function () {
         };
 
         $.ajax({
-            url: API,
+            url: baseUrl,
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${token}`
@@ -249,7 +251,7 @@ $(document).ready(function () {
         const id = $(this).data('id');
         if (confirm('Delete this entry?')) {
             $.ajax({
-                url: `${API}/${id}`,
+                url: `${baseUrl}/${id}`,
                 type: 'DELETE',
                 success: loadEntries
             });
@@ -284,7 +286,7 @@ $(document).ready(function () {
         };
 
         $.ajax({
-            url: `${API}/${id}`,
+            url: `${baseUrl}/${id}`,
             type: 'PATCH',
             contentType: 'application/json',
             data: JSON.stringify(updated),
@@ -309,7 +311,7 @@ setInterval(() => {
 }, 1000);
 
 function loadEntries() {
-    $.get(API, function (entries) {
+    $.get(baseUrl, function (entries) {
         renderEntries(entries);
         updateStats(entries);
         renderChart(entries);

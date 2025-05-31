@@ -526,7 +526,7 @@ function renderChart(entries) {
             scales: {
                 x: {
                     ticks: {
-                        color: $('body').hasClass('dark-mode') ? '#aaa' : '#000'
+                        display: false
                     }
                 },
                 y: {
@@ -632,9 +632,38 @@ function renderDailyChart(entries, range = 'all') {
     const totalDays = Math.max(1, Math.ceil((today - start) / (1000 * 60 * 60 * 24)));
     const avgPerDay = (totalDosage / totalDays).toFixed(2);
 
+    // 👉 Calculate longest gap between dose days (in hours)
+    let maxGapHours = 0;
+    const doseDates = Object.keys(dailyMap)
+        .filter(day => dailyMap[day].some(d => d > 0))
+        .sort();
+
+    for (let i = 1; i < doseDates.length; i++) {
+        const prev = new Date(doseDates[i - 1]);
+        const curr = new Date(doseDates[i]);
+        const diffHours = Math.round((curr - prev) / (1000 * 60 * 60));
+        if (diffHours > maxGapHours) maxGapHours = diffHours;
+    }
+
+// 👉 Format the hours to readable string
+    function formatGap(hours) {
+        if (hours < 12) return `${hours} hours`;
+        if (hours < 24) return `${hours} hours (half day)`;
+
+        const days = Math.floor(hours / 24);
+        const rem = hours % 24;
+
+        if (rem === 0) return `${hours} hours (${days} day${days > 1 ? 's' : ''})`;
+        if (rem <= 12) return `${hours} hours (${days}½ day${days > 0 ? 's' : ''})`;
+        return `${hours} hours (${days + 1} day${days + 1 > 1 ? 's' : ''})`;
+    }
+
     $('#dailyAverageBox')
         .removeClass('d-none')
-        .html(`<strong>Daily Avg for Selected Range:</strong> ${avgPerDay} mg/day`);
+        .html(`
+        <strong>Daily Avg for Selected Range:</strong> ${avgPerDay} mg/day<br/>
+        <strong>Longest Gap Between Doses:</strong> ${formatGap(maxGapHours)}
+    `);
 }
 
 

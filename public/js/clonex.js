@@ -1,6 +1,7 @@
 const baseUrl = location.port === '8080'
     ? 'http://localhost:3000/api/'
     : '/api/clonex';
+let allEntries = [];
 let lastRenderedEntries = [];
 let dosageChart;
 let isPageActive = true;
@@ -150,6 +151,11 @@ $(document).ready(function () {
         renderDailyChart(lastRenderedEntries, selected);
     });
 
+    $('#dosageRange').on('change', function () {
+        const selected = $(this).val();
+        renderChart(lastRenderedEntries, selected);
+    });
+
     $.ajaxSetup({
         headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -293,6 +299,13 @@ $(document).ready(function () {
             success: loadEntries,
             error: () => alert('Error saving edit')
         });
+    });
+
+
+    $('#dailyRangeDropdown .dropdown-item').on('click', function () {
+        const selectedRange = $(this).data('range'); // e.g., '7', '30', etc.
+        $('#dailyRangeBtn').text($(this).text());
+        renderDailyChart(allEntries, selectedRange); // ✅ now passes selected range
     });
 
     loadEntries();
@@ -479,8 +492,17 @@ function renderEntries(entries) {
     });
 }
 
-function renderChart(entries) {
-    const sorted = [...entries].sort((a, b) => new Date(a.takenAt) - new Date(b.takenAt));
+function renderChart(entries, range = 'all') {
+    const today = new Date();
+    const filtered = entries.filter(e => {
+        if (range === 'all') return true;
+        const daysAgo = parseInt(range);
+        const date = new Date(e.takenAt);
+        return date >= new Date(today.getTime() - daysAgo * 24 * 60 * 60 * 1000);
+    });
+
+    // ✅ FIX: Use filtered entries instead of original entries
+    const sorted = [...filtered].sort((a, b) => new Date(a.takenAt) - new Date(b.takenAt));
 
     const labels = sorted.map(e =>
         new Date(e.takenAt).toLocaleDateString('he-IL', {
@@ -545,6 +567,7 @@ let dailyChart;
 function renderDailyChart(entries, range = 'all') {
     const today = new Date();
 
+    // ✅ Filter entries based on selected range
     const filtered = entries.filter(e => {
         if (range === 'all') return true;
         const daysAgo = parseInt(range);
@@ -558,6 +581,32 @@ function renderDailyChart(entries, range = 'all') {
         return;
     }
 
+    // ✅ Sort entries by date
+    const sortedEntries = [...filtered].sort((a, b) => new Date(a.takenAt) - new Date(b.takenAt));
+
+    // ✅ Calculate max gap between doses
+    let maxGapHours = 0;
+    for (let i = 1; i < sortedEntries.length; i++) {
+        const gap = new Date(sortedEntries[i].takenAt) - new Date(sortedEntries[i - 1].takenAt);
+        const gapHours = gap / (1000 * 60 * 60);
+        if (gapHours > maxGapHours) maxGapHours = gapHours;
+    }
+
+    // ✅ Format gap string
+    let gapStr = '';
+    const roundedHours = Math.round(maxGapHours);
+    if (roundedHours < 12) {
+        gapStr = `${roundedHours} hours`;
+    } else if (roundedHours < 24) {
+        gapStr = `${roundedHours} hours (half day)`;
+    } else {
+        const days = Math.floor(roundedHours / 24);
+        const extraHours = roundedHours % 24;
+        const dayStr = days === 1 ? 'one day' : `${days} days`;
+        gapStr = `${roundedHours} hours (${dayStr}${extraHours >= 12 ? ' and a half' : ''})`;
+    }
+
+    // ✅ Group by day
     const dailyMap = {};
     filtered.forEach(e => {
         const day = new Date(e.takenAt).toISOString().split('T')[0];
@@ -565,28 +614,25 @@ function renderDailyChart(entries, range = 'all') {
         dailyMap[day].push(e.dosageMg);
     });
 
-    const start = range === 'all'
-        ? entries.length
-            ? new Date(Math.min(...entries.map(e => new Date(e.takenAt))))
-            : new Date(today)
-        : new Date(today.getTime() - parseInt(range) * 24 * 60 * 60 * 1000);
-
+    // ✅ Loop only through filtered date range
+    const start = new Date(Math.min(...filtered.map(e => new Date(e.takenAt))));
+    const end = new Date(Math.max(...filtered.map(e => new Date(e.takenAt))));
     const dateLabels = [];
     const dateSums = [];
 
-    for (let d = new Date(start); d <= today; d.setDate(d.getDate() + 1)) {
+    let d = new Date(start);
+    while (d <= end) {
         const key = d.toISOString().split('T')[0];
         const avg = dailyMap[key]
             ? (dailyMap[key].reduce((sum, val) => sum + val, 0)).toFixed(3)
             : 0;
         dateLabels.push(key);
         dateSums.push(avg);
+        d.setDate(d.getDate() + 1);
     }
 
-    if (dailyChart) {
-        dailyChart.destroy();
-    }
-
+    // ✅ Destroy old chart and redraw
+    if (dailyChart) dailyChart.destroy();
     const ctx = document.getElementById('dailyChart').getContext('2d');
     dailyChart = new Chart(ctx, {
         type: 'line',
@@ -627,43 +673,17 @@ function renderDailyChart(entries, range = 'all') {
         }
     });
 
-    // ✅ Daily average display
+    // ✅ Show stats
     const totalDosage = filtered.reduce((sum, e) => sum + e.dosageMg, 0);
-    const totalDays = Math.max(1, Math.ceil((today - start) / (1000 * 60 * 60 * 24)));
+    const totalDays = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1);
     const avgPerDay = (totalDosage / totalDays).toFixed(2);
-
-    // 👉 Calculate longest gap between dose days (in hours)
-    let maxGapHours = 0;
-    const doseDates = Object.keys(dailyMap)
-        .filter(day => dailyMap[day].some(d => d > 0))
-        .sort();
-
-    for (let i = 1; i < doseDates.length; i++) {
-        const prev = new Date(doseDates[i - 1]);
-        const curr = new Date(doseDates[i]);
-        const diffHours = Math.round((curr - prev) / (1000 * 60 * 60));
-        if (diffHours > maxGapHours) maxGapHours = diffHours;
-    }
-
-// 👉 Format the hours to readable string
-    function formatGap(hours) {
-        if (hours < 12) return `${hours} hours`;
-        if (hours < 24) return `${hours} hours (half day)`;
-
-        const days = Math.floor(hours / 24);
-        const rem = hours % 24;
-
-        if (rem === 0) return `${hours} hours (${days} day${days > 1 ? 's' : ''})`;
-        if (rem <= 12) return `${hours} hours (${days}½ day${days > 0 ? 's' : ''})`;
-        return `${hours} hours (${days + 1} day${days + 1 > 1 ? 's' : ''})`;
-    }
 
     $('#dailyAverageBox')
         .removeClass('d-none')
         .html(`
-        <strong>Daily Avg for Selected Range:</strong> ${avgPerDay} mg/day<br/>
-        <strong>Longest Gap Between Doses:</strong> ${formatGap(maxGapHours)}
-    `);
+            <strong>Daily Avg for Selected Range:</strong> ${avgPerDay} mg/day<br/>
+            <strong>Largest Time Between Doses:</strong> ${gapStr}
+        `);
 }
 
 

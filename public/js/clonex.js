@@ -6,6 +6,7 @@ let lastRenderedEntries = [];
 let dosageChart;
 let isPageActive = true;
 let lastTakenAt;
+// Default to 24-hour if not set
 
 function batchImport(entries) {
     const promises = entries.map(entry =>
@@ -34,6 +35,18 @@ function batchImport(entries) {
 
 
 $(document).ready(function () {
+    const hourFormat = localStorage.getItem('hourFormat') || '24';
+
+    const flatpickrInstance = flatpickr('#entryTakenAt', {
+        enableTime: true,
+        dateFormat: hourFormat === '24' ? 'Y-m-d H:i' : 'Y-m-d h:i K',
+        time_24hr: hourFormat === '24'
+    });
+
+    $('#nowBtn').click(function () {
+        const now = new Date();
+        flatpickrInstance.setDate(now, true);
+    });
     const token = localStorage.getItem('token');
     if (!token) {
         alert('You must be logged in to access this page.');
@@ -139,12 +152,6 @@ $(document).ready(function () {
         applyDarkMode(!isDark);
     });
 
-    $('#nowBtn').click(function () {
-        const now = new Date();
-        const tzOffset = now.getTimezoneOffset() * 60000; // in ms
-        const localISO = new Date(now - tzOffset).toISOString().slice(0, 16);
-        $('#takenAt').val(localISO);
-    });
 
     $('#dailyRange').on('change', function () {
         const selected = $(this).val();
@@ -220,7 +227,7 @@ $(document).ready(function () {
         e.preventDefault();
 
         const dosageValue = $('#dosage').val().replace(',', '.').trim();
-        const takenAtValue = $('#takenAt').val();
+        const takenAtValue = $('#entryTakenAt').val();
 
         if (!dosageValue || !takenAtValue) {
             alert('Please fill dosage and time!');

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Your App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .settings-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .settings-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .settings-header {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 30px;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .settings-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .settings-subtitle {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .settings-content {
+            padding: 40px;
+        }
+
+        .setting-section {
+            margin-bottom: 35px;
+            padding: 25px;
+            background: #f8fafc;
+            border-radius: 15px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .setting-section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            border-color: #4f46e5;
+        }
+
+        .section-title {
+            font-weight: 600;
+            font-size: 18px;
+            color: #1e293b;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            width: 22px;
+            height: 22px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="email"],
+        input[type="tel"],
+        input[type="text"],
+        input[type="password"],
+        input[type="file"],
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input[type="email"]:focus,
+        input[type="tel"]:focus,
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        input[type="email"]:disabled,
+        input[type="tel"]:disabled,
+        input[type="text"]:disabled,
+        input[type="password"]:disabled {
+            background-color: #f3f4f6;
+            color: #6b7280;
+            cursor: not-allowed;
+            border-color: #d1d5db;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .file-input-button {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .file-input-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+
+        input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .current-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            overflow: hidden;
+            border: 3px solid #white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .current-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-placeholder {
+            color: #9ca3af;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 10px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .radio-option:hover {
+            border-color: #4f46e5;
+            background: #f8fafc;
+        }
+
+        .radio-option input[type="radio"] {
+            margin: 0;
+            accent-color: #4f46e5;
+        }
+
+        .radio-option.selected {
+            border-color: #4f46e5;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+        }
+
+        .save-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .settings-container {
+                margin: 10px;
+                max-width: calc(100% - 20px);
+            }
+
+            .settings-content {
+                padding: 30px 25px;
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .save-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="settings-overlay">
+    <div class="settings-container">
+        <div class="settings-header">
+            <h1 class="settings-title">Settings</h1>
+            <p class="settings-subtitle">Manage your account preferences</p>
+        </div>
+
+        <div class="settings-content">
+            <!-- Name Settings -->
+            <div class="setting-section">
+                <h2 class="section-title">
+                    <span class="section-icon">👤</span>
+                    Personal Information
+                </h2>
+                <div class="form-group">
+                    <label for="userName">Name</label>
+                    <input type="text" id="userName" placeholder="">
+
+                </div>
+            </div>
+
+            <!-- Email Settings -->
+            <div class="setting-section">
+                <h2 class="section-title">
+                    <span class="section-icon">@</span>
+                    Email Configuration
+                </h2>
+                <div class="form-group">
+                    <label for="primary-email">Primary Email</label>
+                    <input type="email" id="primary-email" placeholder="user@example.com" value="user@example.com" readonly disabled>
+                </div>
+                <div class="form-group">
+                    <label for="secondary-email">Secondary Email (Optional)</label>
+                    <input type="email" id="secondary-email" placeholder="secondary@example.com">
+                </div>
+            </div>
+
+            <!-- Phone Settings -->
+            <div class="setting-section">
+                <h2 class="section-title">
+                    <span class="section-icon">📱</span>
+                    Phone Number
+                </h2>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone">
+                </div>
+            </div>
+
+            <!-- Profile Photo -->
+            <div class="setting-section">
+                <h2 class="section-title">
+                    <span class="section-icon">📷</span>
+                    Profile Photo
+                </h2>
+                <div class="form-group">
+                    <div class="current-photo">
+                        <div class="photo-placeholder">No Photo</div>
+                    </div>
+                    <label for="photo-upload">Upload New Photo</label>
+                    <div class="file-input-wrapper">
+                        <button class="file-input-button" type="button">
+                            📷 Choose Photo
+                        </button>
+                        <input type="file" id="photo-upload" accept="image/*">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Password Settings -->
+            <div class="setting-section">
+                <h2 class="section-title">
+                    <span class="section-icon">🔒</span>
+                    Password & Security
+                </h2>
+                <div class="form-group">
+                    <label for="current-password">Current Password</label>
+                    <input type="password" id="current-password" placeholder="Enter current password">
+                </div>
+                <div class="form-group">
+                    <label for="new-password">New Password</label>
+                    <input type="password" id="new-password" placeholder="Enter new password">
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password">Confirm New Password</label>
+                    <input type="password" id="confirm-password" placeholder="Confirm new password">
+                </div>
+                <div class="password-requirements">
+                    <small style="color: #6b7280; display: block; margin-top: 8px;">
+                        Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.
+                    </small>
+                </div>
+            </div>
+
+            <!-- Time Format -->
+            <div class="setting-section">
+                <h2 class="section-title">
+                    <span class="section-icon">🕐</span>
+                    Time Format Preference
+                </h2>
+                <div class="form-group">
+                    <label>Choose your preferred time format</label>
+                    <div class="radio-group">
+                        <label class="radio-option" for="time-12">
+                            <input type="radio" id="time-12" name="time-format" value="12" checked>
+                            <span>12-hour (2:30 PM)</span>
+                        </label>
+                        <label class="radio-option" for="time-24">
+                            <input type="radio" id="time-24" name="time-format" value="24">
+                            <span>24-hour (14:30)</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="save-buttons">
+                <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
+                <button class="btn btn-secondary" onclick="cancelSettings()">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="js/settings.js"></script>
+</body>
+</html>

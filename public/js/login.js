@@ -15,7 +15,7 @@ $(document).ready(function () {
             data: JSON.stringify({ email, password }),
             success: function (response) {
                 localStorage.setItem('token', response.access_token);
-                // Redirect to clonex dashboard page (adjust URL if needed)
+                localStorage.setItem('user', JSON.stringify({ name: response.name, email: response.email }));
                 window.location.href = 'clonex.html';
             },
             error: function (xhr) {
@@ -36,7 +36,7 @@ $(document).ready(function () {
             url: `${apiBase}/api/auth/register`,
             method: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ name, email, password }),
+            data: JSON.stringify({ userName: name, email, password }),
             success: function () {
                 window.location.href = 'activate.html';
             },

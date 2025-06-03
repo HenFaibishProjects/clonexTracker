@@ -372,6 +372,8 @@
                     <input type="text" id="userName" placeholder="">
 
                 </div>
+                <button class="btn btn-primary" onclick="saveNewName()">Save New Name</button>
+
             </div>
 
             <!-- Email Settings -->
@@ -388,6 +390,8 @@
                     <label for="secondary-email">Secondary Email (Optional)</label>
                     <input type="email" id="secondary-email" placeholder="secondary@example.com">
                 </div>
+                <button class="btn btn-primary" onclick="saveSecondaryEmail()">Save Secondary Email</button>
+
             </div>
 
             <!-- Phone Settings -->
@@ -400,7 +404,10 @@
                     <label for="phone">Phone Number</label>
                     <input type="tel" id="phone">
                 </div>
+                <button class="btn btn-primary" onclick="savePhoneNumber()">Save Phone number</button>
+
             </div>
+
 
             <!-- Profile Photo -->
             <div class="setting-section">
@@ -414,12 +421,14 @@
                     </div>
                     <label for="photo-upload">Upload New Photo</label>
                     <div class="file-input-wrapper">
-                        <button class="file-input-button" type="button">
+                        <button class="btn btn-primary" type="button">
                             📷 Choose Photo
                         </button>
                         <input type="file" id="photo-upload" accept="image/*">
                     </div>
                 </div>
+                <button class="btn btn-primary" onclick="savePhoto()">Save Photo</button>
+
             </div>
 
             <!-- Password Settings -->
@@ -445,6 +454,8 @@
                         Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.
                     </small>
                 </div>
+                <button class="btn btn-primary" onclick="saveNewPassword()">Save Password</button>
+
             </div>
 
             <!-- Time Format -->
@@ -466,11 +477,12 @@
                         </label>
                     </div>
                 </div>
+                <button class="btn btn-primary" onclick="saveTimeFormat()">Save Time Format</button>
+
             </div>
 
             <!-- Action Buttons -->
             <div class="save-buttons">
-                <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
                 <button class="btn btn-secondary" onclick="cancelSettings()">Cancel</button>
             </div>
         </div>

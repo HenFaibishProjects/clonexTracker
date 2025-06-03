@@ -6,6 +6,9 @@ export class User {
     @PrimaryGeneratedColumn()
     id: number | undefined;
 
+    @Column({ nullable: true, type: 'varchar' })
+    userName: string | undefined;
+
     @Column({ type: 'varchar', unique: true })
     email: string | undefined;
 

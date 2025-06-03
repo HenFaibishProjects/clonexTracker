@@ -8,5 +8,5 @@ export class RegisterDto {
     password: string | undefined;
 
     @IsNotEmpty()
-    name: string | undefined;
+    userName: string | undefined;
 }

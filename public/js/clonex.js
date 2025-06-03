@@ -569,6 +569,14 @@ function renderChart(entries, range = 'all') {
     });
 }
 
+$('.dropdown-item:contains("Settings")').click(function () {
+    $('.settings-overlay').fadeIn();
+});
+
+function closeSettings() {
+    $('.settings-overlay').fadeOut();
+}
+
 let dailyChart;
 
 function renderDailyChart(entries, range = 'all') {
@@ -698,6 +706,10 @@ function applyDarkMode(enabled) {
     $('body').toggleClass('dark-mode', enabled);
     $('#toggleDarkMode').text(enabled ? '☀️ Light Mode' : '🌙 Dark Mode');
     localStorage.setItem('darkMode', enabled ? '1' : '0');
+}
+
+function settings() {
+    window.location.href = `${window.location.origin}/settings.html`;
 }
 
 function calculateAveragePerDay(entries, daysBack) {

@@ -43,16 +43,7 @@ export class AuthService {
         };
     }
 
-    async signup(email: string, password: string): Promise<User> {
-        const existing = await this.usersRepo.findOne({ where: { email } });
-        if (existing) throw new UnauthorizedException('Email already exists');
-
-        const hashed = await bcrypt.hash(password, 10);
-        const user = this.usersRepo.create({ email, password: hashed });
-        return this.usersRepo.save(user);
-    }
-
-    async registerUser(dto: RegisterDto) {
+    async registerUser(dto: RegisterDto): Promise<User> {
         const existing = await this.usersRepo.findOne({ where: { email: dto.email } });
         if (existing) {
             throw new BadRequestException('This email is already Exists.');
@@ -64,20 +55,21 @@ export class AuthService {
 
         const hashed = await bcrypt.hash(dto.password, 10);
 
-
         const user = this.usersRepo.create({
             ...dto,
             password: hashed,
             isActive: false,
+            userName: dto.userName,
             activationToken: uuidv4(),
         });
 
         console.log('Generated token:', user.activationToken);
 
-        await this.usersRepo.save(user);
+        const response = await this.usersRepo.save(user);
 
         await this.mailService.sendConfirmationEmail(user.email!, user.activationToken!);
 
+        return response;
     }
 
     async activateUser(token: string): Promise<User | null> {

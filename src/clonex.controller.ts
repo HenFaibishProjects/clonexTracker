@@ -28,6 +28,11 @@ export class ClonexController {
         return this.clonexService.addEntry(data, req.user.id!);
     }
 
+    @Post('/changeName')
+    async changeName(@Body() body: { newName: string }, @Req() req: AuthenticatedRequest): Promise<User> {
+        return this.clonexService.changeName(body.newName, req.user.id!);
+    }
+
     @Get()
     async getAllEntries(@Req() req: AuthenticatedRequest): Promise<ClonexEntry[]> {
         return this.clonexService.getAllEntries(req.user.id!);

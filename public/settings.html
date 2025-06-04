@@ -350,6 +350,52 @@
                 flex-direction: column;
             }
         }
+        .settings-modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .modal-box {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal-box h2 {
+            margin-bottom: 15px;
+            font-size: 20px;
+            color: #22c55e;
+        }
+
+        .modal-box p {
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        .modal-box button {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 10px 24px;
+            font-size: 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .modal-box button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 16px rgba(79, 70, 229, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -361,7 +407,16 @@
         </div>
 
         <div class="settings-content">
-            <!-- Name Settings -->
+            <div class="setting-section">
+                <h2 class="section-title">
+                    <span class="section-icon">@</span>
+                    Email Configuration
+                </h2>
+                <div class="form-group">
+                    <label for="primary-email">Primary Email</label>
+                    <input type="email" id="primary-email" placeholder="us er@example.com" value="user@example.com" readonly disabled>
+                </div>
+
             <div class="setting-section">
                 <h2 class="section-title">
                     <span class="section-icon">👤</span>
@@ -372,25 +427,10 @@
                     <input type="text" id="userName" placeholder="">
 
                 </div>
-                <button class="btn btn-primary" onclick="saveNewName()">Save New Name</button>
+                <button class="btn btn-primary" onclick="saveInGeneral('uName')">Save New Name</button>
 
             </div>
 
-            <!-- Email Settings -->
-            <div class="setting-section">
-                <h2 class="section-title">
-                    <span class="section-icon">@</span>
-                    Email Configuration
-                </h2>
-                <div class="form-group">
-                    <label for="primary-email">Primary Email</label>
-                    <input type="email" id="primary-email" placeholder="user@example.com" value="user@example.com" readonly disabled>
-                </div>
-                <div class="form-group">
-                    <label for="secondary-email">Secondary Email (Optional)</label>
-                    <input type="email" id="secondary-email" placeholder="secondary@example.com">
-                </div>
-                <button class="btn btn-primary" onclick="saveSecondaryEmail()">Save Secondary Email</button>
 
             </div>
 
@@ -404,7 +444,7 @@
                     <label for="phone">Phone Number</label>
                     <input type="tel" id="phone">
                 </div>
-                <button class="btn btn-primary" onclick="savePhoneNumber()">Save Phone number</button>
+                <button class="btn btn-primary" onclick="saveInGeneral('checkValuesOnPhone')">Save Phone number</button>
 
             </div>
 
@@ -427,7 +467,7 @@
                         <input type="file" id="photo-upload" accept="image/*">
                     </div>
                 </div>
-                <button class="btn btn-primary" onclick="savePhoto()">Save Photo</button>
+                <button class="btn btn-primary" onclick="saveInGeneral('changePhoto')">Save Photo</button>
 
             </div>
 
@@ -454,7 +494,7 @@
                         Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.
                     </small>
                 </div>
-                <button class="btn btn-primary" onclick="saveNewPassword()">Save Password</button>
+                <button class="btn btn-primary" onclick="saveInGeneral('checkValuesOnPassword')">Save Password</button>
 
             </div>
 
@@ -488,7 +528,20 @@
         </div>
     </div>
 </div>
-
+<div id="settingsModal" class="settings-modal" style="display: none;">
+    <div class="modal-box">
+        <h2>✅ Settings Saved</h2>
+        <p id="modalMessage"></p>
+        <button onclick="confirmRedirect()">OK</button>
+    </div>
+</div>
+<div id="noChangeModal" class="settings-modal" style="display: none;">
+    <div class="modal-box">
+        <h2>⚠️ No Changes Made</h2>
+        <p id="noChangeMessage">Same values entered as existing — nothing was saved.</p>
+        <button onclick="closeNoChange()">Cancel</button>
+    </div>
+</div>
 <script src="js/settings.js"></script>
 </body>
 </html>

@@ -2,13 +2,24 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClonexEntry } from './clonex.entity';
+import {User} from "./auth/user.entity";
 
 @Injectable()
 export class ClonexService {
     constructor(
         @InjectRepository(ClonexEntry)
         private clonexRepo: Repository<ClonexEntry>,
+        @InjectRepository(User)
+        private userRepo: Repository<User>
     ) {}
+
+    async changeName(newName: string, userId: number) {
+        const user = await this.userRepo.findOne({ where: { id: userId } });
+        if (!user) throw new Error('User not found');
+
+        user.userName = newName;
+        return this.userRepo.save(user);
+    }
 
     async addEntry(data: Partial<ClonexEntry>, userId: number): Promise<ClonexEntry> {
         if (data.takenAt) {

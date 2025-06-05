@@ -6,7 +6,24 @@ let lastRenderedEntries = [];
 let dosageChart;
 let isPageActive = true;
 let lastTakenAt;
-// Default to 24-hour if not set
+
+
+function formatTimestamp(datetimeStr) {
+    const storedFormat = localStorage.getItem('timeFormat') || '12';
+    const date = new Date(datetimeStr);
+
+    const options = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: storedFormat === '12'
+    };
+
+    return date.toLocaleString('default', options);
+}
+
 
 window.addEventListener('DOMContentLoaded', () => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -42,7 +59,7 @@ function batchImport(entries) {
 
 
 $(document).ready(function () {
-    const hourFormat = localStorage.getItem('hourFormat') || '24';
+    const hourFormat = localStorage.getItem('timeFormat') || '12';
 
     const flatpickrInstance = flatpickr('#entryTakenAt', {
         enableTime: true,
@@ -476,6 +493,11 @@ function exportToCSV(entries) {
     document.body.removeChild(link);
 }
 
+function getDatetimeInputValue(dateStr) {
+    const date = new Date(dateStr);
+    return date.toISOString().slice(0, 16);
+}
+
 function renderEntries(entries) {
     lastRenderedEntries = entries;
     const $tbody = $('#entriesTable tbody');
@@ -485,14 +507,9 @@ function renderEntries(entries) {
       <tr data-id="${entry.id}">
         <td><span class="value dosage">${entry.dosageMg}</span><input type="number" step="0.01" class="form-control form-control-sm edit dosage d-none" value="${entry.dosageMg}" /></td>
         <td>
-          <span class="value takenAt">${new Date(entry.takenAt).toLocaleString('he-IL', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        })}</span>
-          <input type="datetime-local" class="form-control form-control-sm edit takenAt d-none" value="${entry.takenAt.slice(0, 16)}" />
+        <span class="value takenAt">${formatTimestamp(entry.takenAt)}</span>
+
+        <input type="datetime-local" class="form-control form-control-sm edit takenAt d-none" value="${getDatetimeInputValue(entry.takenAt)}" />
         </td> 
         <td><span class="value reason">${entry.reason || ''}</span><input type="text" class="form-control form-control-sm edit reason d-none" value="${entry.reason || ''}" /></td>
         <td><span class="value comments">${entry.comments || ''}</span><input type="text" class="form-control form-control-sm edit comments d-none" value="${entry.comments || ''}" /></td>

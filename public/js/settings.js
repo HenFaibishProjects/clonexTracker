@@ -67,15 +67,78 @@ async function checkValuesOnPassword() {
     }
 }
 
-if (document.readyState === 'loading') {
+function showTimeFormatSavedPopup(format) {
+    const formatText = format === '24' ? '24-hour (14:30)' : '12-hour (2:30 PM)';
 
+    const overlay = document.createElement('div');
+    overlay.className = 'popup-overlay';
+
+    const popup = document.createElement('div');
+    popup.className = 'custom-popup-content';
+    popup.innerHTML = `
+        ✅ <strong>Time format saved!</strong><br>
+        Your preference: <em>${formatText}</em>
+    `;
+
+    overlay.appendChild(popup);
+    document.body.appendChild(overlay);
+
+    setTimeout(() => {
+        overlay.remove();
+    }, 2000); // remove after 2 seconds
+}
+
+
+
+if (document.readyState === 'loading') {
     window.addEventListener('DOMContentLoaded', () => {
+        const savedFormat = localStorage.getItem('timeFormat') || '12';
+        const saveButton = document.querySelector('button[onclick="saveTimeFormat()"]');
+
+        const currentRadio = document.querySelector(`input[name="time-format"][value="${savedFormat}"]`);
+        if (currentRadio) {
+            currentRadio.checked = true;
+            saveButton.disabled = true;
+            saveButton.title = "Change value to enable Save";
+        }
+
+// Add change listeners
+        document.querySelectorAll('input[name="time-format"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                const selected = document.querySelector('input[name="time-format"]:checked').value;
+                const isSame = selected === savedFormat;
+                saveButton.disabled = isSame;
+                saveButton.title = isSame ? "Change value to enable Save" : "";
+            });
+        });
+
+        // Set the correct radio button as checked based on saved format
+        const radio = document.querySelector(`input[name="time-format"][value="${savedFormat}"]`);
+        if (radio) {
+            radio.checked = true;
+        }
+
+        // NOW apply visual selection styling
+        document.querySelectorAll('input[name="time-format"]').forEach(radio => {
+            const container = radio.closest('.radio-option');
+            if (radio.checked) {
+                container.classList.add('selected');
+            } else {
+                container.classList.remove('selected');
+            }
+
+            // Update on change
+            radio.addEventListener('change', () => {
+                document.querySelectorAll('.radio-option').forEach(opt => opt.classList.remove('selected'));
+                container.classList.add('selected');
+            });
+        });
+
+        // Optional: load user name + email
         const user = JSON.parse(localStorage.getItem('user'));
-        console.log(user.name);
         if (user?.name) {
             document.getElementById('userName').value = user.name;
         }
-
         if (user?.email) {
             document.getElementById('primary-email').value = user.email;
         }
@@ -165,6 +228,22 @@ if (document.readyState === 'loading') {
     function cancelSettings() {
         window.location.href = `${window.location.origin}/clonex.html`;
     }
+
+    function saveTimeFormat() {
+        const selectedFormat = document.querySelector('input[name="time-format"]:checked')?.value;
+
+        if (!selectedFormat) {
+            alert("⚠️ Please select a time format.");
+            return;
+        }
+
+        localStorage.setItem('timeFormat', selectedFormat);
+        showTimeFormatSavedPopup(selectedFormat);
+        setTimeout(() => {
+            window.location.href = '/clonex.html';
+        }, 2000);
+    }
+
 
     document.querySelectorAll('input[name="time-format"]').forEach(radio => {
         radio.addEventListener('change', function () {

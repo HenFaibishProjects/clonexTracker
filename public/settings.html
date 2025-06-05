@@ -5,6 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings - Your App</title>
     <style>
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            backdrop-filter: blur(6px);
+            background-color: rgba(0, 0, 255, 0.2); /* light blue tint */
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .custom-popup-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            font-size: 16px;
+            text-align: center;
+            max-width: 80%;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0 }
+            to { opacity: 1 }
+        }
+        .custom-popup {
+            position: fixed;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -30%);
+            background: #f0f9ff;
+            border: 2px solid #007bff;
+            padding: 1.5rem;
+            z-index: 9999;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+        }
+
+        .custom-popup-content button {
+            margin-top: 1rem;
+        }
         * {
             margin: 0;
             padding: 0;
@@ -244,6 +290,10 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
+        input[type="radio"] {
+            display: none;
+        }
+
         .current-photo img {
             width: 100%;
             height: 100%;
@@ -285,9 +335,14 @@
             accent-color: #4f46e5;
         }
 
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .radio-option.selected {
             border-color: #4f46e5;
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            background: linear-gradient(135deg, #8d89d8, #dab3da);
             color: white;
         }
 
@@ -505,6 +560,8 @@
         <button onclick="closeNoChange()">Cancel</button>
     </div>
 </div>
+<button class="btn btn-primary" onclick="saveTimeFormat()" id="saveTimeFormatBtn" disabled title="Change value to enable Save">Save Time Format</button>
+
 <script src="js/settings.js"></script>
 </body>
 </html>

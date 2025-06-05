@@ -1,7 +1,25 @@
-import {Controller, Post, Body, UnauthorizedException, Get, Query, NotFoundException} from '@nestjs/common';
+import {
+    Controller,
+    Post,
+    Body,
+    UnauthorizedException,
+    Get,
+    Query,
+    NotFoundException,
+    Req,
+    Patch,
+    UseGuards
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from "./register.dot";
 import {LoginResponseDto} from "./loginResponse.dto";
+import {User} from "./user.entity";
+import {AuthGuard} from "@nestjs/passport";
+import {JwtAuthGuard} from "./jwt-auth.guard";
+
+export interface AuthenticatedRequest extends Request {
+    user?: { id: number; email: string };
+}
 
 @Controller('auth')
 export class AuthController {
@@ -22,6 +40,19 @@ export class AuthController {
         } as LoginResponseDto;
 
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Patch('change-password')
+    async changePassword(
+        @Req() req: AuthenticatedRequest,
+        @Body() body: { currentPassword: string; newPassword: string }
+    ) {
+        const userId = req.user?.id;
+        if (!userId) throw new UnauthorizedException();
+
+        return this.authService.changePassword(userId, body.currentPassword, body.newPassword);
+    }
+
 
 
     @Post('register')

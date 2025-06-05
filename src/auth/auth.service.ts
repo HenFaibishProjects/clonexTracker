@@ -1,4 +1,4 @@
-import {BadRequestException, Injectable, UnauthorizedException} from '@nestjs/common';
+import {BadRequestException, Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -79,5 +79,16 @@ export class AuthService {
         user.isActive = true;
         user.activationToken = uuidv4();
         return this.usersRepo.save(user);
+    }
+
+    async changePassword(userId: number, currentPassword: string, newPassword: string): Promise<void> {
+        const user = await this.usersRepo.findOne({ where: { id: userId } });
+        if (!user) throw new NotFoundException('User not found');
+
+        const isMatch = await bcrypt.compare(currentPassword, user.password!);
+        if (!isMatch) throw new UnauthorizedException('Current password is incorrect');
+
+        user.password = await bcrypt.hash(newPassword, 10);
+        await this.usersRepo.save(user);
     }
 }

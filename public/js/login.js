@@ -1,5 +1,4 @@
 
-
 $(document).ready(function () {
     const apiBase = location.port === '8080' ? 'http://localhost:3000' : '';
     // Login form submission

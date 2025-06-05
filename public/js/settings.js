@@ -1,6 +1,72 @@
 const baseUrl = location.port === '8080'
     ? 'http://localhost:3000/api/'
     : '/api/clonex';
+
+const baseAuthUrl = location.port === '8080'
+    ? 'http://localhost:3000/api/'
+    : '/api/auth';
+
+async function checkValuesOnPassword() {
+    const currentPassword = document.getElementById('current-password').value.trim();
+    const newPassword = document.getElementById('new-password').value.trim();
+    const confirmPassword = document.getElementById('confirm-password').value.trim();
+    const token = localStorage.getItem('token');
+
+    // Basic frontend validation
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        alert("⚠️ All fields are required.");
+        return;
+    }
+
+    if (newPassword === currentPassword) {
+        alert("⚠️ New password must be different from current password.");
+        return;
+    }
+
+    const isValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(newPassword);
+    if (!isValid) {
+        alert("❌ Password must be at least 8 characters long and include upper, lower case letters and a number.");
+        return;
+    }
+
+    if (newPassword !== confirmPassword) {
+        alert("❌ New password and confirmation do not match.");
+        return;
+    }
+
+    // Backend call
+    try {
+        const response = await fetch(`${baseAuthUrl}/change-password`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                currentPassword,
+                newPassword
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to change password');
+        }
+
+        alert("✅ Password changed successfully. You will now be logged out.");
+        const theme = localStorage.getItem('theme');
+        localStorage.clear();
+        if (theme) {
+            localStorage.setItem('theme', theme);
+        }
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 200);
+    } catch (err) {
+        alert("❌ " + err.message);
+    }
+}
+
 if (document.readyState === 'loading') {
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -32,9 +98,6 @@ if (document.readyState === 'loading') {
     function saveInGeneral(feature) {
         const actions = {
             uName: checkValuesOnName,
-            photo: changePhoto,
-            password: checkValuesOnPassword,
-            phone: checkValuesOnPhone
         };
 
         const action = actions[feature];
@@ -84,16 +147,6 @@ if (document.readyState === 'loading') {
         }
     }
 
-    function changePhoto () {
-    }
-
-    function checkValuesOnPhone () {
-    }
-
-    function checkValuesOnPassword () {
-    }
-
-
     function showNoChangePopup(message = "Same values entered as existing — nothing was saved.") {
         document.getElementById("noChangeMessage").innerText = message;
         document.getElementById("noChangeModal").style.display = "flex";
@@ -109,19 +162,10 @@ if (document.readyState === 'loading') {
         window.location.href = `${window.location.origin}/clonex.html`;
     }
 
-
     function cancelSettings() {
         window.location.href = `${window.location.origin}/clonex.html`;
     }
 
-    function saveSettings() {
-        console.log('Save settings');
-        // You'll add your save logic here
-        alert('Settings saved! (Add your save logic here)');
-    }
-
-
-    // Update radio button styling when selected
     document.querySelectorAll('input[name="time-format"]').forEach(radio => {
         radio.addEventListener('change', function () {
             document.querySelectorAll('.radio-option').forEach(option => {
@@ -131,21 +175,6 @@ if (document.readyState === 'loading') {
         });
     });
 
-    // Initialize selected state
     document.querySelector('input[name="time-format"]:checked').closest('.radio-option').classList.add('selected');
 
-    // File upload preview
-    document.getElementById('photo-upload').addEventListener('change', function (e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const photoContainer = document.querySelector('.current-photo');
-                photoContainer.innerHTML = `<img src="${e.target.result}" alt="Profile Photo">`;
-            };
-            reader.readAsDataURL(file);
-        }
-
-
-    });
 }

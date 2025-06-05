@@ -8,6 +8,13 @@ let isPageActive = true;
 let lastTakenAt;
 // Default to 24-hour if not set
 
+window.addEventListener('DOMContentLoaded', () => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user?.name) {
+        document.getElementById('userNameDisplay').textContent = user.name;
+    }
+});
+
 function batchImport(entries) {
     const promises = entries.map(entry =>
         $.ajax({

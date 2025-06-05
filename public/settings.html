@@ -434,43 +434,6 @@
 
             </div>
 
-            <!-- Phone Settings -->
-            <div class="setting-section">
-                <h2 class="section-title">
-                    <span class="section-icon">📱</span>
-                    Phone Number
-                </h2>
-                <div class="form-group">
-                    <label for="phone">Phone Number</label>
-                    <input type="tel" id="phone">
-                </div>
-                <button class="btn btn-primary" onclick="saveInGeneral('checkValuesOnPhone')">Save Phone number</button>
-
-            </div>
-
-
-            <!-- Profile Photo -->
-            <div class="setting-section">
-                <h2 class="section-title">
-                    <span class="section-icon">📷</span>
-                    Profile Photo
-                </h2>
-                <div class="form-group">
-                    <div class="current-photo">
-                        <div class="photo-placeholder">No Photo</div>
-                    </div>
-                    <label for="photo-upload">Upload New Photo</label>
-                    <div class="file-input-wrapper">
-                        <button class="btn btn-primary" type="button">
-                            📷 Choose Photo
-                        </button>
-                        <input type="file" id="photo-upload" accept="image/*">
-                    </div>
-                </div>
-                <button class="btn btn-primary" onclick="saveInGeneral('changePhoto')">Save Photo</button>
-
-            </div>
-
             <!-- Password Settings -->
             <div class="setting-section">
                 <h2 class="section-title">
@@ -494,7 +457,7 @@
                         Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.
                     </small>
                 </div>
-                <button class="btn btn-primary" onclick="saveInGeneral('checkValuesOnPassword')">Save Password</button>
+                <button class="btn btn-primary" onclick="checkValuesOnPassword()">Save Password</button>
 
             </div>
 

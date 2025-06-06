@@ -471,7 +471,7 @@
                     <label for="primary-email">Primary Email</label>
                     <input type="email" id="primary-email" placeholder="us er@example.com" value="user@example.com" readonly disabled>
                 </div>
-
+            </div>
             <div class="setting-section">
                 <h2 class="section-title">
                     <span class="section-icon">👤</span>
@@ -485,9 +485,22 @@
                 <button class="btn btn-primary" onclick="saveInGeneral('uName')">Save New Name</button>
 
             </div>
+                <div class="setting-section">
+                    <h2 class="section-title">
+                        <span class="section-icon">⚕️</span>
+                        Benzodiazepines Type
+                    </h2>
+                    <div class="form-group">
+                        <label for="BenzodiazepinesTypeId">Medication Type</label>
+                        <input type="text" id="BenzodiazepinesTypeId" placeholder="">
+
+                    </div>
+                    <button class="btn btn-primary" onclick="changeBenzodiazepinesType()">Save New Benzodiazepines Type</button>
+
+                </div>
 
 
-            </div>
+
 
             <!-- Password Settings -->
             <div class="setting-section">

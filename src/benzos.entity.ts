@@ -1,8 +1,8 @@
 import {Entity, PrimaryGeneratedColumn, Column, ManyToOne} from 'typeorm';
 import {User} from "./auth/user.entity";
 
-@Entity('clonex_entry')
-export class ClonexEntry {
+@Entity('benzos_entry')
+export class BenzosEntry {
     @PrimaryGeneratedColumn()
     id?: number;
 

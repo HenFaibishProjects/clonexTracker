@@ -20,7 +20,7 @@ export class MailService {
         console.log('Sending mail to', to, 'with token', token);
         try {
         await this.transporter.sendMail({
-            from: '"Clonex Tracker" <zzzi10@gmail.com>',
+            from: '"Benzos Tracker" <zzzi10@gmail.com>',
             to,
             subject: 'Confirm your email',
             html: `<p>Welcome! Please confirm your email by clicking this link:</p>

@@ -59,6 +59,7 @@ export class AuthService {
             ...dto,
             password: hashed,
             isActive: false,
+            benzosType: dto.benzosType,
             userName: dto.userName,
             activationToken: uuidv4(),
         });

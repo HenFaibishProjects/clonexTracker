@@ -36,7 +36,8 @@ export class AuthController {
         return {
             access_token: tokenObj.access_token,
             email: user.email,
-            name: user.userName
+            name: user.userName,
+            benzosType: user.benzosType
         } as LoginResponseDto;
 
     }

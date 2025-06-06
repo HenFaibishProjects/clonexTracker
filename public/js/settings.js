@@ -1,6 +1,6 @@
 const baseUrl = location.port === '8080'
     ? 'http://localhost:3000/api/'
-    : '/api/clonex';
+    : '/api/benzos';
 
 const baseAuthUrl = location.port === '8080'
     ? 'http://localhost:3000/api/'
@@ -90,7 +90,6 @@ function showTimeFormatSavedPopup(format) {
 
 
 
-if (document.readyState === 'loading') {
     window.addEventListener('DOMContentLoaded', () => {
         const savedFormat = localStorage.getItem('timeFormat') || '12';
         const saveButton = document.querySelector('button[onclick="saveTimeFormat()"]');
@@ -142,19 +141,67 @@ if (document.readyState === 'loading') {
         if (user?.email) {
             document.getElementById('primary-email').value = user.email;
         }
+        if (user?.benzosType) {
+            document.getElementById('BenzodiazepinesTypeId').value = user.benzosType;
+        }
     });
+
+
+    function changeBenzodiazepinesType() {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const existingBenzosType = user.benzosType;
+        const newEnteredBenzosType = document.getElementById("BenzodiazepinesTypeId")?.value?.trim();
+
+
+        if (existingBenzosType === newEnteredBenzosType) {
+          this.showNoChangePopup();
+        }
+
+         else {
+             const token = localStorage.getItem('token');
+             fetch(`${baseUrl}/changeBenzosType`, {
+                 method: 'POST',
+                 headers: {
+                     'Content-Type': 'application/json',
+                     'Authorization': `Bearer ${token}`,
+                 },
+                 body: JSON.stringify({ newBenzosType: newEnteredBenzosType })
+             })
+                 .then(response => {
+                     if (!response.ok) throw new Error('Failed to update Benzo Type');
+                     return response.json();
+                 })
+                 .then(data => {
+                     console.log('Benzo Type updated successfully:', data);
+                     // Optional: update localStorage, show popup, etc.
+                 }).then(() => {
+                 const user = JSON.parse(localStorage.getItem('user'));
+                 user.benzosType = newEnteredBenzosType;
+                 localStorage.setItem('user', JSON.stringify(user));
+
+                 showSavedPopup('✅ Benzo Type updated! Going to Benzos screen...');
+                 setTimeout(() => {
+                     window.location.href = '/benzos.html';
+                 }, 1500);
+             })
+                 .catch(err => {
+                     console.error(err);
+                 });
+             this.showSavedPopup('New Benzo Type Saved')
+         }
+    }
 
     function showSavedPopup(details) {
         const modal = document.getElementById("settingsModal");
         const msg = document.getElementById("modalMessage");
-        msg.innerHTML = `${details}<br><br>Going to Clonex screen...`;
+        msg.innerHTML = `${details}<br><br>Going to Benzos screen...`;
         modal.style.display = "flex";
     }
 
     function showUnSavedPopup(details) {
         const modal = document.getElementById("settingsModal");
         const msg = document.getElementById("modalMessage");
-        msg.innerHTML = `${details}<br><br>Going to Clonex screen...`;
+        msg.innerHTML = `${details}<br><br>Going to Benzos screen...`;
         modal.style.display = "flex";
     }
 
@@ -166,6 +213,7 @@ if (document.readyState === 'loading') {
         const action = actions[feature];
         if (action) action();
     }
+
 
     function checkValuesOnName() {
         const existingUser = JSON.parse(localStorage.getItem('user'));
@@ -198,9 +246,9 @@ if (document.readyState === 'loading') {
                 user.name = newEnteredUser;
                 localStorage.setItem('user', JSON.stringify(user));
 
-                showSavedPopup('✅ Name updated! Going to Clonex screen...');
+                showSavedPopup('✅ Name updated! Going to Benzos screen...');
                 setTimeout(() => {
-                    window.location.href = '/clonex.html';
+                    window.location.href = '/benzos.html';
                 }, 1500);
             })
                 .catch(err => {
@@ -222,11 +270,11 @@ if (document.readyState === 'loading') {
     function confirmRedirect() {
         const modal = document.getElementById("settingsModal");
         modal.style.display = "none";
-        window.location.href = `${window.location.origin}/clonex.html`;
+        window.location.href = `../benzos.html`;
     }
 
     function cancelSettings() {
-        window.location.href = `${window.location.origin}/clonex.html`;
+        window.location.href = `../benzos.html`;
     }
 
     function saveTimeFormat() {
@@ -240,7 +288,7 @@ if (document.readyState === 'loading') {
         localStorage.setItem('timeFormat', selectedFormat);
         showTimeFormatSavedPopup(selectedFormat);
         setTimeout(() => {
-            window.location.href = '/clonex.html';
+            window.location.href = '/benzos.html';
         }, 2000);
     }
 
@@ -256,4 +304,3 @@ if (document.readyState === 'loading') {
 
     document.querySelector('input[name="time-format"]:checked').closest('.radio-option').classList.add('selected');
 
-}

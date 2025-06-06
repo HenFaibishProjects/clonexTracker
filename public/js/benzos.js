@@ -1,11 +1,12 @@
 const baseUrl = location.port === '8080'
     ? 'http://localhost:3000/api/'
-    : '/api/clonex';
+    : '/api/benzos';
 let allEntries = [];
 let lastRenderedEntries = [];
 let dosageChart;
 let isPageActive = true;
 let lastTakenAt;
+
 
 
 function formatTimestamp(datetimeStr) {
@@ -27,9 +28,9 @@ function formatTimestamp(datetimeStr) {
 
 window.addEventListener('DOMContentLoaded', () => {
     const user = JSON.parse(localStorage.getItem('user'));
-    if (user?.name) {
+    const benzosType = JSON.parse(localStorage.getItem('user')).benzosType;
         document.getElementById('userNameDisplay').textContent = user.name;
-    }
+        document.getElementById('benzosTitle').textContent = `💊 Benzodiazepines Tracker for ${benzosType}`;
 });
 
 function batchImport(entries) {
@@ -247,7 +248,7 @@ $(document).ready(function () {
         $('#statsBox').removeClass('d-none');
     });
 
-    $('#clonexForm').submit(function (e) {
+    $('#benzosForm').submit(function (e) {
         e.preventDefault();
 
         const dosageValue = $('#dosage').val().replace(',', '.').trim();
@@ -274,7 +275,7 @@ $(document).ready(function () {
             contentType: 'application/json',
             data: JSON.stringify(entry),
             success: function () {
-                $('#clonexForm')[0].reset();
+                $('#benzosForm')[0].reset();
                 loadEntries();
             },
             error: function (err) {
@@ -487,11 +488,13 @@ function exportToCSV(entries) {
     const link = document.createElement('a');
 
     link.href = url;
-    link.setAttribute('download', `clonex_entries_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `benzos_entries_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 }
+
+
 
 function getDatetimeInputValue(dateStr) {
     const date = new Date(dateStr);

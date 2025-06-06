@@ -203,6 +203,10 @@ $(document).ready(function () {
     });
 
     $('#filterBtn').click(function () {
+        $('#dosageRange').prop('disabled', true);
+        $('#dosageRange').addClass('disabled');
+        $('#dailyRange').prop('disabled', true);
+        $('#dailyRange').addClass('disabled');
         const from = $('#filterFrom').val();
         const to = $('#filterTo').val();
         const dosageMin = parseFloat($('#filterDosageFrom').val().replace(',', '.'));
@@ -236,6 +240,7 @@ $(document).ready(function () {
             updateStats(filtered);
             updateFilterStats(filtered);
             renderChart(filtered);
+            renderDailyChart(filtered);
             $('#statsBox').addClass('d-none');
         });
     });
@@ -246,6 +251,8 @@ $(document).ready(function () {
         renderChart(lastRenderedEntries);
         $('#filterStatsBox').addClass('d-none').html('');
         $('#statsBox').removeClass('d-none');
+        $('#dosageRange').prop('disabled', false).removeClass('disabled');
+        $('#dailyRange').prop('disabled', false).removeClass('disabled');
     });
 
     $('#benzosForm').submit(function (e) {

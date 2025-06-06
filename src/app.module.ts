@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ClonexEntry } from './clonex.entity';
-import { ClonexController } from './clonex.controller';
-import { ClonexService } from './clonex.service';
+import { BenzosEntry } from './benzos.entity';
+import { BenzosController } from './benzos.controller';
+import { BenzosService } from './benzos.service';
 import * as dotenv from 'dotenv';
 import {User} from "./auth/user.entity";
 import {AuthModule} from "./auth/auth.module";
@@ -23,10 +23,10 @@ dotenv.config();
             autoLoadEntities: true,
             synchronize: true,
         }),
-        TypeOrmModule.forFeature([ClonexEntry, User]),
+        TypeOrmModule.forFeature([BenzosEntry, User]),
     ],
-    controllers: [AppController, ClonexController],
-    providers: [AppService, ClonexService],
+    controllers: [AppController, BenzosController],
+    providers: [AppService, BenzosService],
 })
 
 export class AppModule {}

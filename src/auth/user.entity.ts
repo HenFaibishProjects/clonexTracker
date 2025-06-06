@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
-import {ClonexEntry} from "../clonex.entity";
+import {BenzosEntry} from "../benzos.entity";
 
 @Entity()
 export class User {
@@ -15,11 +15,14 @@ export class User {
     @Column({ type: 'varchar' })
     password: string | undefined;
 
+    @Column({ type: 'varchar' })
+    benzosType: string | undefined;
+
     @CreateDateColumn()
     createdAt: Date | undefined;
 
-    @OneToMany(() => ClonexEntry, (entry: ClonexEntry) => entry.user)
-    entries: ClonexEntry[] | undefined;
+    @OneToMany(() => BenzosEntry, (entry: BenzosEntry) => entry.user)
+    entries: BenzosEntry[] | undefined;
 
     @Column({ type: 'boolean', default: false })
     isActive!: boolean;

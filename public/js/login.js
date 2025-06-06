@@ -14,8 +14,12 @@ $(document).ready(function () {
             data: JSON.stringify({ email, password }),
             success: function (response) {
                 localStorage.setItem('token', response.access_token);
-                localStorage.setItem('user', JSON.stringify({ name: response.name, email: response.email }));
-                window.location.href = 'clonex.html';
+                localStorage.setItem('user', JSON.stringify({
+                    name: response.name,
+                    email: response.email,
+                    benzosType: response.benzosType
+                }));
+                window.location.href = 'benzos.html';
             },
             error: function (xhr) {
                 const msg = xhr.responseJSON?.message || 'Login failed';
@@ -30,12 +34,13 @@ $(document).ready(function () {
         const name = $('#registerName').val().trim();
         const email = $('#registerEmail').val().trim();
         const password = $('#registerPassword').val().trim();
+        const benzos = $('#benzos').val().trim();
 
         $.ajax({
             url: `${apiBase}/api/auth/register`,
             method: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ userName: name, email, password }),
+            data: JSON.stringify({ userName: name, email, password , benzos }),
             success: function () {
                 window.location.href = 'activate.html';
             },

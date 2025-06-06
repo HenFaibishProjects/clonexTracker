@@ -1,4 +1,5 @@
 import { IsEmail, IsNotEmpty } from 'class-validator';
+import {Column} from "typeorm";
 
 export class RegisterDto {
     @IsEmail()
@@ -9,4 +10,7 @@ export class RegisterDto {
 
     @IsNotEmpty()
     userName: string | undefined;
+
+    @IsNotEmpty()
+    benzosType: string | undefined;
 }

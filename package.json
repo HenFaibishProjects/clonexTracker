@@ -1,5 +1,5 @@
 {
-  "name": "clonex-tracker",
+  "name": "benzos-tracker",
   "main": "dist/src/main.js",
   "version": "1.0.0",
   "description": "",
@@ -46,8 +46,8 @@
     "typescript": "^5.8.3"
   },
   "build": {
-    "appId": "com.clonex.tracker",
-    "productName": "Clonex Tracker",
+    "appId": "com.Benzos.tracker",
+    "productName": "Benzos Tracker",
     "files": [
       "dist/**/*",
       "main.js"

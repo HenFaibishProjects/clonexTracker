@@ -13,6 +13,9 @@
     "postinstall": "chmod +x ./node_modules/.bin/tsc"
 
   },
+  "engines": {
+    "node": "20.x"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

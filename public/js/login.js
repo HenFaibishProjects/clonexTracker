@@ -47,7 +47,7 @@ $(document).ready(function () {
         const email = $('#registerEmail').val().trim();
         const password = $('#registerPassword').val().trim();
         const confirmPassword = $('#confirmPassword').val().trim();
-        const benzos = $('#benzos').val().trim();
+        const benzosType = $('#benzos').val().trim();
 
         const isValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password);
         if (!isValid) {
@@ -64,7 +64,7 @@ $(document).ready(function () {
             url: `${apiBase}/api/auth/register`,
             method: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ userName: name, email, password , benzos }),
+            data: JSON.stringify({ userName: name, email, password , benzosType }),
             success: function () {
                 window.location.href = 'activate.html';
             },

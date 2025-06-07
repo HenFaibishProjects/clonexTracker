@@ -46,7 +46,19 @@ $(document).ready(function () {
         const name = $('#registerName').val().trim();
         const email = $('#registerEmail').val().trim();
         const password = $('#registerPassword').val().trim();
+        const confirmPassword = $('#confirmPassword').val().trim();
         const benzos = $('#benzos').val().trim();
+
+        const isValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password);
+        if (!isValid) {
+            alert("❌ Password must be at least 8 characters long and include upper, lower case letters and a number.");
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            alert("❌ New password and confirmation do not match.");
+            return;
+        }
 
         $.ajax({
             url: `${apiBase}/api/auth/register`,

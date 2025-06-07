@@ -78,7 +78,7 @@ export class AuthService {
         if (!user) return null;
 
         user.isActive = true;
-        user.activationToken = uuidv4();
+        user.activationToken = null;
         return this.usersRepo.save(user);
     }
 

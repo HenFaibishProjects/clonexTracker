@@ -60,7 +60,7 @@ async function checkValuesOnPassword() {
             localStorage.setItem('theme', theme);
         }
         setTimeout(() => {
-            window.location.href = 'index.html';
+            window.location.href = 'login.html';
         }, 200);
     } catch (err) {
         alert("❌ " + err.message);

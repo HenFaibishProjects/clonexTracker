@@ -1,3 +1,15 @@
+window.addEventListener('DOMContentLoaded', () => {
+    const hash = window.location.hash;
+
+    if (hash === '#register') {
+        const triggerTab = new bootstrap.Tab(document.querySelector('#register-tab'));
+        triggerTab.show();
+    } else if (hash === '#forgot') {
+        const triggerTab = new bootstrap.Tab(document.querySelector('#forgot-tab'));
+        triggerTab.show();
+    }
+});
+
 
 $(document).ready(function () {
     const apiBase = location.port === '8080' ? 'http://localhost:3000' : '';

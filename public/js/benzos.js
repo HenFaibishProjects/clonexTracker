@@ -75,7 +75,7 @@ $(document).ready(function () {
     const token = localStorage.getItem('token');
     if (!token) {
         alert('You must be logged in to access this page.');
-        window.location.href = 'index.html';
+        window.location.href = 'login.html';
         return;
     }
     const saved = localStorage.getItem('darkMode');
@@ -169,7 +169,7 @@ $(document).ready(function () {
 
     $('#logoutBtn').click(function () {
         localStorage.removeItem('token');
-        window.location.href = 'index.html';
+        window.location.href = 'login.html';
     });
 
     $('#toggleDarkMode').click(function () {

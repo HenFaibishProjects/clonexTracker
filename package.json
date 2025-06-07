@@ -9,20 +9,13 @@
     "build": "tsc",
     "dev": "npx ts-node -r dotenv/config src/main.ts",
     "start": "node dist/main.js",
-    "start:prod": "node dist/main.js",
-    "postinstall": "chmod +x ./node_modules/.bin/tsc"
-
-  },
-  "engines": {
-    "node": "20.x"
+    "start:prod": "node dist/main.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "ts-node": "^10.9.2",
-    "typescript": "^5.8.3",
     "@nestjs/common": "^11.1.0",
     "@nestjs/core": "^11.1.0",
     "@nestjs/jwt": "^11.0.0",
@@ -48,7 +41,9 @@
     "@types/express": "^5.0.1",
     "@types/node": "^22.15.3",
     "@types/nodemailer": "^6.4.17",
-    "@types/passport-jwt": "^4.0.1"
+    "@types/passport-jwt": "^4.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   },
   "build": {
     "appId": "com.Benzos.tracker",

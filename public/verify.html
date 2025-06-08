@@ -1,0 +1,24 @@
+<input type="email" id="email" placeholder="Email">
+<input type="text" id="code" placeholder="Enter activation code">
+<button id="verifyBtn">Verify</button>
+<div id="result"></div>
+
+<script>
+    document.getElementById('verifyBtn').onclick = () => {
+        const email = document.getElementById('email').value;
+        const code = document.getElementById('code').value;
+
+        fetch('/api/auth/verify-code', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, code }),
+        })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('result').textContent = data.message || '✅ Verified!';
+            })
+            .catch(() => {
+                document.getElementById('result').textContent = '❌ Verification failed';
+            });
+    };
+</script>

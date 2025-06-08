@@ -18,6 +18,9 @@ export class User {
     @Column({ type: 'varchar' })
     benzosType: string | undefined;
 
+    @Column({ type: 'varchar', nullable: true })
+    activationCode?: string | null;
+
     @CreateDateColumn()
     createdAt: Date | undefined;
 

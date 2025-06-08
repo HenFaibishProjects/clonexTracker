@@ -55,26 +55,32 @@ export class AuthService {
 
         const hashed = await bcrypt.hash(dto.password, 10);
 
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+
         const user = this.usersRepo.create({
             ...dto,
             password: hashed,
             isActive: false,
             benzosType: dto.benzosType,
             userName: dto.userName,
-            activationToken: uuidv4(),
+            activationCode: code,
         });
 
         console.log('Generated token:', user.activationToken);
 
         const response = await this.usersRepo.save(user);
 
-        await this.mailService.sendConfirmationEmail(user.email!, user.activationToken!);
+        await this.mailService.sendActivationCode(user.email!, code);
 
         return response;
     }
 
     async activateUser(token: string): Promise<User | null> {
         const user = await this.usersRepo.findOne({ where: { activationToken: token } });
+        console.log("-----------------------"); //
+        console.log('🔍 Found user:', user); //
+        console.log("-----------------------"); //
         if (!user) return null;
 
         user.isActive = true;
@@ -91,5 +97,26 @@ export class AuthService {
 
         user.password = await bcrypt.hash(newPassword, 10);
         await this.usersRepo.save(user);
+    }
+
+    async verifyActivationCode(email: string, code: string) {
+        const user = await this.usersRepo.findOne({ where: { email } });
+        if (!user || user.activationCode !== code) {
+            throw new BadRequestException('Invalid activation code');
+        }
+
+        user.isActive = true;
+        user.activationCode = null;
+        await this.usersRepo.save(user);
+
+        return { message: '✅ Account activated. You can now log in.' };
+    }
+
+    async  confirmWithCode(email: string, code: string) {
+        const user = await this.usersRepo.findOne({ where: { email: email, activationCode: code } });
+        if (!user) throw new BadRequestException('Invalid code');
+        user.isActive = true;
+        user.activationCode = null;
+        return this.usersRepo.save(user);
     }
 }

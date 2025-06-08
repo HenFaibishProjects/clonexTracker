@@ -19,6 +19,12 @@ async function bootstrap() {
         exclude: [{ path: 'auth/activate', method: RequestMethod.GET }],
     });
 
+    app.enableCors({
+        origin: ['http://localhost:8080', 'http://localhost:3000', 'https://www.benzotracker.support'],
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+        credentials: true
+    });
+
     await app.listen(3000);
 }
 bootstrap();

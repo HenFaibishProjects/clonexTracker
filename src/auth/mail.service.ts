@@ -13,22 +13,15 @@ export class MailService {
         },
     });
 
-    async sendConfirmationEmail(to: string, token: string) {
+    async sendActivationCode(to: string, code: string) {
         const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
-        const url = `${baseUrl}/activate?token=${token}`;
-
-        console.log('Sending mail to', to, 'with token', token);
-        try {
-        await this.transporter.sendMail({
-            from: '"Benzos Tracker" <zzzi10@gmail.com>',
+        const mailOptions = {
+            from: '"Clonex Tracker" <zzzi10@gmail.com>',
             to,
-            subject: 'Confirm your email',
-            html: `<p>Welcome! Please confirm your email by clicking this link:</p>
-               <a href="${url}">${url}</a>`,
-        });
-    }
-        catch (err) {
-                console.error('❌ Failed to send email:', err);
-            }
+            subject: '🔒 Your Activation Code',
+            text: `Welcome to Clonex Tracker!\n\nYour activation code is: ${code}\n\nPlease enter it in the app on this link:\n\n\ ${baseUrl}/activate.html`
+        };
+
+        await this.transporter.sendMail(mailOptions);
     }
 }

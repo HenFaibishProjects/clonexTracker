@@ -8,7 +8,7 @@ import {
     NotFoundException,
     Req,
     Patch,
-    UseGuards
+    UseGuards, BadRequestException
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from "./register.dot";
@@ -61,6 +61,17 @@ export class AuthController {
         await this.authService.registerUser(dto);
         return { message: '✅ Registration successful! Please check your email to activate your account.' };
     }
+
+    @Post('verify-code')
+    async verifyCode(@Body() body: { email: string, code: string }) {
+        return this.authService.verifyActivationCode(body.email, body.code);
+    }
+
+    @Post('confirm-code')
+    async confirmWithCode(@Body() body: { code: string, email: string }) {
+        return this.authService.confirmWithCode(body.email, body.code);
+    }
+
 
     @Get('confirm')
     async confirm(@Query('token') token: string) {

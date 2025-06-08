@@ -2,60 +2,114 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Benzos Tracker – Activation Successful</title>
+    <title>Activate Your Account</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
             background: linear-gradient(to right, #ece9e6, #ffffff);
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             height: 100vh;
             margin: 0;
-            text-align: center;
         }
 
         .card {
-            background-color: #f8f8f8;
-            padding: 2rem 3rem;
+            background-color: #fff;
+            padding: 2.5rem 3rem;
             border-radius: 1rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
             max-width: 400px;
+            width: 100%;
+            text-align: center;
         }
 
-        h1 {
+        h2 {
+            margin-bottom: 0.5rem;
             color: #2c3e50;
-            margin-bottom: 1rem;
         }
 
         p {
-            color: #444;
+            color: #555;
             margin-bottom: 2rem;
+            font-size: 0.95rem;
         }
 
-        a.button {
-            text-decoration: none;
-            color: white;
-            background-color: #4CAF50;
-            padding: 0.8rem 1.6rem;
+        label {
+            display: block;
+            text-align: left;
+            margin: 0.5rem 0 0.3rem;
+            font-weight: 600;
+            color: #444;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 1px solid #ccc;
             border-radius: 0.5rem;
-            font-weight: bold;
-            transition: background-color 0.3s;
+            box-sizing: border-box;
+            margin-bottom: 1rem;
         }
 
-        a.button:hover {
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
             background-color: #45a049;
+        }
+
+        #result {
+            margin-top: 1.5rem;
+            font-weight: bold;
+            color: #e74c3c;
         }
     </style>
 </head>
 <body>
 <div class="card">
-    <h1>🎉 Registration Successful!</h1>
-    <p>Your email has been successfully verified.<br>
-        You can now log in and start tracking with Benzos Tracker.</p>
-    <a href="/" class="button">Go to Login</a>
+    <h2>🔒 Enter Your Activation Code</h2>
+    <p>We sent you a 6-digit code via email. Please enter it below to activate your account.</p>
+
+    <label for="email">Email</label>
+    <input type="email" id="email" placeholder="Enter your email" required />
+
+    <label for="code">Activation Code</label>
+    <input type="text" id="code" placeholder="Enter the 6-digit code" required />
+
+    <button onclick="verifyCode()">Verify</button>
+    <div id="result"></div>
 </div>
+
+<script>
+        function verifyCode() {
+        const isLocal = window.location.hostname === 'localhost';
+        const apiBase = isLocal ? 'http://localhost:3000' : 'https://www.benzotracker.support';
+        const code = document.getElementById('code').value;
+        const email = document.getElementById('email').value;
+
+        fetch(`${apiBase}/api/auth/confirm-code`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code, email }),
+        })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('result').textContent = data.message || '✅ Activated!';
+            })
+            .catch(() => {
+                document.getElementById('result').textContent = '❌ Activation failed.';
+            });
+    }
+</script>
 </body>
 </html>

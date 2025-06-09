@@ -108,15 +108,13 @@
                 resultDiv.textContent = data.message || '✅ Activated!';
                 resultDiv.style.color = 'green';
             })
-            .then(() => {
-                setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 500);
-            })
             .catch(() => {
                 resultDiv.textContent = '❌ Activation failed.';
                 resultDiv.style.color = 'red';
             });
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 500);
     }
 </script>
 </body>

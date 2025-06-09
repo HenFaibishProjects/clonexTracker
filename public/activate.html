@@ -69,9 +69,9 @@
         }
 
         #result {
-            margin-top: 1.5rem;
+            margin-top: 1rem;
             font-weight: bold;
-            color: #e74c3c;
+            font-size: 1.1rem;
         }
     </style>
 </head>
@@ -96,6 +96,7 @@
         const apiBase = isLocal ? 'http://localhost:3000' : 'https://www.benzotracker.support';
         const code = document.getElementById('code').value;
         const email = document.getElementById('email').value;
+        const resultDiv = document.getElementById('result');
 
         fetch(`${apiBase}/api/auth/confirm-code`, {
             method: 'POST',
@@ -104,10 +105,12 @@
         })
             .then(res => res.json())
             .then(data => {
-                document.getElementById('result').textContent = data.message || '✅ Activated!';
+                resultDiv.textContent = data.message || '✅ Activated!';
+                resultDiv.style.color = 'green';
             })
             .catch(() => {
-                document.getElementById('result').textContent = '❌ Activation failed.';
+                resultDiv.textContent = '❌ Activation failed.';
+                resultDiv.style.color = 'red';
             });
     }
 </script>

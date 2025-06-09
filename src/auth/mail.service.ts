@@ -16,10 +16,10 @@ export class MailService {
     async sendActivationCode(to: string, code: string) {
         const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
         const mailOptions = {
-            from: '"Clonex Tracker" <zzzi10@gmail.com>',
+            from: '"Benzo Tracker" <zzzi10@gmail.com>',
             to,
             subject: '🔒 Your Activation Code',
-            text: `Welcome to Clonex Tracker!\n\nYour activation code is: ${code}\n\nPlease enter it in the app on this link:\n\n\ ${baseUrl}/activate.html`
+            text: `Welcome to Benzo Tracker!\n\nYour activation code is: ${code}\n\nPlease enter it in the app on this link:\n\n\ ${baseUrl}/activate.html`
         };
 
         await this.transporter.sendMail(mailOptions);

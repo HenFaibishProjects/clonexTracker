@@ -66,7 +66,7 @@ $(document).ready(function () {
             contentType: 'application/json',
             data: JSON.stringify({ userName: name, email, password , benzosType }),
             success: function (data) {
-                window.location.href = `${apiBase}/afterregistration.html`
+                window.location.href = '/afterregistration.html';
             },
             error: function (xhr) {
                 const msg = xhr.responseJSON?.message || 'Registration failed';

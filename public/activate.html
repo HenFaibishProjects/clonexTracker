@@ -86,7 +86,7 @@
     <label for="code">Activation Code</label>
     <input type="text" id="code" placeholder="Enter the 6-digit code" required />
 
-    <button onclick="verifyCode()">Verify</button>
+    <button id="verifyButton" onclick="verifyCode()">Verify</button>
     <div id="result"></div>
 </div>
 
@@ -97,6 +97,7 @@
         const code = document.getElementById('code').value;
         const email = document.getElementById('email').value;
         const resultDiv = document.getElementById('result');
+        const verifyButton = document.getElementById('verifyButton');
 
         fetch(`${apiBase}/api/auth/confirm-code`, {
             method: 'POST',
@@ -107,6 +108,7 @@
             .then(data => {
                 resultDiv.textContent = data.message || '✅ Activated!';
                 resultDiv.style.color = 'green';
+                verifyButton.disabled = true;
             })
             .catch(() => {
                 resultDiv.textContent = '❌ Activation failed.';

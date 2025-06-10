@@ -66,8 +66,10 @@ $(document).ready(function () {
             contentType: 'application/json',
             data: JSON.stringify({ userName: name, email, password , benzosType }),
             success: function (data) {
-                window.location.href = 'afterregistration.html';
+                const modal = new bootstrap.Modal(document.getElementById('registrationSuccessModal'));
+                modal.show();
             },
+
             error: function (xhr) {
                 const msg = xhr.responseJSON?.message || 'Registration failed';
                 $('#authMessage')

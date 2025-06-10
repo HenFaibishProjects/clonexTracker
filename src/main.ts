@@ -1,36 +1,24 @@
-import { NestExpressApplication } from '@nestjs/platform-express';
-import { join } from 'path';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { RequestMethod } from '@nestjs/common';
-import * as express from 'express';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+    // ✅ Serve static files from /public
     app.useStaticAssets(join(__dirname, '..', 'public'));
 
-    app.enableCors({
-        origin: 'http://localhost:8080', // Allow frontend server
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-        credentials: true               // Allow cookies/headers if used
-    });
-
-    app.setGlobalPrefix('api', {
-        exclude: [{ path: 'auth/activate', method: RequestMethod.GET }],
-    });
-
+    // ✅ CORS: allow frontend + deployed domain
     app.enableCors({
         origin: ['http://localhost:8080', 'http://localhost:3000', 'https://www.benzotracker.support'],
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-        credentials: true
+        credentials: true,
     });
 
-    app.use('/',
-        express.static(join(__dirname, '..', 'public'))
-    );
+    // ✅ Prefix only API routes — excludes static files
+    app.setGlobalPrefix('api');
 
-
-    await app.listen(3000);
+    await app.listen(process.env.PORT || 3000);
 }
 bootstrap();

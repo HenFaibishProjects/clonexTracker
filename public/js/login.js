@@ -68,6 +68,11 @@ $(document).ready(function () {
             success: function (data) {
                 const modal = new bootstrap.Modal(document.getElementById('registrationSuccessModal'));
                 modal.show();
+                modal._element.addEventListener('hidden.bs.modal', () => {
+                    const triggerTab = new bootstrap.Tab(document.querySelector('#login-tab'));
+                    triggerTab.show();
+                });
+
             },
 
             error: function (xhr) {

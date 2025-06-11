@@ -8,6 +8,13 @@ td {
 #benzosForm button {
     min-height: 38px;
 }
+.modal-content {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+.modal-body p {
+    margin-bottom: 0.8rem;
+    font-size: 1.05rem;
+}
 
 select.disabled {
     background-color: #625e5e !important;

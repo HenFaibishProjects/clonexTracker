@@ -10,14 +10,51 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-function hideForgotPassword() {
-    const loginTab = new bootstrap.Tab(document.querySelector('#login-tab'));
-    loginTab.show();
 
+function hideForgotPassword() {
+    // First deactivate all tab panes
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+        pane.classList.remove('show', 'active');
+    });
+
+    // Activate the login tab pane
+    document.getElementById('login').classList.add('show', 'active');
+
+    // Optional: also update nav-link active state if you care
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+
+    // Set the login tab link as active
+    document.getElementById('login-tab').classList.add('active');
+}
+
+
+function showForgotPassword() {
+    // First deactivate all tab panes
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+        pane.classList.remove('show', 'active');
+    });
+
+    // Activate the forgot password tab pane
+    document.getElementById('forgot').classList.add('show', 'active');
+
+    // Optional: also update nav-link active state if you care
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
 }
 
 
 $(document).ready(function () {
+    const hash = window.location.hash;
+    if (hash === '#register') {
+        const triggerTab = new bootstrap.Tab(document.querySelector('#register-tab'));
+        triggerTab.show();
+    } else if (hash === '#forgot') {
+        const triggerTab = new bootstrap.Tab(document.querySelector('#forgot-tab'));
+        triggerTab.show();
+    }
     const apiBase = location.port === '8080' ? 'http://localhost:3000' : '';
     // Login form submission
     $('#loginForm').submit(function (e) {
@@ -94,6 +131,9 @@ $(document).ready(function () {
     $('#loginEmail, #loginPassword').on('input', () => {
         $('#loginError').addClass('d-none').text('');
     });
+
+
+
 
 
     $('#forgotForm').submit(function (e) {

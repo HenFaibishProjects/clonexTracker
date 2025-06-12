@@ -16,6 +16,7 @@ import {LoginResponseDto} from "./loginResponse.dto";
 import {User} from "./user.entity";
 import {AuthGuard} from "@nestjs/passport";
 import {JwtAuthGuard} from "./jwt-auth.guard";
+import {ResetPasswordDto} from "./ResetPassword.dto";
 
 export interface AuthenticatedRequest extends Request {
     user?: { id: number; email: string };
@@ -87,6 +88,16 @@ export class AuthController {
             throw new NotFoundException('Invalid or expired activation token');
         }
         return { message: '✅ Account activated successfully. You can now log in.' };
+    }
+
+    @Post('request-reset-password')
+    async requestResetPassword(@Body('email') email: string) {
+        return this.authService.requestResetPassword(email);
+    }
+
+    @Post('reset-password')
+    async resetPassword(@Body() dto: ResetPasswordDto) {
+        return this.authService.resetPassword(dto);
     }
 
 }

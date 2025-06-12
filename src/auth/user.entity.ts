@@ -32,4 +32,11 @@ export class User {
 
     @Column({ type: 'varchar', nullable: true })
     activationToken: string | undefined | null;
+
+    @Column({ type: 'varchar', nullable: true })
+    resetPasswordToken: string | undefined | null;
+
+    @Column({  nullable: true, type: 'timestamp' })
+    resetTokenExpiry: Date | undefined | null;
+
 }

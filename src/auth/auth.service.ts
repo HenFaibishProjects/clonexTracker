@@ -1,12 +1,13 @@
 import {BadRequestException, Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import {JwtService} from '@nestjs/jwt';
+import {InjectRepository} from '@nestjs/typeorm';
+import {Repository} from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { User } from './user.entity';
-import { v4 as uuidv4 } from 'uuid';
+import {User} from './user.entity';
+import {v4 as uuidv4} from 'uuid';
 import {RegisterDto} from "./register.dot";
 import {MailService} from "./mail.service";
+import {ResetPasswordDto} from "./ResetPassword.dto";
 
 @Injectable()
 export class AuthService {
@@ -112,11 +113,55 @@ export class AuthService {
         return { message: '✅ Account activated. You can now log in.' };
     }
 
-    async  confirmWithCode(email: string, code: string) {
+    async confirmWithCode(email: string, code: string) {
         const user = await this.usersRepo.findOne({ where: { email: email, activationCode: code } });
         if (!user) throw new BadRequestException('Invalid code');
         user.isActive = true;
         user.activationCode = null;
         return this.usersRepo.save(user);
     }
+
+    async requestResetPassword(email: string) {
+        const user = await this.usersRepo.findOne({ where: { email } });
+        if (user) {
+            const token = uuidv4();
+            const expiry = new Date();
+            expiry.setHours(expiry.getHours() + 1);
+
+            user.resetPasswordToken = token;
+            user.resetTokenExpiry = expiry;
+            await this.usersRepo.save(user);
+
+            await this.mailService.sendPasswordResetEmail(user.email, token);
+
+            return { message: 'Password reset link has been sent to your email.' };
+        }
+
+
+    }
+
+
+    async resetPassword(dto: ResetPasswordDto): Promise<{ message: string }> {
+        const user = await this.usersRepo.findOne({ where: { resetPasswordToken: dto.token } });
+
+        if (!user) {
+            throw new NotFoundException('Invalid or expired token.');
+        }
+
+        const now = new Date();
+        if (!user.resetTokenExpiry || user.resetTokenExpiry < now) {
+            throw new BadRequestException('Token has expired.');
+        }
+        if (!dto.newPassword) {
+            throw new BadRequestException('New password is required');
+        }
+
+        user.password = await bcrypt.hash(dto.newPassword, 10);
+        user.resetPasswordToken = null;
+        user.resetTokenExpiry = null;
+
+        await this.usersRepo.save(user);
+        return { message: '✅ Password successfully reset.' };
+    }
+
 }

@@ -10,6 +10,12 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+function hideForgotPassword() {
+    const loginTab = new bootstrap.Tab(document.querySelector('#login-tab'));
+    loginTab.show();
+
+}
+
 
 $(document).ready(function () {
     const apiBase = location.port === '8080' ? 'http://localhost:3000' : '';
@@ -89,10 +95,29 @@ $(document).ready(function () {
         $('#loginError').addClass('d-none').text('');
     });
 
-    // Forgot Password form submission (placeholder)
+
     $('#forgotForm').submit(function (e) {
         e.preventDefault();
+
         const email = $('#forgotEmail').val().trim();
-        alert('If an account exists for ' + email + ', a reset link will be sent (this is a demo).');
+        if (!email) {
+            alert('Please enter your email address.');
+            return;
+        }
+
+        $.ajax({
+            url: `${apiBase}/api/auth/request-reset-password`,
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ email }),
+            success: function () {
+                $('#forgotForm')[0].reset();
+                window.location.href = `afterChangePw.html?email=${encodeURIComponent(email)}`;
+            },
+            error: function () {
+                alert('❌ Failed to send password reset. Please try again.');
+            }
+        });
     });
+
 });

@@ -70,8 +70,10 @@ $(document).ready(function () {
 
     $('#nowBtn').click(function () {
         const now = new Date();
-        flatpickrInstance.setDate(now, true);
+        const formattedNow = now.toISOString().slice(0, 16);  // 'YYYY-MM-DDTHH:MM'
+        flatpickrInstance.setDate(formattedNow, true);
     });
+
     const token = localStorage.getItem('token');
     if (!token) {
         alert('You must be logged in to access this page.');

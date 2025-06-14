@@ -44,4 +44,15 @@ export class MailService {
 
         await this.transporter.sendMail(mailOptions);
     }
+
+    async mailContactMe(subject: string, email: string, name: string, message: string) {
+        const mailOptions = {
+            from: '"LiDa Software" <zzzi10@gmail.com>',
+            to: 'zzzi10@gmail.com',
+            subject: `[Contact Form] ${subject}`,
+            text: `Name: ${name}\nEmail: ${email}\n\n${message}`,
+        };
+        await this.transporter.sendMail(mailOptions);
+    }
+
 }

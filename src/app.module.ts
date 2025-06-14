@@ -8,6 +8,9 @@ import { BenzosService } from './benzos.service';
 import * as dotenv from 'dotenv';
 import {User} from "./auth/user.entity";
 import {AuthModule} from "./auth/auth.module";
+import {ContactController} from "./contactMe/contact.controller";
+import {ContactService} from "./contactMe/contact.service";
+import {MailService} from "./auth/mail.service";
 dotenv.config();
 
 @Module({
@@ -25,8 +28,8 @@ dotenv.config();
         }),
         TypeOrmModule.forFeature([BenzosEntry, User]),
     ],
-    controllers: [AppController, BenzosController],
-    providers: [AppService, BenzosService],
+    controllers: [AppController, BenzosController, ContactController],
+    providers: [AppService, BenzosService, ContactService, MailService],
 })
 
 export class AppModule {}

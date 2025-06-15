@@ -1,3 +1,4 @@
+/* General Inputs */
 input.edit {
     max-width: 150px;
 }
@@ -15,100 +16,17 @@ td {
     margin-bottom: 0.8rem;
     font-size: 1.05rem;
 }
-
 select.disabled {
     background-color: #625e5e !important;
     cursor: not-allowed;
     opacity: 0.7;
 }
 
-body.dark-mode {
-    background-color: #121212 !important;
-    color: #e0e0e0 !important;
-}
-
-body.dark-mode ::selection {
-    background-color: #444;  /* dark gray highlight */
-    color: #dd5656;              /* white text */
-}
-
-body:not(.dark-mode) ::selection {
-    background-color: #237ddc; /* soft blue highlight */
-    color: #000;               /* black text */
-}
-
-.dark-mode .table {
-    color: #fff;
-}
-
-
-.dark-mode .table-hover tbody tr:hover {
-    background-color: #2a2a2a;
-}
-
-.dark-mode .form-control,
-.dark-mode .btn,
-.dark-mode .alert {
-    background-color: #1f1f1f;
-    color: #e0e0e0;
-    border-color: #444;
-}
-
-.dark-mode .btn-outline-dark {
-    color: #fff;
-    border-color: #888;
-}
-
-.dark-mode .table tbody tr {
-    background-color: #1c1c1c;
-}
-
-.dark-mode .table,
-.dark-mode .table thead th,
-.dark-mode .table tbody td {
-    background-color: #1c1c1c !important;
-    color: #e0e0e0 !important;
-    border-color: #444;
-}
-
-.dark-mode .table thead th {
-    background-color: #2a2a2a !important;
-}
-
-
-.dark-mode .table-light {
-    background-color: #2a2a2a !important;
-    color: #e0e0e0 !important;
-}
-
-.dark-mode ::placeholder {
-    color: #bbbbbb !important;
-    opacity: 1;
-}
-
-.dark-mode .form-control:focus {
-    background-color: #1f1f1f !important;
-    color: #e0e0e0 !important;
-    border-color: #666 !important;
-    box-shadow: none !important;
-}
-
-.dark-mode input[type="number"]::-webkit-inner-spin-button,
-.dark-mode input[type="number"]::-webkit-outer-spin-button,
-.dark-mode input[type="datetime-local"]::-webkit-calendar-picker-indicator,
-.dark-mode input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-    opacity: 0.7;
-}
-
-
-/* style.css */
-
+/* Light Mode */
 body {
     background-color: #f8f9fa;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-
 .auth-container {
     max-width: 380px;
     margin: 80px auto;
@@ -117,71 +35,28 @@ body {
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
 h1 {
     font-size: 2rem;
     margin-bottom: 20px;
     color: #333333;
 }
-
 .nav-tabs .nav-link {
     font-weight: 500;
     color: #555;
 }
-
 .nav-tabs .nav-link.active {
     color: #0d6efd;
 }
-
 .btn {
     font-weight: 600;
 }
-
 .form-label {
     font-weight: 500;
 }
-
-body.dark-mode ::selection {
-    background: #444 !important;
-    color: #dd5656 !important;
-}
-
 body:not(.dark-mode) ::selection {
-    background: #b3d4fc !important;
+    background-color: #b3d4fc !important;
     color: #000 !important;
 }
-
-.dark-mode input::selection {
-    background: #666 !important;
-    color: #b31414 !important;
-}
-
-/* Highlight for normal text */
-body.dark-mode ::selection {
-    background: #444 !important;
-    color: #dd5656 !important;
-}
-
-/* Highlight inside inputs */
-body.dark-mode input::selection,
-body.dark-mode textarea::selection {
-    background: #666 !important;
-    color: #fff !important;
-}
-
-/* Custom highlight for elements with .custom-selection */
-.custom-selection::selection {
-    background-color: #444 !important;
-    color: #dd5656 !important;
-}
-
-/* Optional: for dark-mode input/textarea fields */
-.custom-selection input::selection,
-.custom-selection textarea::selection {
-    background-color: #666 !important;
-    color: #c90000 !important;
-}
-
 .dropdown-toggle::after {
     display: inline-block;
     margin-left: 0.255em;
@@ -192,34 +67,215 @@ body.dark-mode textarea::selection {
     border-bottom: 0;
     border-left: 0.3em solid transparent;
 }
-
 body:not(.dark-mode) .dropdown-toggle {
-    color: #333 !important;  /* dark gray text */
+    color: #333 !important;
 }
-
 body:not(.dark-mode) .btn-dark.dropdown-toggle {
     color: #fff !important;
     background-color: #343a40 !important;
 }
 
-body.dark-mode input.form-control {
+/* Dark Mode */
+body.dark-mode {
+    background-color: #121212 !important;
+    color: #e0e0e0 !important;
+}
+body.dark-mode ::selection {
+    background-color: #444 !important;
+    color: #dd5656 !important;
+}
+.dark-mode .table {
+    color: #fff;
+}
+.dark-mode .table-hover tbody tr:hover {
+    background-color: #2a2a2a;
+}
+.dark-mode .btn, .dark-mode .alert {
+    background-color: #1f1f1f;
+    color: #e0e0e0;
+    border-color: #444;
+}
+.dark-mode .form-control:not(input) {
+    background-color: #1f1f1f;
+    color: #e0e0e0;
+    border-color: #444;
+}
+.dark-mode .btn-outline-dark {
+    color: #fff;
+    border-color: #888;
+}
+.dark-mode .table tbody tr {
+    background-color: #1c1c1c;
+}
+.dark-mode .table, .dark-mode .table thead th, .dark-mode .table tbody td {
+    background-color: #1c1c1c !important;
+    color: #e0e0e0 !important;
+    border-color: #444;
+}
+.dark-mode .table thead th {
+    background-color: #2a2a2a !important;
+}
+.dark-mode .table-light {
+    background-color: #2a2a2a !important;
+    color: #e0e0e0 !important;
+}
+.dark-mode ::placeholder {
+    color: #bbbbbb !important;
+    opacity: 1;
+}
+.dark-mode input.form-control {
+    background-color: #222 !important;
+    color: #eee !important;
+    border: 1px solid #555 !important;
+}
+.dark-mode input.form-control::placeholder {
+    color: #aaa !important;
+}
+.dark-mode input[type="number"]::-webkit-inner-spin-button,
+.dark-mode input[type="number"]::-webkit-outer-spin-button,
+.dark-mode input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+.dark-mode input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.7;
+}
+
+/* Focus & Autofill FULL FIX */
+body.dark-mode .form-control:focus {
+    color: #eee !important;
+    background-color: #222 !important;
+    border-color: #555 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Autofill Chrome hack */
+body.dark-mode input:-webkit-autofill,
+body.dark-mode input:-webkit-autofill:focus,
+body.dark-mode input:-webkit-autofill:hover,
+body.dark-mode input:-webkit-autofill:active {
+    background-color: #222 !important;
+    box-shadow: 0 0 0px 1000px #222 inset !important;
+    -webkit-box-shadow: 0 0 0px 1000px #222 inset !important;
+    -webkit-text-fill-color: #eee !important;
+    transition: background-color 5000s ease-in-out 0s !important;
+}
+
+/* Optional (for some edge cases on certain browsers) */
+input:focus-visible, textarea:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* ✅ DATETIME LOCAL INNER FIELDS FULL FIX */
+
+/* Light mode inner fields */
+input[type="datetime-local"]::-webkit-datetime-edit-hour-field,
+input[type="datetime-local"]::-webkit-datetime-edit-minute-field,
+input[type="datetime-local"]::-webkit-datetime-edit-ampm-field {
+    background-color: transparent !important;
+    color: #000 !important;
+}
+
+/* Dark mode inner fields */
+body.dark-mode input[type="datetime-local"]::-webkit-datetime-edit-hour-field,
+body.dark-mode input[type="datetime-local"]::-webkit-datetime-edit-minute-field,
+body.dark-mode input[type="datetime-local"]::-webkit-datetime-edit-ampm-field {
+    background-color: transparent !important;
+    color: #eee !important;
+}
+
+body.dark-mode .flatpickr-calendar {
+    background: #222;
+    color: #eee;
+}
+
+body.dark-mode .flatpickr-time input,
+body.dark-mode .flatpickr-days {
+    background: #222;
+    color: #eee;
+}
+
+/* 🎯 Fix flatpickr alt input (visible input) for dark mode */
+body.dark-mode .flatpickr-alt-input {
+    background-color: #222 !important;
+    color: #fff !important;
+    border: 1px solid #555 !important;
+}
+
+/* 🎯 Optional: fix the flatpickr calendar popup itself */
+body.dark-mode .flatpickr-calendar {
+    background-color: #1f1f1f !important;
+    color: #eee !important;
+}
+
+body.dark-mode .flatpickr-calendar .flatpickr-day {
+    background: transparent !important;
+    color: #eee !important;
+}
+
+/* 🎯 Fix flatpickr weekday header in dark mode */
+body.dark-mode .flatpickr-weekday {
+    color: #eee !important;
+    background-color: #1f1f1f !important;
+}
+
+body.dark-mode .flatpickr-day.today {
+    background: #333 !important;
+    color: #fff !important;
+}
+
+/* 🎯 Fix flatpickr month and year selectors in dark mode */
+body.dark-mode .flatpickr-current-month {
+    color: #eee !important;
+    background-color: #1f1f1f !important;
+}
+
+body.dark-mode .flatpickr-months {
+    background-color: #1f1f1f !important;
+    border-bottom: 1px solid #444 !important;
+}
+
+body.dark-mode .flatpickr-monthDropdown-months,
+body.dark-mode .flatpickr-current-month input.cur-year {
     background-color: #222 !important;
     color: #eee !important;
     border: 1px solid #555 !important;
 }
 
-body.dark-mode input.form-control::placeholder {
-    color: #aaa !important;
+/* Also dropdown options */
+body.dark-mode select.flatpickr-monthDropdown-months option {
+    background-color: #222 !important;
+    color: #eee !important;
 }
 
+body.dark-mode .flatpickr-prev-month,
+body.dark-mode .flatpickr-next-month {
+    color: #eee !important;
+    fill: #eee !important;
+}
 
+body.dark-mode .flatpickr-am-pm {
+    color: #eee !important;
+    background-color: #222 !important;
+    border: 1px solid #555 !important;
+}
 
+/* 🎯 Make colon (:) white */
+body.dark-mode .flatpickr-time .flatpickr-time-separator {
+    background-color: #333 !important;
+    color: #eee !important;
+    border: none !important;
+}
 
+/* 🎯 Make numbers (hours, minutes) white */
+body.dark-mode .flatpickr-time .numInput {
+    color: #eee !important;
+    background-color: #222 !important;
+    border: 1px solid #555 !important;
+}
 
-
-
-
-
-
-
-
+/* 🎯 Make up/down arrows white */
+body.dark-mode .flatpickr-time .arrowUp,
+body.dark-mode .flatpickr-time .arrowDown {
+    color: #eee !important;
+}

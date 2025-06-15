@@ -273,7 +273,7 @@ $(document).ready(function () {
 
         const entry = {
             dosageMg: Number(dosageValue),
-            takenAt: takenAtValue,
+            takenAt: localToUtcIso(takenAtValue),
             reason: $('#reason').val(),
             comments: $('#comments').val()
         };
@@ -296,6 +296,10 @@ $(document).ready(function () {
             }
         });
     });
+
+    function localToUtcIso(localDatetimeStr) {
+        return new Date(localDatetimeStr).toISOString();
+    }
 
     $('#entriesTable').on('click', '.delete-btn', function () {
         const id = $(this).data('id');
@@ -330,7 +334,7 @@ $(document).ready(function () {
 
         const updated = {
             dosageMg,
-            takenAt: $row.find('input.takenAt').val(),
+            takenAt: localToUtcIso($row.find('input.takenAt').val()),  // <-- fix here too!
             reason: $row.find('input.reason').val(),
             comments: $row.find('input.comments').val()
         };
@@ -510,7 +514,12 @@ function exportToCSV(entries) {
 
 function getDatetimeInputValue(dateStr) {
     const date = new Date(dateStr);
-    return date.toISOString().slice(0, 16);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
 function renderEntries(entries) {

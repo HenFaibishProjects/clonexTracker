@@ -65,7 +65,10 @@ $(document).ready(function () {
     const flatpickrInstance = flatpickr('#entryTakenAt', {
         enableTime: true,
         dateFormat: hourFormat === '24' ? 'Y-m-d H:i' : 'Y-m-d h:i K',
-        time_24hr: hourFormat === '24'
+        time_24hr: hourFormat === '24',
+        altInput: true,
+        altFormat: hourFormat === '24' ? 'Y-m-d H:i' : 'Y-m-d h:i K',
+        allowInput: true
     });
 
     $('#nowBtn').click(function () {

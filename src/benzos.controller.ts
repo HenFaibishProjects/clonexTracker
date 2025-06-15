@@ -70,4 +70,5 @@ export class BenzosController {
     ): Promise<void> {
         return this.benzosService.updateOne(id, data, req.user.id!);
     }
+
 }

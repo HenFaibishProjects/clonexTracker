@@ -323,6 +323,22 @@ $(document).ready(function () {
         $row.find('.edit').removeClass('d-none');
         $row.find('.edit-btn').addClass('d-none');
         $row.find('.save-btn').removeClass('d-none');
+        $row.find('.cancel-btn').removeClass('d-none');
+
+        $('#entriesTable .edit-btn, #entriesTable .delete-btn').not($row.find('.edit-btn, .delete-btn')).each(function () {
+            $(this).prop('disabled', true).addClass('disabled-blur');
+        });
+    });
+
+    $('#entriesTable').on('click', '.cancel-btn', function () {
+        const $row = $(this).closest('tr');
+        $row.find('.value').removeClass('d-none');
+        $row.find('.edit').addClass('d-none');
+        $row.find('.edit-btn').removeClass('d-none');
+        $row.find('.save-btn').addClass('d-none');
+        $row.find('.cancel-btn').addClass('d-none');
+
+        $('#entriesTable .edit-btn, #entriesTable .delete-btn').prop('disabled', false);
     });
 
     $('#entriesTable').on('click', '.save-btn', function () {
@@ -339,7 +355,7 @@ $(document).ready(function () {
 
         const updated = {
             dosageMg,
-            takenAt: localToUtcIso($row.find('input.takenAt').val()),  // <-- fix here too!
+            takenAt: localToUtcIso($row.find('input.takenAt').val()),
             reason: $row.find('input.reason').val(),
             comments: $row.find('input.comments').val()
         };
@@ -349,7 +365,10 @@ $(document).ready(function () {
             type: 'PATCH',
             contentType: 'application/json',
             data: JSON.stringify(updated),
-            success: loadEntries,
+            success: function () {
+                loadEntries();
+                $('#entriesTable .edit-btn, #entriesTable .delete-btn').prop('disabled', false);
+            },
             error: () => alert('Error saving edit')
         });
     });
@@ -543,9 +562,11 @@ function renderEntries(entries) {
         <td><span class="value reason">${entry.reason || ''}</span><input type="text" class="form-control form-control-sm edit reason d-none" value="${entry.reason || ''}" /></td>
         <td><span class="value comments">${entry.comments || ''}</span><input type="text" class="form-control form-control-sm edit comments d-none" value="${entry.comments || ''}" /></td>
         <td>
-          <button class="btn btn-sm btn-secondary edit-btn">✏️</button>
-          <button class="btn btn-sm btn-success save-btn d-none">💾</button>
-          <button class="btn btn-sm btn-danger delete-btn" data-id="${entry.id}">🗑</button>
+          <button class="btn btn-sm btn-secondary edit-btn" data-bs-toggle="tooltip" title="Edit entry">✏️</button>
+          <button class="btn btn-sm btn-success save-btn d-none" data-bs-toggle="tooltip" title="Save changes">💾</button>
+          <button class="btn btn-sm btn-warning cancel-btn d-none" data-bs-toggle="tooltip" title="Cancel editing">❌</button>
+          <button class="btn btn-sm btn-danger delete-btn" data-id="${entry.id}" data-bs-toggle="tooltip" title="Delete entry">🗑</button>
+
         </td>
       </tr>`;
         $tbody.append(row);

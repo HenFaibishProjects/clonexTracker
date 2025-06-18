@@ -286,3 +286,52 @@ body.dark-mode .flatpickr-time .arrowDown {
     pointer-events: none;
     filter: blur(4.8px);
 }
+
+
+@media (max-width: 768px) {
+    .input-group-mobile input,
+    .input-group-mobile button {
+        width: 100%;
+    }
+    .btn-narrow {
+        min-width: 1px;
+    }
+}
+
+@media (max-width: 768px) {
+    body.dark-mode input[type="text"],
+    body.dark-mode input[type="date"],
+    body.dark-mode input[type="datetime-local"] {
+        background-color: #222 !important;
+        color: #fff !important;
+        border: 1px solid #555 !important;
+    }
+}
+
+body.dark-mode .dropdown-menu {
+    background-color: #1f1f1f !important;
+    color: #fff !important;
+    border: 1px solid #444 !important;
+}
+
+body.dark-mode .dropdown-menu .dropdown-item {
+    color: #fff !important;
+}
+
+body.dark-mode .dropdown-menu .dropdown-item:hover {
+    background-color: #333 !important;
+}
+
+/* Force dark background and text for all select elements */
+body.dark-mode select {
+    background-color: #222 !important;
+    color: #fff !important;
+    border: 1px solid #555 !important;
+}
+
+/* iOS & mobile fix for native appearance (no full fix, but helps) */
+body.dark-mode select option {
+    background-color: #222 !important;
+    color: #fff !important;
+}
+

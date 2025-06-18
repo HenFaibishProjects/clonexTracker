@@ -44,18 +44,20 @@
         <div class="col-auto">
             <input type="text" class="form-control" id="reason" placeholder="Reason" />
         </div>
-        <div class="col-auto">
+        <div class="col-12 col-md-auto d-flex flex-column flex-md-row gap-2">
             <input type="text" class="form-control" id="comments" placeholder="Comments" />
-        </div>
-        <div class="col-auto">
-            <button type="submit" class="btn btn-primary">Add</button>
+            <div class="col-auto">
+                <div class="d-flex justify-content-start">
+                    <button type="submit" class="btn btn-primary w-auto">Add</button>
+                </div>
+            </div>
         </div>
     </form>
 
     <div id="statsBox" class="alert alert-info" role="alert">
         Loading stats...
     </div>
-
+    <h5>Filter by Dosage, Date, Reason, or Comments:</h5>
     <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
         <!-- Date filters -->
         <input type="date" class="form-control" id="filterFrom" placeholder="From date" style="max-width: 150px;" />
@@ -89,6 +91,7 @@
         </thead>
         <tbody></tbody>
     </table>
+
 
 
     <h5 class="mt-5">📈 Dosage Over Time</h5>

@@ -335,3 +335,21 @@ body.dark-mode select option {
     color: #fff !important;
 }
 
+/* Fix for mobile + dark mode date inputs */
+@media (max-width: 768px) {
+    body.dark-mode input[type="date"] {
+        background-color: #222 !important;
+        color: #fff !important;
+        border: 1px solid #555 !important;
+    }
+
+    body.dark-mode input[type="date"]::placeholder {
+        color: #bbb !important;
+    }
+
+    /* Fix calendar icon color on mobile */
+    body.dark-mode input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+    }
+}
+

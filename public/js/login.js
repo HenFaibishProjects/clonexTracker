@@ -10,7 +10,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-
 function hideForgotPassword() {
     // First deactivate all tab panes
     document.querySelectorAll('.tab-pane').forEach(pane => {
@@ -29,7 +28,6 @@ function hideForgotPassword() {
     document.getElementById('login-tab').classList.add('active');
 }
 
-
 function showForgotPassword() {
     // First deactivate all tab panes
     document.querySelectorAll('.tab-pane').forEach(pane => {
@@ -44,7 +42,6 @@ function showForgotPassword() {
         link.classList.remove('active');
     });
 }
-
 
 $(document).ready(function () {
     const hash = window.location.hash;
@@ -77,8 +74,12 @@ $(document).ready(function () {
                 window.location.href = 'benzos.html';
             },
             error: function (xhr) {
+                console.log("XHR object:", xhr);
                 const msg = xhr.responseJSON?.message || 'Login failed';
                 $('#loginError').text(msg).removeClass('d-none');
+                console.log("Error message displayed in #loginError.");
+                alert('❌ The credentials you entered don\'t match what\'s stored in the system.');
+                console.log("Alert should have been shown.");
             }
         });
     });
@@ -131,10 +132,6 @@ $(document).ready(function () {
     $('#loginEmail, #loginPassword').on('input', () => {
         $('#loginError').addClass('d-none').text('');
     });
-
-
-
-
 
     $('#forgotForm').submit(function (e) {
         e.preventDefault();

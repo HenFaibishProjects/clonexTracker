@@ -772,8 +772,8 @@ function renderDailyChart(entries, range = 'all') {
 
     // ✅ Show stats
     const totalDosage = filtered.reduce((sum, e) => sum + e.dosageMg, 0);
-    const daysWithDoses = Object.keys(dailyMap).length; // Count only days that had doses
-    const avgPerDay = daysWithDoses > 0 ? (totalDosage / daysWithDoses).toFixed(2) : '0.00';
+    const totalDays = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1);
+    const avgPerDay = (totalDosage / totalDays).toFixed(2);
 
     $('#dailyAverageBox')
         .removeClass('d-none')

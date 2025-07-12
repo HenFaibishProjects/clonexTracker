@@ -673,12 +673,20 @@ function renderDailyChart(entries, range = 'all') {
     // ✅ Sort entries by date
     const sortedEntries = [...filtered].sort((a, b) => new Date(a.takenAt) - new Date(b.takenAt));
 
-    // ✅ Calculate max gap between doses
+    // ✅ Calculate max gap between doses (including gap to today)
     let maxGapHours = 0;
     for (let i = 1; i < sortedEntries.length; i++) {
         const gap = new Date(sortedEntries[i].takenAt) - new Date(sortedEntries[i - 1].takenAt);
         const gapHours = gap / (1000 * 60 * 60);
         if (gapHours > maxGapHours) maxGapHours = gapHours;
+    }
+
+    // Also check gap from last dose to today
+    if (sortedEntries.length > 0) {
+        const lastDoseTime = new Date(sortedEntries[sortedEntries.length - 1].takenAt);
+        const gapToToday = today - lastDoseTime;
+        const gapToTodayHours = gapToToday / (1000 * 60 * 60);
+        if (gapToTodayHours > maxGapHours) maxGapHours = gapToTodayHours;
     }
 
     // ✅ Format gap string
@@ -703,9 +711,9 @@ function renderDailyChart(entries, range = 'all') {
         dailyMap[day].push(e.dosageMg);
     });
 
-    // ✅ Loop only through filtered date range
+    // ✅ MODIFIED: Loop from filtered date range start to TODAY
     const start = new Date(Math.min(...filtered.map(e => new Date(e.takenAt))));
-    const end = new Date(Math.max(...filtered.map(e => new Date(e.takenAt))));
+    const end = new Date(today); // Changed: use today instead of last entry date
     const dateLabels = [];
     const dateSums = [];
 
@@ -764,8 +772,8 @@ function renderDailyChart(entries, range = 'all') {
 
     // ✅ Show stats
     const totalDosage = filtered.reduce((sum, e) => sum + e.dosageMg, 0);
-    const totalDays = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1);
-    const avgPerDay = (totalDosage / totalDays).toFixed(2);
+    const daysWithDoses = Object.keys(dailyMap).length; // Count only days that had doses
+    const avgPerDay = daysWithDoses > 0 ? (totalDosage / daysWithDoses).toFixed(2) : '0.00';
 
     $('#dailyAverageBox')
         .removeClass('d-none')
@@ -774,8 +782,6 @@ function renderDailyChart(entries, range = 'all') {
             <strong>Largest Time Between Doses:</strong> ${gapStr}
         `);
 }
-
-
 function applyDarkMode(enabled) {
     $('body').toggleClass('dark-mode', enabled);
     $('#toggleDarkMode').text(enabled ? '☀️ Light Mode' : '🌙 Dark Mode');

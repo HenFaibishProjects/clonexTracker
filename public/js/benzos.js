@@ -189,12 +189,12 @@ $(document).ready(function () {
 
 
     $('#dailyRange').on('change', function () {
-        const selected = $(this).val();
+        const selected = $(this).val(); // Will be "14" for the new option
         renderDailyChart(lastRenderedEntries, selected);
     });
 
     $('#dosageRange').on('change', function () {
-        const selected = $(this).val();
+        const selected = $(this).val(); // Will be "14" for the new option
         renderChart(lastRenderedEntries, selected);
     });
 
@@ -397,10 +397,11 @@ setInterval(() => {
 
 function loadEntries() {
     $.get(baseUrl, function (entries) {
+        allEntries = entries; // ✅ Update global allEntries
         renderEntries(entries);
         updateStats(entries);
         renderChart(entries);
-        renderDailyChart(entries);
+        renderDailyChart(entries); // ✅ This will now include today
     });
 }
 
@@ -703,6 +704,25 @@ function renderDailyChart(entries, range = 'all') {
         gapStr = `${roundedHours} hours (${dayStr}${extraHours >= 12 ? ' and a half' : ''})`;
     }
 
+    // ✅ NEW: Calculate average dosing frequency
+    let avgFrequencyStr = '';
+    if (sortedEntries.length > 1) {
+        // Calculate total time span in days
+        const firstDose = new Date(sortedEntries[0].takenAt);
+        const lastDose = new Date(sortedEntries[sortedEntries.length - 1].takenAt);
+        const totalDays = (lastDose - firstDose) / (1000 * 60 * 60 * 24);
+        
+        // Calculate average days between doses
+        const avgGapDays = (totalDays / (sortedEntries.length - 1)).toFixed(1);
+        
+        // Calculate average dosage per dose
+        const avgDose = (sortedEntries.reduce((sum, e) => sum + e.dosageMg, 0) / sortedEntries.length).toFixed(2);
+        
+        avgFrequencyStr = `Average "taking every ${avgGapDays} days" the Dosage ${avgDose} mg`;
+    } else if (sortedEntries.length === 1) {
+        avgFrequencyStr = `Only one dose recorded: ${sortedEntries[0].dosageMg} mg`;
+    }
+
     // ✅ Group by day
     const dailyMap = {};
     filtered.forEach(e => {
@@ -711,20 +731,28 @@ function renderDailyChart(entries, range = 'all') {
         dailyMap[day].push(e.dosageMg);
     });
 
-    // ✅ MODIFIED: Loop from filtered date range start to TODAY
+    // ✅ FIXED: Ensure today is always included in the range
     const start = new Date(Math.min(...filtered.map(e => new Date(e.takenAt))));
-    const end = new Date(today); // Changed: use today instead of last entry date
+    const todayKey = today.toISOString().split('T')[0];
+    const end = new Date(today);
+    
+    // Force today to be included even if no entries exist for today
+    end.setHours(23, 59, 59, 999); // End of today
+    
     const dateLabels = [];
     const dateSums = [];
 
     let d = new Date(start);
+    d.setHours(0, 0, 0, 0); // Start of day
+    
     while (d <= end) {
         const key = d.toISOString().split('T')[0];
-        const avg = dailyMap[key]
-            ? (dailyMap[key].reduce((sum, val) => sum + val, 0)).toFixed(3)
+        const sum = dailyMap[key]
+            ? dailyMap[key].reduce((sum, val) => sum + val, 0)
             : 0;
+        
         dateLabels.push(key);
-        dateSums.push(avg);
+        dateSums.push(parseFloat(sum.toFixed(3)));
         d.setDate(d.getDate() + 1);
     }
 
@@ -770,7 +798,7 @@ function renderDailyChart(entries, range = 'all') {
         }
     });
 
-    // ✅ Show stats
+    // ✅ Show stats with frequency calculation
     const totalDosage = filtered.reduce((sum, e) => sum + e.dosageMg, 0);
     const totalDays = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1);
     const avgPerDay = (totalDosage / totalDays).toFixed(2);
@@ -779,7 +807,8 @@ function renderDailyChart(entries, range = 'all') {
         .removeClass('d-none')
         .html(`
             <strong>Daily Avg for Selected Range:</strong> ${avgPerDay} mg/day<br/>
-            <strong>Largest Time Between Doses:</strong> ${gapStr}
+            <strong>Largest Time Between Doses:</strong> ${gapStr}<br/>
+            <strong>${avgFrequencyStr}</strong>
         `);
 }
 function applyDarkMode(enabled) {

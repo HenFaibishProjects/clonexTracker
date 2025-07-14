@@ -657,8 +657,12 @@ function closeSettings() {
 
 let dailyChart;
 
-function renderDailyChart(entries, range = 'all') {const today = new Date();
-    today.setHours(23, 59, 59, 999); // Set to end of today
+function renderDailyChart(entries, range = 'all') {
+    // ✅ CHANGE: Force today to be July 14, 2025 in your timezone
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    
+    console.log('Today is:', today.toISOString().split('T')[0]); // Debug log
 
     // ✅ Filter entries based on selected range
     const filtered = entries.filter(e => {

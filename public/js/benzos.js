@@ -707,21 +707,23 @@ function renderDailyChart(entries, range = 'all') {
         gapStr = `${roundedHours} hours (${dayStr}${extraHours >= 12 ? ' and a half' : ''})`;
     }
 
-    // ✅ NEW: Calculate average dosing frequency
     let avgFrequencyStr = '';
     if (sortedEntries.length > 1) {
-        // Calculate total time span in days
+        // Calculate total time span in days WITHIN THE FILTERED RANGE
         const firstDose = new Date(sortedEntries[0].takenAt);
         const lastDose = new Date(sortedEntries[sortedEntries.length - 1].takenAt);
-        const totalDays = (lastDose - firstDose) / (1000 * 60 * 60 * 24);
+        const selectedDays = range === 'all' ?
+            Math.ceil((today - new Date(sortedEntries[0].takenAt)) / (1000 * 60 * 60 * 24)) + 1 :
+            parseInt(range);
 
-        // Calculate average days between doses
-        const avgGapDays = (totalDays / (sortedEntries.length - 1)).toFixed(1);
+
+        // Calculate average days between doses WITHIN THE SELECTED RANGE
+        const avgGapDays = (selectedDays / (sortedEntries.length)).toFixed(1);
 
         // Calculate average dosage per dose
         const avgDose = (sortedEntries.reduce((sum, e) => sum + e.dosageMg, 0) / sortedEntries.length).toFixed(2);
 
-        avgFrequencyStr = `Average "taking every ${avgGapDays} days" the Dosage ${avgDose} mg`;
+        avgFrequencyStr = `Average "taking every ${avgGapDays} days" the Dosage ${avgDose} mg (within selected range)`;
     } else if (sortedEntries.length === 1) {
         avgFrequencyStr = `Only one dose recorded: ${sortedEntries[0].dosageMg} mg`;
     }
@@ -838,3 +840,8 @@ function calculateAveragePerDay(entries, daysBack) {
     const avgPerDay = (totalDosage / daysBack).toFixed(2);
     return avgPerDay;
 }
+
+
+
+
+

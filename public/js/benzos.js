@@ -714,6 +714,7 @@ function renderDailyChart(entries, range = 'all') {
         
         // Calculate average days between doses
         const avgGapDays = (totalDays / (sortedEntries.length - 1)).toFixed(1);
+
         
         // Calculate average dosage per dose
         const avgDose = (sortedEntries.reduce((sum, e) => sum + e.dosageMg, 0) / sortedEntries.length).toFixed(2);

@@ -576,6 +576,9 @@ function renderEntries(entries) {
 
 function renderChart(entries, range = 'all') {
     const today = new Date();
+    today.setHours(23, 59 , 59 , 999);
+
+
     const filtered = entries.filter(e => {
         if (range === 'all') return true;
         const daysAgo = parseInt(range);
@@ -654,15 +657,17 @@ function closeSettings() {
 
 let dailyChart;
 
-function renderDailyChart(entries, range = 'all') {
-    const today = new Date();
+function renderDailyChart(entries, range = 'all') {const today = new Date();
+    today.setHours(23, 59, 59, 999); // Set to end of today
 
     // ✅ Filter entries based on selected range
     const filtered = entries.filter(e => {
         if (range === 'all') return true;
         const daysAgo = parseInt(range);
         const date = new Date(e.takenAt);
-        return date >= new Date(today.getTime() - daysAgo * 24 * 60 * 60 * 1000);
+        const cutoffDate = new Date(today.getTime() - (daysAgo - 1) * 24 * 60 * 60 * 1000); // Include today
+        cutoffDate.setHours(0, 0, 0, 0); // Start of cutoff day
+        return date >= cutoffDate;
     });
 
     if (!filtered.length) {
@@ -736,6 +741,10 @@ function renderDailyChart(entries, range = 'all') {
     const start = new Date(Math.min(...filtered.map(e => new Date(e.takenAt))));
     const todayKey = today.toISOString().split('T')[0];
     const end = new Date(today);
+
+    if (!dailyMap[todayKey]) {
+        dailyMap[todayKey] = [];
+    }
     
     // Force today to be included even if no entries exist for today
     end.setHours(23, 59, 59, 999); // End of today

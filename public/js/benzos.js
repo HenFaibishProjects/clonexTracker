@@ -437,9 +437,9 @@ function updateFilterStats(entries) {
     $('#filterStatsBox')
         .removeClass('d-none')
         .html(`
-            <strong>Average Dosage in Last Week:</strong> ${avgWeek} mg<br/>
-            <strong>Average Dosage in Last Month:</strong> ${avgMonth} mg
-        `);
+ <strong>Average Dosage in Last Week:</strong> ${avgWeek} mg<br/>
+ <strong>Average Dosage in Last Month:</strong> ${avgMonth} mg
+ `);
 }
 
 function updateStats(entries) {
@@ -478,20 +478,20 @@ function updateStats(entries) {
     }
 
     $('#statsBox').html(`
-        <strong>Last Taken:</strong> ${lastTakenAt.toLocaleString('he-IL', {
+ <strong>Last Taken:</strong> ${lastTakenAt.toLocaleString('he-IL', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
     })}<br/>
-        <strong>Last Dosage:</strong> ${lastEntry.dosageMg} mg
-        <br>
-        <strong>Average Dosage in Last Week:</strong> ${avgWeek} mg<br/>
-  
-        <strong>Average Dosage in Last Month:</strong> ${avgMonth} mg<br/>
-        <strong id="runningTimer">🕒 Time from Last Dosage: ...</strong>
-    `);
+ <strong>Last Dosage:</strong> ${lastEntry.dosageMg} mg
+ <br>
+ <strong>Average Dosage in Last Week:</strong> ${avgWeek} mg<br/>
+ 
+ <strong>Average Dosage in Last Month:</strong> ${avgMonth} mg<br/>
+ <strong id="runningTimer">🕒 Time from Last Dosage: ...</strong>
+ `);
 }
 
 function exportToCSV(entries) {
@@ -553,23 +553,23 @@ function renderEntries(entries) {
     $tbody.empty();
     entries.forEach((entry) => {
         const row = `
-      <tr data-id="${entry.id}">
-        <td><span class="value dosage">${entry.dosageMg}</span><input type="number" step="0.01" class="form-control form-control-sm edit dosage d-none" value="${entry.dosageMg}" /></td>
-        <td>
-        <span class="value takenAt">${formatTimestamp(entry.takenAt)}</span>
+ <tr data-id="${entry.id}">
+ <td><span class="value dosage">${entry.dosageMg}</span><input type="number" step="0.01" class="form-control form-control-sm edit dosage d-none" value="${entry.dosageMg}" /></td>
+ <td>
+ <span class="value takenAt">${formatTimestamp(entry.takenAt)}</span>
 
-        <input type="datetime-local" class="form-control form-control-sm edit takenAt d-none" value="${getDatetimeInputValue(entry.takenAt)}" />
-        </td> 
-        <td><span class="value reason">${entry.reason || ''}</span><input type="text" class="form-control form-control-sm edit reason d-none" value="${entry.reason || ''}" /></td>
-        <td><span class="value comments">${entry.comments || ''}</span><input type="text" class="form-control form-control-sm edit comments d-none" value="${entry.comments || ''}" /></td>
-        <td>
-          <button class="btn btn-sm btn-secondary edit-btn" data-bs-toggle="tooltip" title="Edit entry">✏️</button>
-          <button class="btn btn-sm btn-success save-btn d-none" data-bs-toggle="tooltip" title="Save changes">💾</button>
-          <button class="btn btn-sm btn-warning cancel-btn d-none" data-bs-toggle="tooltip" title="Cancel editing">❌</button>
-          <button class="btn btn-sm btn-danger delete-btn" data-id="${entry.id}" data-bs-toggle="tooltip" title="Delete entry">🗑</button>
+ <input type="datetime-local" class="form-control form-control-sm edit takenAt d-none" value="${getDatetimeInputValue(entry.takenAt)}" />
+ </td> 
+ <td><span class="value reason">${entry.reason || ''}</span><input type="text" class="form-control form-control-sm edit reason d-none" value="${entry.reason || ''}" /></td>
+ <td><span class="value comments">${entry.comments || ''}</span><input type="text" class="form-control form-control-sm edit comments d-none" value="${entry.comments || ''}" /></td>
+ <td>
+ <button class="btn btn-sm btn-secondary edit-btn" data-bs-toggle="tooltip" title="Edit entry">✏️</button>
+ <button class="btn btn-sm btn-success save-btn d-none" data-bs-toggle="tooltip" title="Save changes">💾</button>
+ <button class="btn btn-sm btn-warning cancel-btn d-none" data-bs-toggle="tooltip" title="Cancel editing">❌</button>
+ <button class="btn btn-sm btn-danger delete-btn" data-id="${entry.id}" data-bs-toggle="tooltip" title="Delete entry">🗑</button>
 
-        </td>
-      </tr>`;
+ </td>
+ </tr>`;
         $tbody.append(row);
     });
 }
@@ -665,9 +665,60 @@ function renderDailyChart(entries, range = 'all') {
         return date >= new Date(today.getTime() - daysAgo * 24 * 60 * 60 * 1000);
     });
 
+    // ✅ FIXED: Show today even when no entries exist
     if (!filtered.length) {
+        // Still show today with 0 dosage
+        const todayKey = today.toISOString().split('T')[0];
+        const dateLabels = [todayKey];
+        const dateSums = [0];
+
         if (dailyChart) dailyChart.destroy();
-        $('#dailyAverageBox').addClass('d-none');
+        const ctx = document.getElementById('dailyChart').getContext('2d');
+        dailyChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dateLabels,
+                datasets: [{
+                    label: 'Daily Dosage (mg)',
+                    data: dateSums,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        ticks: {
+                            color: $('body').hasClass('dark-mode') ? '#aaa' : '#000',
+                            autoSkip: true,
+                            maxTicksLimit: 15
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: $('body').hasClass('dark-mode') ? '#aaa' : '#000'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: $('body').hasClass('dark-mode') ? '#e0e0e0' : '#000'
+                        }
+                    }
+                }
+            }
+        });
+
+        $('#dailyAverageBox')
+            .removeClass('d-none')
+            .html(`
+ <strong>Daily Avg for Selected Range:</strong> 0.00 mg/day<br/>
+ <strong>No entries found for the selected range</strong>
+ `);
         return;
     }
 
@@ -711,14 +762,14 @@ function renderDailyChart(entries, range = 'all') {
         const firstDose = new Date(sortedEntries[0].takenAt);
         const lastDose = new Date(sortedEntries[sortedEntries.length - 1].takenAt);
         const totalDays = (lastDose - firstDose) / (1000 * 60 * 60 * 24);
-        
+
         // Calculate average days between doses
         const avgGapDays = (totalDays / (sortedEntries.length - 1)).toFixed(1);
 
-        
+
         // Calculate average dosage per dose
         const avgDose = (sortedEntries.reduce((sum, e) => sum + e.dosageMg, 0) / sortedEntries.length).toFixed(2);
-        
+
         avgFrequencyStr = `Average "taking every ${avgGapDays} days" the Dosage ${avgDose} mg`;
     } else if (sortedEntries.length === 1) {
         avgFrequencyStr = `Only one dose recorded: ${sortedEntries[0].dosageMg} mg`;
@@ -733,28 +784,38 @@ function renderDailyChart(entries, range = 'all') {
     });
 
     // ✅ FIXED: Ensure today is always included in the range
-    const start = new Date(Math.min(...filtered.map(e => new Date(e.takenAt))));
+    const start = filtered.length > 0
+        ? new Date(Math.min(...filtered.map(e => new Date(e.takenAt))))
+        : new Date(today); // If no entries, start from today
+
     const todayKey = today.toISOString().split('T')[0];
     const end = new Date(today);
-    
+
     // Force today to be included even if no entries exist for today
     end.setHours(23, 59, 59, 999); // End of today
-    
+
     const dateLabels = [];
     const dateSums = [];
 
     let d = new Date(start);
     d.setHours(0, 0, 0, 0); // Start of day
-    
+
+    // Ensure we always include today in the loop
     while (d <= end) {
         const key = d.toISOString().split('T')[0];
         const sum = dailyMap[key]
             ? dailyMap[key].reduce((sum, val) => sum + val, 0)
             : 0;
-        
+
         dateLabels.push(key);
         dateSums.push(parseFloat(sum.toFixed(3)));
         d.setDate(d.getDate() + 1);
+    }
+
+    // Double-check that today is included
+    if (!dateLabels.includes(todayKey)) {
+        dateLabels.push(todayKey);
+        dateSums.push(0); // No dosage for today
     }
 
     // ✅ Destroy old chart and redraw
@@ -807,10 +868,10 @@ function renderDailyChart(entries, range = 'all') {
     $('#dailyAverageBox')
         .removeClass('d-none')
         .html(`
-            <strong>Daily Avg for Selected Range:</strong> ${avgPerDay} mg/day<br/>
-            <strong>Largest Time Between Doses:</strong> ${gapStr}<br/>
-            <strong>${avgFrequencyStr}</strong>
-        `);
+ <strong>Daily Avg for Selected Range:</strong> ${avgPerDay} mg/day<br/>
+ <strong>Largest Time Between Doses:</strong> ${gapStr}<br/>
+ <strong>${avgFrequencyStr}</strong>
+ `);
 }
 function applyDarkMode(enabled) {
     $('body').toggleClass('dark-mode', enabled);

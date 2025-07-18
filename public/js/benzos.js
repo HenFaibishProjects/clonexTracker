@@ -375,7 +375,8 @@ $(document).ready(function () {
 
 
     $('#dailyRangeDropdown .dropdown-item').on('click', function () {
-        const selectedRange = $(this).data('range'); // e.g., '7', '30', etc.
+        //const selectedRange = $(this).data('range');
+        const selectedRange = $(this).data('range');
         $('#dailyRangeBtn').text($(this).text());
         renderDailyChart(allEntries, selectedRange); // ✅ now passes selected range
     });
@@ -656,13 +657,18 @@ let dailyChart;
 
 function renderDailyChart(entries, range = 'all') {
     const today = new Date();
+    today.setHours(23, 59, 59, 999); // End of today
 
-    // ✅ Filter entries based on selected range
+    const now = new Date();
+    now.setHours(0, 0, 0, 0); // Start of today
+
+    // ✅ FIXED: Filter entries based on selected range
     const filtered = entries.filter(e => {
         if (range === 'all') return true;
         const daysAgo = parseInt(range);
         const date = new Date(e.takenAt);
-        return date >= new Date(today.getTime() - daysAgo * 24 * 60 * 60 * 1000);
+        // FIXED: Remove the -1 to include the full number of days
+        return date >= new Date(now.getTime() - (daysAgo - 1) * 86400000) && date <= new Date(today);
     });
 
     // ✅ FIXED: Show today even when no entries exist
@@ -757,7 +763,9 @@ function renderDailyChart(entries, range = 'all') {
 
     // ✅ NEW: Calculate average dosing frequency
     let avgFrequencyStr = '';
-    if (sortedEntries.length > 1) {
+    let avgFrequency = '';
+    const realRange = +range+1
+    if (sortedEntries.length > 1 && realRange) {
         // Calculate total time span in days
         const firstDose = new Date(sortedEntries[0].takenAt);
         const lastDose = new Date(sortedEntries[sortedEntries.length - 1].takenAt);
@@ -766,13 +774,13 @@ function renderDailyChart(entries, range = 'all') {
         // Calculate average days between doses
         const avgGapDays = (totalDays / (sortedEntries.length - 1)).toFixed(1);
 
-
         // Calculate average dosage per dose
         const avgDose = (sortedEntries.reduce((sum, e) => sum + e.dosageMg, 0) / sortedEntries.length).toFixed(2);
-
-        avgFrequencyStr = `Average "taking every ${avgGapDays} days" the Dosage ${avgDose} mg`;
+        const avgPerDay = (realRange /  sortedEntries.length).toFixed(2);
+        avgFrequencyStr = `The dosage was taken ${sortedEntries.length} times over the past ${realRange} days.`;
+        avgFrequency = `Average of taking medication every ${avgPerDay} days in the time period of ${realRange} days.`;
     } else if (sortedEntries.length === 1) {
-        avgFrequencyStr = `Only one dose recorded: ${sortedEntries[0].dosageMg} mg`;
+        avgFrequencyStr = `Only one dose recorded in ${realRange} days`;
     }
 
     // ✅ Group by day
@@ -783,15 +791,25 @@ function renderDailyChart(entries, range = 'all') {
         dailyMap[day].push(e.dosageMg);
     });
 
-    // ✅ FIXED: Ensure today is always included in the range
+    // ✅ FIXED: Calculate proper date range for chart display
     const start = filtered.length > 0
         ? new Date(Math.min(...filtered.map(e => new Date(e.takenAt))))
-        : new Date(today); // If no entries, start from today
+        : new Date(today);
+
+    // For range filtering, ensure we show the full requested range
+    if (range !== 'all') {
+        const daysAgo = parseInt(range);
+        const rangeStart = new Date(now.getTime() - (daysAgo - 1) * 86400000);
+        rangeStart.setHours(0, 0, 0, 0);
+
+        // Use the earlier of the two dates to ensure full range is shown
+        if (rangeStart < start) {
+            start.setTime(rangeStart.getTime());
+        }
+    }
 
     const todayKey = today.toISOString().split('T')[0];
     const end = new Date(today);
-
-    // Force today to be included even if no entries exist for today
     end.setHours(23, 59, 59, 999); // End of today
 
     const dateLabels = [];
@@ -800,7 +818,7 @@ function renderDailyChart(entries, range = 'all') {
     let d = new Date(start);
     d.setHours(0, 0, 0, 0); // Start of day
 
-    // Ensure we always include today in the loop
+    // Generate all dates in the range
     while (d <= end) {
         const key = d.toISOString().split('T')[0];
         const sum = dailyMap[key]
@@ -870,7 +888,8 @@ function renderDailyChart(entries, range = 'all') {
         .html(`
  <strong>Daily Avg for Selected Range:</strong> ${avgPerDay} mg/day<br/>
  <strong>Largest Time Between Doses:</strong> ${gapStr}<br/>
- <strong>${avgFrequencyStr}</strong>
+ <strong>${avgFrequencyStr}</strong><br/>
+ <strong>${avgFrequency}</strong>
  `);
 }
 function applyDarkMode(enabled) {

@@ -343,6 +343,8 @@
             const registerSection = document.getElementById('registerSection');
             const forgotSection = document.getElementById('forgotSection');
             const tabs = document.querySelectorAll('.tab-modern');
+            const authTitle = document.querySelector('.auth-title');
+            const authSubtitle = document.querySelector('.auth-subtitle');
             
             // Hide all sections
             loginSection.classList.add('hidden');
@@ -356,9 +358,13 @@
             if (tab === 'login') {
                 loginSection.classList.remove('hidden');
                 tabs[0].classList.add('active');
+                authTitle.textContent = 'Welcome Back';
+                authSubtitle.textContent = 'Sign in to continue tracking your progress';
             } else if (tab === 'register') {
                 registerSection.classList.remove('hidden');
                 tabs[1].classList.add('active');
+                authTitle.textContent = 'Get Started';
+                authSubtitle.textContent = 'Create your account to start tracking your progress';
             }
             
             // Clear alert messages

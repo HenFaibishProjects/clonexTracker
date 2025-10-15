@@ -471,6 +471,15 @@
                         <span>📈</span>
                         <span>Enhanced Analytics</span>
                     </h3>
+                    <select id="analyticsRange" class="select-modern">
+                        <option value="all">📅 All Time</option>
+                        <option value="7">📆 Last 7 Days</option>
+                        <option value="14">📆 Last 14 Days</option>
+                        <option value="30">🗓️ Last 30 Days</option>
+                        <option value="90">🗓️ Last 90 Days</option>
+                        <option value="180">🗓️ Last 6 Months</option>
+                        <option value="365">📅 Last Year</option>
+                    </select>
                 </div>
 
                 <!-- Trends Section -->
@@ -562,22 +571,18 @@
                     <h4 style="font-size: var(--text-lg); font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-bottom: var(--space-4); display: flex; align-items: center; gap: var(--space-2);">
                         <span>📐</span> Statistical Summary
                     </h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-4);">
-                        <div style="padding: var(--space-3); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
-                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">MEAN</div>
-                            <div style="font-size: var(--text-lg); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsMean">-</div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
+                        <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">AVERAGE</div>
+                            <div style="font-size: var(--text-xl); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsAverage">-</div>
                         </div>
-                        <div style="padding: var(--space-3); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
-                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">MEDIAN</div>
-                            <div style="font-size: var(--text-lg); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsMedian">-</div>
+                        <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">MINIMUM</div>
+                            <div style="font-size: var(--text-xl); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsMin">-</div>
                         </div>
-                        <div style="padding: var(--space-3); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
-                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">MIN</div>
-                            <div style="font-size: var(--text-lg); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsMin">-</div>
-                        </div>
-                        <div style="padding: var(--space-3); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
-                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">MAX</div>
-                            <div style="font-size: var(--text-lg); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsMax">-</div>
+                        <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">MAXIMUM</div>
+                            <div style="font-size: var(--text-xl); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsMax">-</div>
                         </div>
                     </div>
                 </div>

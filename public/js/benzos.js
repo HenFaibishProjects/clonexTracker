@@ -9,6 +9,129 @@ let lastTakenAt;
 
 // ========== NOTIFICATION SYSTEM ==========
 
+function showConfirmDialog(message, onConfirm, onCancel) {
+    // Remove any existing dialogs
+    $('.confirm-dialog-overlay').remove();
+    
+    const dialog = $(`
+        <div class="confirm-dialog-overlay" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease-out;
+        ">
+            <div class="confirm-dialog-content" style="
+                background: var(--bg-elevated);
+                border: 2px solid var(--border-color);
+                border-radius: var(--radius-2xl);
+                box-shadow: var(--shadow-2xl);
+                max-width: 500px;
+                width: 90%;
+                padding: var(--space-8);
+                animation: slideUp 0.3s ease-out;
+            ">
+                <div style="text-align: center; margin-bottom: var(--space-6);">
+                    <div style="
+                        width: 64px;
+                        height: 64px;
+                        margin: 0 auto var(--space-4);
+                        background: var(--color-warning-100);
+                        border-radius: var(--radius-full);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 2rem;
+                    ">⚠️</div>
+                    <h3 style="
+                        font-size: var(--text-xl);
+                        font-weight: var(--font-weight-bold);
+                        color: var(--text-primary);
+                        margin: 0 0 var(--space-3);
+                    ">Confirm Deletion</h3>
+                    <p style="
+                        font-size: var(--text-base);
+                        color: var(--text-secondary);
+                        line-height: 1.6;
+                        margin: 0;
+                        white-space: pre-line;
+                    ">${message}</p>
+                </div>
+                <div style="
+                    display: flex;
+                    gap: var(--space-3);
+                    justify-content: center;
+                ">
+                    <button class="confirm-dialog-cancel" style="
+                        flex: 1;
+                        padding: var(--space-3) var(--space-6);
+                        background: var(--bg-tertiary);
+                        color: var(--text-primary);
+                        border: 2px solid var(--border-color);
+                        border-radius: var(--radius-lg);
+                        font-size: var(--text-base);
+                        font-weight: var(--font-weight-medium);
+                        cursor: pointer;
+                        transition: all var(--transition-fast);
+                    ">Cancel</button>
+                    <button class="confirm-dialog-confirm" style="
+                        flex: 1;
+                        padding: var(--space-3) var(--space-6);
+                        background: var(--color-danger-600);
+                        color: white;
+                        border: 2px solid var(--color-danger-600);
+                        border-radius: var(--radius-lg);
+                        font-size: var(--text-base);
+                        font-weight: var(--font-weight-medium);
+                        cursor: pointer;
+                        transition: all var(--transition-fast);
+                    ">Delete</button>
+                </div>
+            </div>
+        </div>
+    `);
+    
+    // Add animation styles if not already present
+    if (!$('#dialog-styles').length) {
+        $('<style id="dialog-styles">@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } } .confirm-dialog-cancel:hover { background: var(--bg-secondary); } .confirm-dialog-confirm:hover { background: var(--color-danger-700); border-color: var(--color-danger-700); }</style>').appendTo('head');
+    }
+    
+    $('body').append(dialog);
+    
+    // Handle cancel
+    dialog.find('.confirm-dialog-cancel').on('click', function() {
+        dialog.fadeOut(200, function() { 
+            $(this).remove(); 
+            if (onCancel) onCancel();
+        });
+    });
+    
+    // Handle confirm
+    dialog.find('.confirm-dialog-confirm').on('click', function() {
+        dialog.fadeOut(200, function() { 
+            $(this).remove(); 
+            if (onConfirm) onConfirm();
+        });
+    });
+    
+    // Close on overlay click
+    dialog.on('click', function(e) {
+        if (e.target === this) {
+            dialog.fadeOut(200, function() { 
+                $(this).remove(); 
+                if (onCancel) onCancel();
+            });
+        }
+    });
+}
+
 function showNotification(message, type = 'info', duration = 4000) {
     // Remove any existing notifications
     $('.notification-toast').remove();
@@ -1183,39 +1306,41 @@ function closeTaperingGoalModal() {
 }
 
 function deleteTaperingGoal() {
-    if (!confirm('Are you sure you want to delete your tapering goal? This cannot be undone.')) {
-        return;
-    }
-    
-    const taperingUrl = location.port === '8080'
-        ? 'http://localhost:3000/api/benzos/tapering-goal'
-        : '/api/benzos/tapering-goal';
-    
-    console.log('Deleting tapering goal at:', taperingUrl);
-    
-    $.ajax({
-        url: taperingUrl,
-        method: 'DELETE',
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-        },
-        success: function(response) {
-            console.log('Delete successful:', response);
-            $('#taperingGoalSection').hide();
-            $('#setGoalPrompt').show();
-            showNotification('Tapering goal deleted successfully.', 'success');
-        },
-        error: function(xhr, status, error) {
-            console.error('Delete failed:', {
-                status: xhr.status,
-                statusText: xhr.statusText,
-                responseText: xhr.responseText,
-                error: error
+    showConfirmDialog(
+        'Are you sure you want to delete your tapering goal?\n\nThis action is permanent and cannot be undone. All goal progress and data will be lost.',
+        function() {
+            // On confirm
+            const taperingUrl = location.port === '8080'
+                ? 'http://localhost:3000/api/benzos/tapering-goal'
+                : '/api/benzos/tapering-goal';
+            
+            console.log('Deleting tapering goal at:', taperingUrl);
+            
+            $.ajax({
+                url: taperingUrl,
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                },
+                success: function(response) {
+                    console.log('Delete successful:', response);
+                    $('#taperingGoalSection').hide();
+                    $('#setGoalPrompt').show();
+                    showNotification('Tapering goal deleted successfully.', 'success');
+                },
+                error: function(xhr, status, error) {
+                    console.error('Delete failed:', {
+                        status: xhr.status,
+                        statusText: xhr.statusText,
+                        responseText: xhr.responseText,
+                        error: error
+                    });
+                    const errorMsg = xhr.responseJSON?.message || `Failed to delete tapering goal. Error: ${xhr.status} ${xhr.statusText}`;
+                    showNotification(errorMsg, 'error');
+                }
             });
-            const errorMsg = xhr.responseJSON?.message || `Failed to delete tapering goal. Error: ${xhr.status} ${xhr.statusText}`;
-            showNotification(errorMsg, 'error');
         }
-    });
+    );
 }
 
 // ========== ENHANCED ANALYTICS FUNCTIONS ==========

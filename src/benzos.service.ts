@@ -135,7 +135,18 @@ export class BenzosService {
         if (!user) throw new Error('User not found');
 
         user.taperGoalActive = false;
-        return this.userRepo.save(user);
+        
+        // Clear all tapering goal data to prevent issues
+        user.taperStartDosage = null;
+        user.taperTargetDosage = null;
+        user.taperStartDate = null;
+        user.taperTargetDate = null;
+        user.taperNotes = null;
+        
+        await this.userRepo.save(user);
+        
+        // Return a simple success response instead of the full user object
+        return { success: true, message: 'Tapering goal deleted successfully' };
     }
 
     async getTaperingProgress(userId: number) {

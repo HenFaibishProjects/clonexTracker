@@ -1191,19 +1191,29 @@ function deleteTaperingGoal() {
         ? 'http://localhost:3000/api/benzos/tapering-goal'
         : '/api/benzos/tapering-goal';
     
+    console.log('Deleting tapering goal at:', taperingUrl);
+    
     $.ajax({
         url: taperingUrl,
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
         },
-        success: function() {
+        success: function(response) {
+            console.log('Delete successful:', response);
             $('#taperingGoalSection').hide();
             $('#setGoalPrompt').show();
             showNotification('Tapering goal deleted successfully.', 'success');
         },
-        error: function() {
-            showNotification('Failed to delete tapering goal.', 'error');
+        error: function(xhr, status, error) {
+            console.error('Delete failed:', {
+                status: xhr.status,
+                statusText: xhr.statusText,
+                responseText: xhr.responseText,
+                error: error
+            });
+            const errorMsg = xhr.responseJSON?.message || `Failed to delete tapering goal. Error: ${xhr.status} ${xhr.statusText}`;
+            showNotification(errorMsg, 'error');
         }
     });
 }

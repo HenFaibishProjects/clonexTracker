@@ -52,26 +52,12 @@ export class BenzosController {
         return this.benzosService.getBetweenDates(from, to, req.user.id!);
     }
 
-    @Delete(':id')
-    async deleteOne(@Req() req: AuthenticatedRequest, @Param('id') id: number): Promise<void> {
-        return this.benzosService.deleteOne(id, req.user.id!);
-    }
-
     @Post('/delete-many')
     async deleteMany(@Req() req: AuthenticatedRequest, @Body() body: { ids: number[] }): Promise<void> {
         return this.benzosService.deleteMany(body.ids, req.user.id!);
     }
 
-    @Patch(':id')
-    async updateOne(
-        @Req() req: AuthenticatedRequest,
-        @Param('id') id: number,
-        @Body() data: Partial<BenzosEntry>,
-    ): Promise<void> {
-        return this.benzosService.updateOne(id, data, req.user.id!);
-    }
-
-    // Tapering Goal Endpoints
+    // Tapering Goal Endpoints (MUST be before :id routes to avoid conflicts)
     @Post('/tapering-goal')
     async setTaperingGoal(
         @Req() req: AuthenticatedRequest,
@@ -106,7 +92,7 @@ export class BenzosController {
     }
 
     @Delete('/tapering-goal')
-    async deactivateTaperingGoal(@Req() req: AuthenticatedRequest): Promise<User> {
+    async deactivateTaperingGoal(@Req() req: AuthenticatedRequest): Promise<{ success: boolean; message: string }> {
         return this.benzosService.deactivateTaperingGoal(req.user.id!);
     }
 
@@ -118,6 +104,21 @@ export class BenzosController {
     @Get('/enhanced-analytics')
     async getEnhancedAnalytics(@Req() req: AuthenticatedRequest) {
         return this.benzosService.getEnhancedAnalytics(req.user.id!);
+    }
+
+    // Generic :id routes (MUST be after specific routes to avoid conflicts)
+    @Delete(':id')
+    async deleteOne(@Req() req: AuthenticatedRequest, @Param('id') id: number): Promise<void> {
+        return this.benzosService.deleteOne(id, req.user.id!);
+    }
+
+    @Patch(':id')
+    async updateOne(
+        @Req() req: AuthenticatedRequest,
+        @Param('id') id: number,
+        @Body() data: Partial<BenzosEntry>,
+    ): Promise<void> {
+        return this.benzosService.updateOne(id, data, req.user.id!);
     }
 
 }

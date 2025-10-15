@@ -16,7 +16,7 @@ export class MailService {
     async sendActivationCode(to: string, code: string) {
         const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
         const mailOptions = {
-            from: '"Benzo Tracker" <zzzi10@gmail.com>',
+            from: '"Benzo Tracker" <lidasoftwarenet@gmail.com>',
             to,
             subject: '🔒 Your Activation Code',
             text: `Welcome to Benzo Tracker!\n\nYour activation code is: ${code}\n\nPlease enter it in the app on this link:\n\n\ ${baseUrl}/activate.html`
@@ -31,7 +31,7 @@ export class MailService {
 
 
         const mailOptions = {
-            from: '"Benzos Tracker" <zzzi10@gmail.com>',
+            from: '"Benzos Tracker" <lidasoftwarenet@gmail.com>',
             to,
             subject: '🔒 Password Reset Request',
             html: `
@@ -47,8 +47,8 @@ export class MailService {
 
     async mailContactMe(subject: string, email: string, name: string, message: string) {
         const mailOptions = {
-            from: '"LiDa Software" <zzzi10@gmail.com>',
-            to: 'zzzi10@gmail.com',
+            from: '"LiDa Software" <lidasoftwarenet@gmail.com>',
+            to: 'lidasoftwarenet@gmail.com',
             subject: `[Contact Form] ${subject}`,
             text: `Name: ${name}\nEmail: ${email}\n\n${message}`,
         };

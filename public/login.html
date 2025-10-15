@@ -4,131 +4,427 @@
     <link rel="icon" type="image/png" href="/icons/pl.png">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Benzos Tracker - Authentication</title>
+    <title>Benzos Tracker - Sign In</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style-modern.css" />
+    <style>
+        /* Additional authentication-specific styles */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        }
+        
+        .auth-link {
+            color: var(--color-primary-500);
+            text-decoration: none;
+            font-weight: var(--font-weight-medium);
+            transition: color var(--transition-fast);
+        }
+        
+        .auth-link:hover {
+            color: var(--color-primary-600);
+            text-decoration: underline;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: var(--space-6) 0;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .divider span {
+            padding: 0 var(--space-4);
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
+        }
+        
+        .password-requirements {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            margin-top: var(--space-2);
+            line-height: 1.5;
+        }
+        
+        .back-to-login {
+            text-align: center;
+            margin-top: var(--space-6);
+        }
+        
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--space-6);
+            font-size: 2.5rem;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: var(--z-modal);
+            padding: var(--space-6);
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-content-modern {
+            background: var(--bg-elevated);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-8);
+            max-width: 500px;
+            width: 100%;
+            box-shadow: var(--shadow-2xl);
+            border: 1px solid var(--border-color);
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .alert-message {
+            padding: var(--space-4);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-4);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .alert-message.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--color-success);
+            color: var(--color-success);
+        }
+        
+        .alert-message.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--color-error);
+            color: var(--color-error);
+        }
+        
+        .alert-message.info {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid var(--color-info);
+            color: var(--color-info);
+        }
+    </style>
 </head>
 <body>
-<div class="container auth-container">
-    <h1 class="text-center mb-4">Benzos Tracker</h1>
-    <div id="authMessage" class="alert d-none text-center" role="alert"></div>
+    <div class="auth-container-modern">
+        <div class="auth-card animate-fade-in">
+            <!-- Auth Header -->
+            <div class="auth-header">
+                <div class="auth-logo">💊</div>
+                <h1 class="auth-title">Welcome Back</h1>
+                <p class="auth-subtitle">Sign in to continue tracking your progress</p>
+            </div>
 
-    <!-- Navigation Tabs -->
-    <ul class="nav nav-tabs mb-4" id="authTab" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab" aria-controls="login" aria-selected="true">Login</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button" role="tab" aria-controls="register" aria-selected="false">Register</button>
-        </li>
-    </ul>
+            <!-- Alert Messages -->
+            <div id="authMessage" class="hidden"></div>
 
-    <!-- Tab Contents -->
-    <div class="tab-content">
+            <!-- Login/Register Tabs -->
+            <div class="tabs-modern" id="authTabs">
+                <button class="tab-modern active" onclick="switchTab('login')">Sign In</button>
+                <button class="tab-modern" onclick="switchTab('register')">Sign Up</button>
+            </div>
 
-        <!-- Login Tab Pane -->
-        <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
-            <form id="loginForm" class="mt-3">
-                <div class="mb-3">
-                    <label for="loginEmail" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="loginEmail" placeholder="Enter your email" required />
-                </div>
-                <div class="mb-3">
-                    <label for="loginPassword" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="loginPassword" placeholder="Enter your password" required />
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Login</button>
-                <div class="text-center mt-2">
-                    <a href="#" onclick="showForgotPassword()">Forgot Password?</a>
-                </div>
-            </form>
-        </div>
-
-        <!-- Registration Form -->
-        <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
-            <form id="registerForm" class="mt-3">
-                <div class="mb-3">
-                    <label for="registerName" class="form-label">Name</label>
-                    <input type="text" class="form-control" id="registerName" placeholder="Your Name" required />
-                </div>
-                <div class="mb-3">
-                    <label for="registerEmail" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="registerEmail" placeholder="Enter your email" required />
-                </div>
-                <div class="mb-3">
-                    <label for="registerPassword" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="registerPassword" placeholder="Choose a password" required />
-                    <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm new password">
-                    <div class="password-requirements">
-                        <small style="color: #6b7280; display: block; margin-top: 8px;">
-                            Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.
-                        </small>
+            <!-- Login Form -->
+            <div id="loginSection">
+                <form id="loginForm">
+                    <div class="form-group-modern">
+                        <label for="loginEmail" class="form-label-modern">Email Address</label>
+                        <input 
+                            type="email" 
+                            class="form-input-modern" 
+                            id="loginEmail" 
+                            placeholder="your.email@example.com" 
+                            required 
+                        />
                     </div>
-                </div>
-                <div class="mb-3">
-                    <label for="registerPassword" class="form-label">Benzodiazepines Type</label>
-                    <input type="text" class="form-control" id="benzos" placeholder="Enter your Benzodiazepines" required />
-                </div>
-                <button type="submit" class="btn btn-success w-100">Register</button>
-            </form>
-        </div>
+                    
+                    <div class="form-group-modern">
+                        <label for="loginPassword" class="form-label-modern">Password</label>
+                        <input 
+                            type="password" 
+                            class="form-input-modern" 
+                            id="loginPassword" 
+                            placeholder="Enter your password" 
+                            required 
+                        />
+                    </div>
 
-        <!-- Forgot Password -->
-        <div class="tab-pane fade" id="forgot" role="tabpanel">
-            <form id="forgotForm" class="mt-3">
-                <div class="text-center mb-4">
-                    <div class="forgot-icon mb-3">🔑</div>
-                    <h4>Reset Your Password</h4>
-                    <p class="text-muted">Enter your email address and we'll send you a reset link</p>
-                </div>
+                    <button type="submit" class="btn-modern btn-primary-modern btn-full btn-lg">
+                        Sign In
+                    </button>
 
-                <div class="mb-3">
-                    <label for="forgotEmail" class="form-label">Email Address</label>
-                    <input type="email" class="form-control" id="forgotEmail" placeholder="Enter your email" required />
-                </div>
-
-                <button type="submit" class="btn btn-primary w-100 mb-3">📧 Send Reset Link</button>
-
-                <div class="alert alert-info">
-                    <small><strong>Note:</strong> If your email isn't registered in our system, no email will be sent for security reasons.</small>
-                </div>
-
-                <div class="text-center mt-3">
-                    <small class="text-muted"><a href="#" onclick="hideForgotPassword()">Close Reset Password</a></small>
-                </div>
-            </form>
-        </div>
-
-    </div>
-</div>
-
-<!-- Registration Success Modal -->
-<div class="modal fade" id="registrationSuccessModal" tabindex="-1" aria-labelledby="registrationSuccessLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-success">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="registrationSuccessLabel">🎉 Registration Successful!</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="text-center mt-4">
+                        <a href="#" class="auth-link" onclick="showForgotPassword(event)">
+                            Forgot your password?
+                        </a>
+                    </div>
+                </form>
             </div>
-            <div class="modal-body text-center">
-                <p>✅ We've sent an <strong>activation code</strong> to your email.</p>
-                <p>📬 Check your inbox for an email from <strong>Benzos Tracker</strong>.</p>
-                <p>💡 Click the link and enter your email + code on the activation screen.</p>
-                <hr />
-                <a href="activate.html" class="btn btn-success ms-2">Go to Activation</a>
+
+            <!-- Register Form -->
+            <div id="registerSection" class="hidden">
+                <form id="registerForm">
+                    <div class="form-group-modern">
+                        <label for="registerName" class="form-label-modern">Full Name</label>
+                        <input 
+                            type="text" 
+                            class="form-input-modern" 
+                            id="registerName" 
+                            placeholder="John Doe" 
+                            required 
+                        />
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label for="registerEmail" class="form-label-modern">Email Address</label>
+                        <input 
+                            type="email" 
+                            class="form-input-modern" 
+                            id="registerEmail" 
+                            placeholder="your.email@example.com" 
+                            required 
+                        />
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label for="registerPassword" class="form-label-modern">Password</label>
+                        <input 
+                            type="password" 
+                            class="form-input-modern" 
+                            id="registerPassword" 
+                            placeholder="Create a strong password" 
+                            required 
+                        />
+                        <div class="password-requirements">
+                            Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.
+                        </div>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label for="confirmPassword" class="form-label-modern">Confirm Password</label>
+                        <input 
+                            type="password" 
+                            class="form-input-modern" 
+                            id="confirmPassword" 
+                            placeholder="Confirm your password" 
+                            required 
+                        />
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label for="benzos" class="form-label-modern">Benzodiazepine Type</label>
+                        <input 
+                            type="text" 
+                            class="form-input-modern" 
+                            id="benzos" 
+                            placeholder="e.g., Clonazepam, Diazepam" 
+                            required 
+                        />
+                    </div>
+
+                    <button type="submit" class="btn-modern btn-primary-modern btn-full btn-lg">
+                        Create Account
+                    </button>
+                </form>
+            </div>
+
+            <!-- Forgot Password Section -->
+            <div id="forgotSection" class="hidden">
+                <div class="back-to-login">
+                    <a href="#" class="auth-link" onclick="hideForgotPassword(event)">
+                        ← Back to Sign In
+                    </a>
+                </div>
+
+                <div class="text-center mb-6">
+                    <div class="auth-logo">🔑</div>
+                    <h2 class="auth-title" style="font-size: var(--text-2xl);">Reset Password</h2>
+                    <p class="auth-subtitle">Enter your email and we'll send you a reset link</p>
+                </div>
+
+                <form id="forgotForm">
+                    <div class="form-group-modern">
+                        <label for="forgotEmail" class="form-label-modern">Email Address</label>
+                        <input 
+                            type="email" 
+                            class="form-input-modern" 
+                            id="forgotEmail" 
+                            placeholder="your.email@example.com" 
+                            required 
+                        />
+                    </div>
+
+                    <button type="submit" class="btn-modern btn-primary-modern btn-full btn-lg">
+                        Send Reset Link
+                    </button>
+
+                    <div class="alert-message info mt-4">
+                        <span>ℹ️</span>
+                        <small>If your email is registered, you'll receive a reset link shortly.</small>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-</div>
 
-<footer class="text-center mb-3" style="color: blue;">
-    &copy; 2025 LiDa Software. All rights reserved.
-</footer>
+    <!-- Registration Success Modal -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-content-modern">
+            <div class="success-icon">✅</div>
+            <h2 class="text-center mb-4" style="font-size: var(--text-2xl); font-weight: var(--font-weight-bold); color: var(--text-primary);">
+                Registration Successful!
+            </h2>
+            <p class="text-center mb-4" style="color: var(--text-secondary);">
+                We've sent an activation code to your email. Check your inbox for instructions.
+            </p>
+            <div class="alert-message info mb-4">
+                <span>📬</span>
+                <small>Look for an email from <strong>Benzos Tracker</strong></small>
+            </div>
+            <a href="activate.html" class="btn-modern btn-primary-modern btn-full btn-lg">
+                Go to Activation
+            </a>
+        </div>
+    </div>
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="js/login.js"></script>
+    <footer class="text-center" style="position: fixed; bottom: var(--space-4); left: 0; right: 0; color: white; font-size: var(--text-sm); z-index: 0;">
+        © 2025 LiDa Software. All rights reserved.
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="js/login.js"></script>
+    
+    <script>
+        // Tab switching functionality
+        function switchTab(tab) {
+            const loginSection = document.getElementById('loginSection');
+            const registerSection = document.getElementById('registerSection');
+            const forgotSection = document.getElementById('forgotSection');
+            const tabs = document.querySelectorAll('.tab-modern');
+            const authTitle = document.querySelector('.auth-title');
+            const authSubtitle = document.querySelector('.auth-subtitle');
+            
+            // Hide all sections
+            loginSection.classList.add('hidden');
+            registerSection.classList.add('hidden');
+            forgotSection.classList.add('hidden');
+            
+            // Remove active class from all tabs
+            tabs.forEach(t => t.classList.remove('active'));
+            
+            // Show selected section and activate tab
+            if (tab === 'login') {
+                loginSection.classList.remove('hidden');
+                tabs[0].classList.add('active');
+                authTitle.textContent = 'Welcome Back';
+                authSubtitle.textContent = 'Sign in to continue tracking your progress';
+            } else if (tab === 'register') {
+                registerSection.classList.remove('hidden');
+                tabs[1].classList.add('active');
+                authTitle.textContent = 'Get Started';
+                authSubtitle.textContent = 'Create your account to start tracking your progress';
+            }
+            
+            // Clear alert messages
+            document.getElementById('authMessage').className = 'hidden';
+        }
+        
+        // Show forgot password section
+        function showForgotPassword(event) {
+            if (event) event.preventDefault();
+            const loginSection = document.getElementById('loginSection');
+            const registerSection = document.getElementById('registerSection');
+            const forgotSection = document.getElementById('forgotSection');
+            const tabs = document.querySelectorAll('.tab-modern');
+            
+            loginSection.classList.add('hidden');
+            registerSection.classList.add('hidden');
+            forgotSection.classList.remove('hidden');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            
+            document.getElementById('authMessage').className = 'hidden';
+        }
+        
+        // Hide forgot password section
+        function hideForgotPassword(event) {
+            if (event) event.preventDefault();
+            switchTab('login');
+        }
+        
+        // Show success modal
+        function showSuccessModal() {
+            document.getElementById('successModal').classList.add('active');
+        }
+        
+        // Close modal when clicking outside
+        document.getElementById('successModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+            }
+        });
+        
+        // Check URL hash for register
+        if (window.location.hash === '#register') {
+            switchTab('register');
+        }
+        
+        // Show alert message
+        function showAlert(message, type = 'info') {
+            const alertEl = document.getElementById('authMessage');
+            alertEl.className = `alert-message ${type}`;
+            
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+            alertEl.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+        }
+        
+        // Override the original modal trigger if needed
+        const originalShowModal = window.showRegistrationSuccessModal;
+        window.showRegistrationSuccessModal = function() {
+            showSuccessModal();
+        };
+    </script>
 </body>
 </html>

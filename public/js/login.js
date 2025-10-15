@@ -110,21 +110,15 @@ $(document).ready(function () {
             contentType: 'application/json',
             data: JSON.stringify({ userName: name, email, password , benzosType }),
             success: function (data) {
-                const modal = new bootstrap.Modal(document.getElementById('registrationSuccessModal'));
-                modal.show();
-                modal._element.addEventListener('hidden.bs.modal', () => {
-                    const triggerTab = new bootstrap.Tab(document.querySelector('#login-tab'));
-                    triggerTab.show();
-                });
-
+                console.log('Registration successful:', data);
+                // Show the custom modal (not Bootstrap modal)
+                document.getElementById('successModal').classList.add('active');
             },
-
             error: function (xhr) {
                 const msg = xhr.responseJSON?.message || 'Registration failed';
-                $('#authMessage')
-                    .removeClass('d-none alert-success')
-                    .addClass('alert-danger')
-                    .text('❌ ' + msg);
+                const authMessage = document.getElementById('authMessage');
+                authMessage.className = 'alert-message error';
+                authMessage.innerHTML = '<span>❌</span><span>' + msg + '</span>';
             }
         });
     });

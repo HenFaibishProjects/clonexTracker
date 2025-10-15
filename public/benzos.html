@@ -323,6 +323,15 @@
             <!-- Stats will be dynamically loaded here -->
         </div>
 
+        <!-- Running Timer Card -->
+        <div id="runningTimerCard" class="entry-form-card" style="display: none; background: linear-gradient(135deg, var(--color-accent-50) 0%, var(--color-accent-100) 100%); border: 2px solid var(--color-accent-200); margin-bottom: var(--space-8);">
+            <div style="text-align: center;">
+                <div style="font-size: var(--text-sm); color: var(--color-accent-700); font-weight: var(--font-weight-semibold); margin-bottom: var(--space-2);">⏱️ TIME SINCE LAST DOSE</div>
+                <div id="runningTimer" style="font-size: var(--text-4xl); font-weight: var(--font-weight-bold); color: var(--color-accent-600); font-variant-numeric: tabular-nums;">00:00:00</div>
+                <div id="lastDoseInfo" style="font-size: var(--text-sm); color: var(--color-accent-600); margin-top: var(--space-2);"></div>
+            </div>
+        </div>
+
         <!-- Entry Form Card -->
         <div class="entry-form-card">
             <h3 class="section-title">

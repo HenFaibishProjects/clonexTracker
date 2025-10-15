@@ -478,7 +478,6 @@ body.dark-mode .card-glass {
 }
 
 .table-modern tbody tr {
-  border-bottom: 1px solid var(--border-color);
   transition: background-color var(--transition-fast);
 }
 
@@ -491,6 +490,7 @@ body.dark-mode .card-glass {
   font-size: var(--text-sm);
   color: var(--text-primary);
   border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .table-modern td:last-child {

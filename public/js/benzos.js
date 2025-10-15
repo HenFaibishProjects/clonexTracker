@@ -147,11 +147,10 @@ $(document).ready(function () {
                 return;
             }
 
-            const modal = new bootstrap.Modal(document.getElementById('importChoiceModal'));
-            modal.show();
+            $('#importModal').addClass('active');
 
             $('#deleteAndImportBtn').off('click').on('click', function () {
-                modal.hide();
+                closeImportModal();
                 $.ajax({
                     url: `${baseUrl}/delete-many`,
                     method: 'POST',
@@ -166,7 +165,7 @@ $(document).ready(function () {
             });
 
             $('#mergeImportBtn').off('click').on('click', function () {
-                modal.hide();
+                closeImportModal();
                 batchImport(validEntries);
             });
 
@@ -393,7 +392,7 @@ setInterval(() => {
     const minutes = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
     const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
 
-    $('#runningTimer').text(`🕒 Time from Last Dosage: ${hours}:${minutes}:${seconds}`);
+    $('#runningTimer').text(`${hours}:${minutes}:${seconds}`);
 }, 1000);
 
 function loadEntries() {
@@ -509,32 +508,11 @@ function updateFilterStats(entries) {
 
 function updateStats(entries) {
     if (!entries.length) {
-        $('#statsBox').html('No entries yet.');
+        $('#runningTimerCard').hide();
         return;
     }
 
-    const total = entries.length;
     const lastEntry = entries[0];
-
-    // Last 7 days
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-    const weekEntries = entries.filter(e => new Date(e.takenAt) >= oneWeekAgo);
-    const avgWeek = weekEntries.length
-        ? (weekEntries.reduce((sum, e) => sum + e.dosageMg, 0) / weekEntries.length).toFixed(2)
-        : '0.00';
-    const avgPerDayWeek = (weekEntries.reduce((sum, e) => sum + e.dosageMg, 0) / 7).toFixed(2);
-
-    // Last 30 days
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
-    const monthEntries = entries.filter(e => new Date(e.takenAt) >= oneMonthAgo);
-    const avgMonth = monthEntries.length
-        ? (monthEntries.reduce((sum, e) => sum + e.dosageMg, 0) / monthEntries.length).toFixed(2)
-        : '0.00';
-    const avgPerDayMonth = (monthEntries.reduce((sum, e) => sum + e.dosageMg, 0) / 30).toFixed(2);
-
-    const averageDosage = (entries.reduce((sum, e) => sum + e.dosageMg, 0) / total).toFixed(3);
 
     if (lastEntry.takenAt.includes(':')) {
         lastTakenAt = new Date(lastEntry.takenAt);
@@ -542,21 +520,15 @@ function updateStats(entries) {
         lastTakenAt = new Date(`${lastEntry.takenAt}:00:00+03:00`);
     }
 
-    $('#statsBox').html(`
- <strong>Last Taken:</strong> ${lastTakenAt.toLocaleString('he-IL', {
+    // Show and update the running timer card
+    $('#runningTimerCard').show();
+    $('#lastDoseInfo').html(`Last dose: ${lastEntry.dosageMg} mg at ${lastTakenAt.toLocaleString('he-IL', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
-    })}<br/>
- <strong>Last Dosage:</strong> ${lastEntry.dosageMg} mg
- <br>
- <strong>Average Dosage in Last Week:</strong> ${avgWeek} mg<br/>
- 
- <strong>Average Dosage in Last Month:</strong> ${avgMonth} mg<br/>
- <strong id="runningTimer">🕒 Time from Last Dosage: ...</strong>
- `);
+    })}`);
 }
 
 function exportToCSV(entries) {
@@ -988,6 +960,11 @@ window.openTaperingGoalModal = openTaperingGoalModal;
 window.editTaperingGoal = editTaperingGoal;
 window.closeTaperingGoalModal = closeTaperingGoalModal;
 window.deleteTaperingGoal = deleteTaperingGoal;
+window.closeImportModal = closeImportModal;
+
+function closeImportModal() {
+    $('#importModal').removeClass('active');
+}
 
 function loadTaperingGoal() {
     $.ajax({

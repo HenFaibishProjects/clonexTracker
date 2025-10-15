@@ -483,6 +483,7 @@ function loadEntries() {
         updateStatsGrid(entries);
         renderChart(entries);
         renderDailyChart(entries); // ✅ This will now include today
+        loadEnhancedAnalytics(); // ✅ Load analytics after entries are loaded
     });
 }
 
@@ -1048,8 +1049,12 @@ function closeImportModal() {
 }
 
 function loadTaperingGoal() {
+    const taperingUrl = location.port === '8080'
+        ? 'http://localhost:3000/api/benzos/tapering-progress'
+        : '/api/benzos/tapering-progress';
+        
     $.ajax({
-        url: `${baseUrl}/tapering-progress`,
+        url: taperingUrl,
         method: 'GET',
         headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -1145,8 +1150,12 @@ function openTaperingGoalModal() {
 }
 
 function editTaperingGoal() {
+    const taperingUrl = location.port === '8080'
+        ? 'http://localhost:3000/api/benzos/tapering-goal'
+        : '/api/benzos/tapering-goal';
+        
     $.ajax({
-        url: `${baseUrl}/tapering-goal`,
+        url: taperingUrl,
         method: 'GET',
         headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -1178,8 +1187,12 @@ function deleteTaperingGoal() {
         return;
     }
     
+    const taperingUrl = location.port === '8080'
+        ? 'http://localhost:3000/api/benzos/tapering-goal'
+        : '/api/benzos/tapering-goal';
+    
     $.ajax({
-        url: `${baseUrl}/tapering-goal`,
+        url: taperingUrl,
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -1474,9 +1487,13 @@ $(document).ready(function() {
 
         const isEditing = $('#taperingModalTitle').text().includes('Edit');
         const method = isEditing ? 'PATCH' : 'POST';
+        
+        const taperingUrl = location.port === '8080'
+            ? 'http://localhost:3000/api/benzos/tapering-goal'
+            : '/api/benzos/tapering-goal';
 
         $.ajax({
-            url: `${baseUrl}/tapering-goal`,
+            url: taperingUrl,
             method: method,
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -1498,9 +1515,6 @@ $(document).ready(function() {
 
     // Load tapering goal on page load
     loadTaperingGoal();
-    
-    // Load enhanced analytics on page load
-    loadEnhancedAnalytics();
     
     // Refresh tapering progress every 60 seconds
     setInterval(function() {

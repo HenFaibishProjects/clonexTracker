@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import {ContactService} from "./contact.service";
 
 @Controller('contact')
@@ -7,7 +7,14 @@ export class ContactController {
     }
 
     @Post('send')
+    @HttpCode(HttpStatus.OK)
     async sendContactEmail(@Body() body: { name: string; email: string; subject: string; message: string }) {
-        await this.contactService.sendContactEmail(body.name, body.email, body.subject, body.message)
+        try {
+            await this.contactService.sendContactEmail(body.name, body.email, body.subject, body.message);
+            return { success: true, message: 'Email sent successfully' };
+        } catch (error) {
+            console.error('Failed to send contact email:', error);
+            throw error;
+        }
     }
 }

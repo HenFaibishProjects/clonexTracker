@@ -71,4 +71,53 @@ export class BenzosController {
         return this.benzosService.updateOne(id, data, req.user.id!);
     }
 
+    // Tapering Goal Endpoints
+    @Post('/tapering-goal')
+    async setTaperingGoal(
+        @Req() req: AuthenticatedRequest,
+        @Body() goalData: {
+            startDosage: number;
+            targetDosage: number;
+            startDate: Date;
+            targetDate: Date;
+            notes?: string;
+        }
+    ): Promise<User> {
+        return this.benzosService.setTaperingGoal(goalData, req.user.id!);
+    }
+
+    @Get('/tapering-goal')
+    async getTaperingGoal(@Req() req: AuthenticatedRequest) {
+        return this.benzosService.getTaperingGoal(req.user.id!);
+    }
+
+    @Patch('/tapering-goal')
+    async updateTaperingGoal(
+        @Req() req: AuthenticatedRequest,
+        @Body() goalData: Partial<{
+            startDosage: number;
+            targetDosage: number;
+            startDate: Date;
+            targetDate: Date;
+            notes: string;
+        }>
+    ): Promise<User> {
+        return this.benzosService.updateTaperingGoal(goalData, req.user.id!);
+    }
+
+    @Delete('/tapering-goal')
+    async deactivateTaperingGoal(@Req() req: AuthenticatedRequest): Promise<User> {
+        return this.benzosService.deactivateTaperingGoal(req.user.id!);
+    }
+
+    @Get('/tapering-progress')
+    async getTaperingProgress(@Req() req: AuthenticatedRequest) {
+        return this.benzosService.getTaperingProgress(req.user.id!);
+    }
+
+    @Get('/enhanced-analytics')
+    async getEnhancedAnalytics(@Req() req: AuthenticatedRequest) {
+        return this.benzosService.getEnhancedAnalytics(req.user.id!);
+    }
+
 }

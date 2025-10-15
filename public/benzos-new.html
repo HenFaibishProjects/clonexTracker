@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="/icons/pl.png">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Benzos Tracker - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+    <link rel="stylesheet" href="style-modern.css" />
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-secondary);
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-6);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+        }
+
+        .entry-form-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-8);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-4);
+            margin-top: var(--space-4);
+        }
+
+        .form-grid-full {
+            grid-column: 1 / -1;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-6);
+        }
+
+        .section-title {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .filter-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-6);
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space-4);
+            margin-top: var(--space-4);
+        }
+
+        .chart-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-6);
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-4);
+        }
+
+        .chart-title {
+            font-size: var(--text-lg);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+        }
+
+        .select-modern {
+            padding: var(--space-2) var(--space-4);
+            font-size: var(--text-sm);
+            font-family: var(--font-sans);
+            color: var(--text-primary);
+            background-color: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            transition: all var(--transition-fast);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .select-modern:focus {
+            border-color: var(--color-primary-500);
+            box-shadow: 0 0 0 4px rgba(65, 105, 255, 0.1);
+        }
+
+        .table-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-6);
+        }
+
+        .table-header-card {
+            background: var(--bg-tertiary);
+            padding: var(--space-4) var(--space-6);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .btn-group-modern {
+            display: flex;
+            gap: var(--space-2);
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--space-16) var(--space-6);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: var(--space-4);
+            opacity: 0.3;
+        }
+
+        .empty-state-text {
+            font-size: var(--text-lg);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-2);
+        }
+
+        .badge-modern {
+            display: inline-flex;
+            align-items: center;
+            padding: var(--space-1) var(--space-3);
+            font-size: var(--text-xs);
+            font-weight: var(--font-weight-medium);
+            border-radius: var(--radius-full);
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .dropdown-menu-bootstrap {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            padding: var(--space-2);
+        }
+
+        body.dark-mode .dropdown-menu-bootstrap {
+            background: var(--bg-elevated);
+        }
+
+        .dropdown-item-bootstrap {
+            padding: var(--space-3) var(--space-4);
+            color: var(--text-primary);
+            border-radius: var(--radius-md);
+            transition: all var(--transition-fast);
+        }
+
+        .dropdown-item-bootstrap:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="dashboard-logo">
+            <div class="dashboard-logo-icon">💊</div>
+            <span id="benzosTitle"></span>
+        </div>
+        <div class="dropdown">
+            <button class="dropdown-toggle-modern" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                <span>👤</span>
+                <span id="userNameDisplay"></span>
+                <span>▾</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-bootstrap" aria-labelledby="userMenu">
+                <li><a class="dropdown-item dropdown-item-bootstrap" href="#" id="exportCsvBtn">⬇️ Export Data</a></li>
+                <li><a class="dropdown-item dropdown-item-bootstrap" href="#" id="importCsvBtn">⬆️ Import Data</a></li>
+                <li><a class="dropdown-item dropdown-item-bootstrap" href="#" id="toggleDarkMode">🌙 Dark Mode</a></li>
+                <li><a class="dropdown-item dropdown-item-bootstrap" href="#" onclick="settings()">⚙️ Settings</a></li>
+                <li><hr class="dropdown-divider-modern"></li>
+                <li><a class="dropdown-item dropdown-item-bootstrap text-danger" href="#" id="logoutBtn">🚪 Logout</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Tapering Goal Progress Section -->
+        <div id="taperingGoalSection" style="display: none;">
+            <div class="entry-form-card" style="background: linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-primary-100) 100%); border: 2px solid var(--color-primary-200);">
+                <div class="section-header">
+                    <h3 class="section-title" style="color: var(--color-primary-700);">
+                        <span>🎯</span>
+                        <span>Tapering Goal Progress</span>
+                    </h3>
+                    <div class="btn-group-modern">
+                        <button type="button" class="btn-modern btn-secondary-modern btn-sm" onclick="editTaperingGoal()">✏️ Edit</button>
+                        <button type="button" class="btn-modern btn-danger-modern btn-sm" onclick="deleteTaperingGoal()">🗑️ Delete</button>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-6); margin-bottom: var(--space-6);">
+                    <div>
+                        <div style="font-size: var(--text-xs); color: var(--color-primary-600); font-weight: var(--font-weight-medium); margin-bottom: var(--space-1);">START DOSAGE</div>
+                        <div style="font-size: var(--text-2xl); font-weight: var(--font-weight-bold); color: var(--color-primary-800);" id="goalStartDosage">-</div>
+                    </div>
+                    <div>
+                        <div style="font-size: var(--text-xs); color: var(--color-primary-600); font-weight: var(--font-weight-medium); margin-bottom: var(--space-1);">CURRENT AVG</div>
+                        <div style="font-size: var(--text-2xl); font-weight: var(--font-weight-bold); color: var(--color-primary-800);" id="goalCurrentDosage">-</div>
+                    </div>
+                    <div>
+                        <div style="font-size: var(--text-xs); color: var(--color-primary-600); font-weight: var(--font-weight-medium); margin-bottom: var(--space-1);">TARGET DOSAGE</div>
+                        <div style="font-size: var(--text-2xl); font-weight: var(--font-weight-bold); color: var(--color-primary-800);" id="goalTargetDosage">-</div>
+                    </div>
+                    <div>
+                        <div style="font-size: var(--text-xs); color: var(--color-primary-600); font-weight: var(--font-weight-medium); margin-bottom: var(--space-1);">DAYS REMAINING</div>
+                        <div style="font-size: var(--text-2xl); font-weight: var(--font-weight-bold); color: var(--color-primary-800);" id="goalDaysRemaining">-</div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: var(--space-4);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
+                        <span style="font-size: var(--text-sm); font-weight: var(--font-weight-semibold); color: var(--color-primary-700);">Dosage Progress</span>
+                        <span style="font-size: var(--text-lg); font-weight: var(--font-weight-bold); color: var(--color-primary-800);" id="goalProgressPercent">0%</span>
+                    </div>
+                    <div style="background: var(--bg-elevated); border-radius: var(--radius-full); height: 24px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
+                        <div id="goalProgressBar" style="background: linear-gradient(90deg, var(--color-success-500), var(--color-success-600)); height: 100%; width: 0%; transition: width 0.5s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: var(--space-2);">
+                            <span style="font-size: var(--text-xs); color: white; font-weight: var(--font-weight-bold);" id="goalProgressText"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: var(--space-4);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
+                        <span style="font-size: var(--text-sm); font-weight: var(--font-weight-semibold); color: var(--color-primary-700);">Time Progress</span>
+                        <span style="font-size: var(--text-sm); font-weight: var(--font-weight-medium); color: var(--color-primary-700);" id="goalTimeInfo">-</span>
+                    </div>
+                    <div style="background: var(--bg-elevated); border-radius: var(--radius-full); height: 12px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
+                        <div id="goalTimeBar" style="background: var(--color-primary-400); height: 100%; width: 0%; transition: width 0.5s ease;"></div>
+                    </div>
+                </div>
+
+                <div id="goalStatus" class="alert-modern alert-success" style="display: none; margin-bottom: var(--space-4);"></div>
+                
+                <div id="goalNotes" style="display: none; padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg); border-left: 4px solid var(--color-primary-500);">
+                    <div style="font-size: var(--text-xs); color: var(--text-secondary); font-weight: var(--font-weight-medium); margin-bottom: var(--space-1);">📝 NOTES</div>
+                    <div style="color: var(--text-primary); font-size: var(--text-sm);" id="goalNotesText"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Set Goal Button (shown when no goal exists) -->
+        <div id="setGoalPrompt" style="display: none;">
+            <div class="entry-form-card" style="text-align: center; padding: var(--space-8); background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);">
+                <div style="font-size: 3rem; margin-bottom: var(--space-4); opacity: 0.6;">🎯</div>
+                <h3 style="font-size: var(--text-xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin-bottom: var(--space-2);">Set Your Tapering Goal</h3>
+                <p style="color: var(--text-secondary); margin-bottom: var(--space-6); max-width: 500px; margin-left: auto; margin-right: auto;">Create a structured plan to safely reduce your dosage over time. Track your progress and stay motivated!</p>
+                <button type="button" class="btn-modern btn-primary-modern btn-lg" onclick="openTaperingGoalModal()">
+                    ➕ Create Tapering Goal
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="stats-grid" id="statsGrid">
+            <!-- Stats will be dynamically loaded here -->
+        </div>
+
+        <!-- Entry Form Card -->
+        <div class="entry-form-card">
+            <h3 class="section-title">
+                <span>➕</span>
+                <span>Add New Entry</span>
+            </h3>
+            <form id="benzosForm">
+                <div class="form-grid">
+                    <div class="form-group-modern">
+                        <label for="dosage" class="form-label-modern">Dosage (mg)</label>
+                        <input type="number" step="0.001" class="form-input-modern" id="dosage" placeholder="0.000" min="0.1" required />
+                    </div>
+                    <div class="form-group-modern">
+                        <label for="entryTakenAt" class="form-label-modern">Date & Time</label>
+                        <div class="flex gap-2">
+                            <input type="text" class="form-input-modern" id="entryTakenAt" placeholder="YYYY-MM-DD HH:MM" required style="flex: 1;" />
+                            <button type="button" class="btn-modern btn-secondary-modern" id="nowBtn" title="Set to Now" style="padding: var(--space-3) var(--space-4);">Now</button>
+                        </div>
+                    </div>
+                    <div class="form-group-modern">
+                        <label for="reason" class="form-label-modern">Reason</label>
+                        <input type="text" class="form-input-modern" id="reason" placeholder="Optional" />
+                    </div>
+                    <div class="form-group-modern">
+                        <label for="comments" class="form-label-modern">Comments</label>
+                        <input type="text" class="form-input-modern" id="comments" placeholder="Optional" />
+                    </div>
+                    <div class="form-group-modern" style="display: flex; align-items: flex-end;">
+                        <button type="submit" class="btn-modern btn-primary-modern btn-full btn-lg">Add Entry</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Filter Card -->
+        <div class="filter-card">
+            <h3 class="section-title">
+                <span>🔍</span>
+                <span>Filter Entries</span>
+            </h3>
+            <div class="filter-grid">
+                <div class="form-group-modern">
+                    <label for="filterFrom" class="form-label-modern">From Date</label>
+                    <input type="date" class="form-input-modern" id="filterFrom" />
+                </div>
+                <div class="form-group-modern">
+                    <label for="filterTo" class="form-label-modern">To Date</label>
+                    <input type="date" class="form-input-modern" id="filterTo" />
+                </div>
+                <div class="form-group-modern">
+                    <label for="filterDosageFrom" class="form-label-modern">Min Dosage</label>
+                    <input type="number" step="0.01" class="form-input-modern" id="filterDosageFrom" placeholder="Min" />
+                </div>
+                <div class="form-group-modern">
+                    <label for="filterDosageTo" class="form-label-modern">Max Dosage</label>
+                    <input type="number" step="0.01" class="form-input-modern" id="filterDosageTo" placeholder="Max" />
+                </div>
+                <div class="form-group-modern">
+                    <label for="filterReason" class="form-label-modern">Reason Contains</label>
+                    <input type="text" class="form-input-modern" id="filterReason" placeholder="Search..." />
+                </div>
+                <div class="form-group-modern">
+                    <label for="filterComment" class="form-label-modern">Comment Contains</label>
+                    <input type="text" class="form-input-modern" id="filterComment" placeholder="Search..." />
+                </div>
+            </div>
+            <div class="btn-group-modern mt-4">
+                <button type="button" class="btn-modern btn-primary-modern" id="filterBtn">Apply Filters</button>
+                <button type="button" class="btn-modern btn-secondary-modern" id="clearFilterBtn">Clear Filters</button>
+            </div>
+            <div id="filterStatsBox" class="alert-modern alert-warning mt-4" style="display: none;"></div>
+        </div>
+
+        <!-- Entries Table -->
+        <div class="table-card">
+            <div class="table-header-card">
+                <h3 class="section-title" style="margin: 0;">
+                    <span>📋</span>
+                    <span>Your Entries</span>
+                </h3>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="table-modern" id="entriesTable">
+                    <thead>
+                        <tr>
+                            <th>Dosage</th>
+                            <th>Taken At</th>
+                            <th>Reason</th>
+                            <th>Comments</th>
+                            <th style="text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Entries will be dynamically loaded -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">📈 Dosage Over Time</h3>
+                <select id="dosageRange" class="select-modern">
+                    <option value="all">📅 All Time</option>
+                    <option value="8">📆 Last 8 Days</option>
+                    <option value="14">📆 Last 14 Days</option>
+                    <option value="30">🗓️ Last 30 Days</option>
+                    <option value="180">🗓️ Last 6 Months</option>
+                    <option value="365">📅 Last Year</option>
+                </select>
+            </div>
+            <canvas id="dosageChart" height="80"></canvas>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">📊 Daily Dosage Summary</h3>
+                <select id="dailyRange" class="select-modern">
+                    <option value="all">📅 All Time</option>
+                    <option value="7">📆 Last 8 Days</option>
+                    <option value="14">📆 Last 15 Days</option>
+                    <option value="30">🗓️ Last 31 Days</option>
+                    <option value="180">🗓️ Last 6 Months</option>
+                    <option value="365">📅 Last Year</option>
+                </select>
+            </div>
+            <canvas id="dailyChart" height="80"></canvas>
+            <div id="dailyAverageBox" class="alert-modern alert-info mt-4" style="display: none;"></div>
+        </div>
+
+        <!-- Enhanced Analytics Section -->
+        <div id="enhancedAnalyticsSection" style="display: none;">
+            <div class="entry-form-card" style="background: linear-gradient(135deg, var(--bg-elevated) 0%, var(--bg-tertiary) 100%); border: 2px solid var(--border-color);">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <span>📈</span>
+                        <span>Enhanced Analytics</span>
+                    </h3>
+                </div>
+
+                <!-- Trends Section -->
+                <div style="margin-bottom: var(--space-6);">
+                    <h4 style="font-size: var(--text-lg); font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-bottom: var(--space-4); display: flex; align-items: center; gap: var(--space-2);">
+                        <span>📊</span> Trends
+                    </h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-4);">
+                        <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg); border-left: 4px solid var(--color-primary-500);">
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">WEEK-OVER-WEEK</div>
+                            <div style="font-size: var(--text-xl); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsWeekTrend">-</div>
+                        </div>
+                        <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg); border-left: 4px solid var(--color-primary-500);">
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">MONTH-OVER-MONTH</div>
+                            <div style="font-size: var(--text-xl); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsMonthTrend">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Consistency Score -->
+                <div style="margin-bottom: var(--space-6);">
+                    <h4 style="font-size: var(--text-lg); font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-bottom: var(--space-4); display: flex; align-items: center; gap: var(--space-2);">
+                        <span>🎯</span> Consistency Score
+                    </h4>
+                    <div style="display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <div style="font-size: 3rem; font-weight: var(--font-weight-bold); color: var(--color-primary-600);" id="analyticsConsistencyScore">-</div>
+                            <div style="font-size: var(--text-sm); color: var(--text-secondary);" id="analyticsConsistencyLabel">-</div>
+                        </div>
+                        <div style="flex: 2; min-width: 300px;">
+                            <div style="font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: var(--space-2);" id="analyticsConsistencyDescription">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Time Patterns -->
+                <div style="margin-bottom: var(--space-6);">
+                    <h4 style="font-size: var(--text-lg); font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-bottom: var(--space-4); display: flex; align-items: center; gap: var(--space-2);">
+                        <span>🕐</span> Time-of-Day Patterns
+                    </h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-4);">
+                        <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-2);">🌅 MORNING<br>(6AM-12PM)</div>
+                            <div style="font-size: var(--text-2xl); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsMorning">-</div>
+                        </div>
+                        <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-2);">☀️ AFTERNOON<br>(12PM-6PM)</div>
+                            <div style="font-size: var(--text-2xl); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsAfternoon">-</div>
+                        </div>
+                        <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-2);">🌆 EVENING<br>(6PM-12AM)</div>
+                            <div style="font-size: var(--text-2xl); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsEvening">-</div>
+                        </div>
+                        <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-2);">🌙 NIGHT<br>(12AM-6AM)</div>
+                            <div style="font-size: var(--text-2xl); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsNight">-</div>
+                        </div>
+                    </div>
+                    <div id="analyticsPeakTime" class="alert-modern alert-info mt-4" style="display: none;"></div>
+                </div>
+
+                <!-- Streaks -->
+                <div style="margin-bottom: var(--space-6);">
+                    <h4 style="font-size: var(--text-lg); font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-bottom: var(--space-4); display: flex; align-items: center; gap: var(--space-2);">
+                        <span>⏱️</span> Streaks & Gaps
+                    </h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-4);">
+                        <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg);">
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">LONGEST GAP WITHOUT DOSE</div>
+                            <div style="font-size: var(--text-xl); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsLongestGap">-</div>
+                        </div>
+                        <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg);">
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">CURRENT STREAK (SINCE LAST DOSE)</div>
+                            <div style="font-size: var(--text-xl); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsCurrentStreak">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Most Common Dosages -->
+                <div style="margin-bottom: var(--space-6);">
+                    <h4 style="font-size: var(--text-lg); font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-bottom: var(--space-4); display: flex; align-items: center; gap: var(--space-2);">
+                        <span>💊</span> Most Common Dosages
+                    </h4>
+                    <div id="analyticsMostCommon" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-3);"></div>
+                </div>
+
+                <!-- Statistical Summary -->
+                <div>
+                    <h4 style="font-size: var(--text-lg); font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-bottom: var(--space-4); display: flex; align-items: center; gap: var(--space-2);">
+                        <span>📐</span> Statistical Summary
+                    </h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-4);">
+                        <div style="padding: var(--space-3); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">MEAN</div>
+                            <div style="font-size: var(--text-lg); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsMean">-</div>
+                        </div>
+                        <div style="padding: var(--space-3); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">MEDIAN</div>
+                            <div style="font-size: var(--text-lg); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsMedian">-</div>
+                        </div>
+                        <div style="padding: var(--space-3); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">MIN</div>
+                            <div style="font-size: var(--text-lg); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsMin">-</div>
+                        </div>
+                        <div style="padding: var(--space-3); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">MAX</div>
+                            <div style="font-size: var(--text-lg); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsMax">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div class="modal-overlay" id="importModal">
+        <div class="modal-content-modern">
+            <h3 class="text-center mb-6" style="font-size: var(--text-2xl); font-weight: var(--font-weight-bold);">
+                📥 Import CSV Options
+            </h3>
+            <p class="text-center mb-6" style="color: var(--text-secondary);">
+                How do you want to handle the imported data?
+            </p>
+            <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+                <button type="button" class="btn-modern btn-danger-modern btn-full btn-lg" id="deleteAndImportBtn">
+                    🗑 Delete All & Import
+                </button>
+                <button type="button" class="btn-modern btn-primary-modern btn-full btn-lg" id="mergeImportBtn">
+                    ➕ Merge with Existing
+                </button>
+                <button type="button" class="btn-modern btn-secondary-modern btn-full btn-lg" onclick="closeImportModal()">
+                    ❌ Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tapering Goal Modal -->
+    <div class="modal-overlay" id="taperingGoalModal">
+        <div class="modal-content-modern" style="max-width: 600px;">
+            <h3 class="text-center mb-6" style="font-size: var(--text-2xl); font-weight: var(--font-weight-bold);">
+                🎯 <span id="taperingModalTitle">Set Tapering Goal</span>
+            </h3>
+            <form id="taperingGoalForm">
+                <div class="form-group-modern mb-4">
+                    <label for="goalStartDosageInput" class="form-label-modern">Starting Dosage (mg)</label>
+                    <input type="number" step="0.001" class="form-input-modern" id="goalStartDosageInput" placeholder="e.g., 2.000" required />
+                    <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-top: var(--space-1);">Your current average dosage</div>
+                </div>
+                
+                <div class="form-group-modern mb-4">
+                    <label for="goalTargetDosageInput" class="form-label-modern">Target Dosage (mg)</label>
+                    <input type="number" step="0.001" class="form-input-modern" id="goalTargetDosageInput" placeholder="e.g., 0.500" required />
+                    <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-top: var(--space-1);">Your goal dosage (can be 0 for complete discontinuation)</div>
+                </div>
+
+                <div class="form-group-modern mb-4">
+                    <label for="goalStartDateInput" class="form-label-modern">Start Date</label>
+                    <input type="date" class="form-input-modern" id="goalStartDateInput" required />
+                </div>
+
+                <div class="form-group-modern mb-4">
+                    <label for="goalTargetDateInput" class="form-label-modern">Target Completion Date</label>
+                    <input type="date" class="form-input-modern" id="goalTargetDateInput" required />
+                    <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-top: var(--space-1);">When you aim to reach your target dosage</div>
+                </div>
+
+                <div class="form-group-modern mb-6">
+                    <label for="goalNotesInput" class="form-label-modern">Notes (Optional)</label>
+                    <textarea class="form-input-modern" id="goalNotesInput" rows="3" placeholder="e.g., Following doctor's advice, reducing by 10% every 2 weeks..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: var(--space-3);">
+                    <button type="submit" class="btn-modern btn-primary-modern btn-full btn-lg">
+                        <span id="taperingModalSubmitText">Create Goal</span>
+                    </button>
+                    <button type="button" class="btn-modern btn-secondary-modern btn-full btn-lg" onclick="closeTaperingGoalModal()">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <input type="file" id="csvFileInput" accept=".csv" style="display: none" />
+
+    <footer class="text-center mt-8 mb-4" style="color: var(--text-secondary); font-size: var(--text-sm);">
+        © 2025 LiDa Software. All rights reserved.
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/benzos.js"></script>
+    
+    <script>
+        function closeImportModal() {
+            document.getElementById('importModal').classList.remove('active');
+        }
+        
+        // Close modal when clicking outside
+        document.getElementById('importModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+            }
+        });
+        
+        // Show import modal
+        function showImportModal() {
+            document.getElementById('importModal').classList.add('active');
+        }
+        
+        // Override the import button click if needed
+        document.getElementById('importCsvBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            showImportModal();
+        });
+    </script>
+</body>
+</html>

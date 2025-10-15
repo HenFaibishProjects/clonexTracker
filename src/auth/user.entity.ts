@@ -39,4 +39,22 @@ export class User {
     @Column({  nullable: true, type: 'timestamp' })
     resetTokenExpiry: Date | undefined | null;
 
+    // Tapering Goal fields
+    @Column({ type: 'float', nullable: true })
+    taperStartDosage?: number | null;
+
+    @Column({ type: 'float', nullable: true })
+    taperTargetDosage?: number | null;
+
+    @Column({ type: 'date', nullable: true })
+    taperStartDate?: Date | null;
+
+    @Column({ type: 'date', nullable: true })
+    taperTargetDate?: Date | null;
+
+    @Column({ type: 'text', nullable: true })
+    taperNotes?: string | null;
+
+    @Column({ type: 'boolean', default: false })
+    taperGoalActive!: boolean;
 }

@@ -88,11 +88,11 @@ Enterprise-grade application interface with:
 2. **Replace the files:**
    ```bash
    # Option A: Rename the new files to replace old ones
-   mv public/login-new.html public/login.html
-   mv public/benzos-new.html public/benzos.html
+   mv public/login.html public/login.html
+   mv public/benzos.html public/benzos.html
    
    # Option B: Keep both and update links
-   # Update index.html to link to login-new.html instead of login.html
+   # Update index.html to link to login.html instead of login.html
    ```
 
 3. **Update the landing page link:**

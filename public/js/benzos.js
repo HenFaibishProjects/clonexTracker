@@ -983,6 +983,12 @@ function calculateAveragePerDay(entries, daysBack) {
 
 // ========== TAPERING GOAL FUNCTIONS ==========
 
+// Make functions globally accessible
+window.openTaperingGoalModal = openTaperingGoalModal;
+window.editTaperingGoal = editTaperingGoal;
+window.closeTaperingGoalModal = closeTaperingGoalModal;
+window.deleteTaperingGoal = deleteTaperingGoal;
+
 function loadTaperingGoal() {
     $.ajax({
         url: `${baseUrl}/tapering-progress`,

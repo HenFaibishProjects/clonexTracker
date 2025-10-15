@@ -68,7 +68,7 @@ export class AuthService {
             activationCode: code,
         });
 
-        console.log('Generated token:', user.activationToken);
+        console.log('Generated activation code:', code);
 
         const response = await this.usersRepo.save(user);
 

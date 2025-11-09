@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import {Controller, Post, Body, Get, Delete} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import {LearningProgress} from "./learning-progress.entity";
@@ -28,4 +28,11 @@ export class LearningProgressController {
     async getAll() {
         return await this.repo.find();
     }
+
+    @Delete('reset')
+    async resetAll() {
+        await this.repo.clear();
+        return { success: true };
+    }
+
 }

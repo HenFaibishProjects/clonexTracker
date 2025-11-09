@@ -11,7 +11,14 @@ async function bootstrap() {
 
     // ✅ CORS: allow frontend + deployed domain
     app.enableCors({
-        origin: ['http://localhost:8080', 'http://localhost:3000', 'https://www.benzotracker.support'],
+
+        origin: [
+            'http://localhost:8080',
+            'http://localhost:3000',
+            'https://www.benzotracker.support',
+            'https://www.lidasoftware.online',
+            'https://lidasoftware.online',
+        ],
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         credentials: true,
     });

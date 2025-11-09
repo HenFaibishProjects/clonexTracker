@@ -12,6 +12,7 @@ export class BenzosService {
         private benzosEntryRepository: Repository<BenzosEntry>,
         @InjectRepository(User)
         private userRepo: Repository<User>,
+        @InjectRepository(AccessToken)
         private tokenRepo: Repository<AccessToken>
     ) {}
 

@@ -11,17 +11,13 @@ async function bootstrap() {
 
     // ✅ CORS: allow frontend + deployed domain
     app.enableCors({
-
-        origin: [
-            'http://localhost:8080',
-            'http://localhost:3000',
-            'https://www.benzotracker.support',
-            'https://www.lidasoftware.online',
-            'https://lidasoftware.online',
-        ],
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-        credentials: true,
+        origin: true,
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        credentials: false,
     });
+
+    app.useStaticAssets(join(__dirname, '..', 'public'));
 
     // ✅ Prefix only API routes — excludes static files
     app.setGlobalPrefix('api');

@@ -12,6 +12,7 @@ import {ContactController} from "./contactMe/contact.controller";
 import {ContactService} from "./contactMe/contact.service";
 import {MailService} from "./auth/mail.service";
 import {AccessToken} from "./access-token.entity";
+import {TokenController} from "./token.controller";
 dotenv.config();
 
 @Module({
@@ -29,7 +30,7 @@ dotenv.config();
         }),
         TypeOrmModule.forFeature([BenzosEntry, User, AccessToken]),
     ],
-    controllers: [AppController, BenzosController, ContactController],
+    controllers: [AppController, BenzosController, ContactController, TokenController],
     providers: [AppService, BenzosService, ContactService, MailService],
 })
 

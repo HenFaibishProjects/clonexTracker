@@ -11,6 +11,7 @@ import {AuthModule} from "./auth/auth.module";
 import {ContactController} from "./contactMe/contact.controller";
 import {ContactService} from "./contactMe/contact.service";
 import {MailService} from "./auth/mail.service";
+import {AccessToken} from "./access-token.entity";
 dotenv.config();
 
 @Module({
@@ -26,7 +27,7 @@ dotenv.config();
             autoLoadEntities: true,
             synchronize: true,
         }),
-        TypeOrmModule.forFeature([BenzosEntry, User]),
+        TypeOrmModule.forFeature([BenzosEntry, User, AccessToken]),
     ],
     controllers: [AppController, BenzosController, ContactController],
     providers: [AppService, BenzosService, ContactService, MailService],

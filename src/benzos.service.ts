@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BenzosEntry } from './benzos.entity';
 import {User} from "./auth/user.entity";
+import {AccessToken} from "./access-token.entity";
 
 @Injectable()
 export class BenzosService {
@@ -10,8 +11,14 @@ export class BenzosService {
         @InjectRepository(BenzosEntry)
         private benzosEntryRepository: Repository<BenzosEntry>,
         @InjectRepository(User)
-        private userRepo: Repository<User>
+        private userRepo: Repository<User>,
+        private tokenRepo: Repository<AccessToken>
     ) {}
+
+    async verifyToken(token: string): Promise<boolean> {
+        const record = await this.tokenRepo.findOne({ where: { token } });
+        return !!record;
+    }
 
     async changeName(newName: string, userId: number) {
         const user = await this.userRepo.findOne({ where: { id: userId } });

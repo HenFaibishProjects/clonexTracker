@@ -121,4 +121,10 @@ export class BenzosController {
         return this.benzosService.updateOne(id, data, req.user.id!);
     }
 
+    @Post('verify-token')
+    async verifyToken(@Body() body: { token: string }) {
+        const valid = await this.benzosService.verifyToken(body.token);
+        return { valid };
+    }
+
 }

@@ -13,8 +13,11 @@ import {ContactService} from "./contactMe/contact.service";
 import {MailService} from "./auth/mail.service";
 import {AccessToken} from "./access-token.entity";
 import {TokenController} from "./token.controller";
-import {LearningProgressController} from "./progress.controller";
-import {LearningProgress} from "./learning-progress.entity";
+import {LearningProgressController} from "./progress/progress.controller";
+import {LearningProgress} from "./progress/learning-progress.entity";
+import {Note} from "./Note/notes.entity";
+import {NotesController} from "./Note/notes.controller";
+import {NotesModule} from "./Note/notes.module";
 dotenv.config();
 
 @Module({
@@ -31,6 +34,7 @@ dotenv.config();
             synchronize: true,
         }),
         TypeOrmModule.forFeature([BenzosEntry, User, AccessToken, LearningProgress]),
+        NotesModule
     ],
     controllers: [AppController, BenzosController, ContactController, TokenController, LearningProgressController],
     providers: [AppService, BenzosService, ContactService, MailService],

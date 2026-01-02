@@ -32,6 +32,9 @@ dotenv.config();
             database: process.env.DB_NAME,
             autoLoadEntities: true,
             synchronize: true,
+            ssl: {
+                rejectUnauthorized: false
+            },
         }),
         TypeOrmModule.forFeature([BenzosEntry, User, AccessToken, LearningProgress]),
         NotesModule

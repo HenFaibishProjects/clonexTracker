@@ -486,7 +486,7 @@ body.dark-mode .card-glass {
 }
 
 .table-modern td {
-  padding: var(--space-4) var(--space-6);
+  padding: 12px;
   font-size: var(--text-sm);
   color: var(--text-primary);
   border-right: 1px solid var(--border-color);

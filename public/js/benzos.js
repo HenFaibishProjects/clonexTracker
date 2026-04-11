@@ -1,133 +1,75 @@
 const baseUrl = location.port === '8080'
-    ? 'http://localhost:3000/api/'
+    ? 'http://localhost:3000/api/benzos'
     : '/api/benzos';
+
+// Immediate auth check before any execution
+if (!localStorage.getItem('token')) {
+    window.location.href = 'login.html';
+}
+
 let allEntries = [];
+
 let lastRenderedEntries = [];
+
+// Export functions defined after utilities — see bottom of file
 let dosageChart;
 let isPageActive = true;
 let lastTakenAt;
 
 // ========== NOTIFICATION SYSTEM ==========
 
-function showConfirmDialog(message, onConfirm, onCancel) {
-    // Remove any existing dialogs
+function showConfirmDialog(options) {
+    const {
+        title = 'Are you sure?',
+        message = '',
+        confirmText = 'Confirm',
+        cancelText = 'Cancel',
+        icon = '⚠️',
+        type = 'danger',
+        onConfirm,
+        onCancel
+    } = options;
+
     $('.confirm-dialog-overlay').remove();
-    
+
     const dialog = $(`
-        <div class="confirm-dialog-overlay" style="
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            z-index: 10001;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.2s ease-out;
-        ">
-            <div class="confirm-dialog-content" style="
-                background: var(--bg-elevated);
-                border: 2px solid var(--border-color);
-                border-radius: var(--radius-2xl);
-                box-shadow: var(--shadow-2xl);
-                max-width: 500px;
-                width: 90%;
-                padding: var(--space-8);
-                animation: slideUp 0.3s ease-out;
-            ">
-                <div style="text-align: center; margin-bottom: var(--space-6);">
-                    <div style="
-                        width: 64px;
-                        height: 64px;
-                        margin: 0 auto var(--space-4);
-                        background: var(--color-warning-100);
-                        border-radius: var(--radius-full);
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        font-size: 2rem;
-                    ">⚠️</div>
-                    <h3 style="
-                        font-size: var(--text-xl);
-                        font-weight: var(--font-weight-bold);
-                        color: var(--text-primary);
-                        margin: 0 0 var(--space-3);
-                    ">Confirm Deletion</h3>
-                    <p style="
-                        font-size: var(--text-base);
-                        color: var(--text-secondary);
-                        line-height: 1.6;
-                        margin: 0;
-                        white-space: pre-line;
-                    ">${message}</p>
-                </div>
-                <div style="
-                    display: flex;
-                    gap: var(--space-3);
-                    justify-content: center;
-                ">
-                    <button class="confirm-dialog-cancel" style="
-                        flex: 1;
-                        padding: var(--space-3) var(--space-6);
-                        background: var(--bg-tertiary);
-                        color: var(--text-primary);
-                        border: 2px solid var(--border-color);
-                        border-radius: var(--radius-lg);
-                        font-size: var(--text-base);
-                        font-weight: var(--font-weight-medium);
-                        cursor: pointer;
-                        transition: all var(--transition-fast);
-                    ">Cancel</button>
-                    <button class="confirm-dialog-confirm" style="
-                        flex: 1;
-                        padding: var(--space-3) var(--space-6);
-                        background: var(--color-danger-600);
-                        color: white;
-                        border: 2px solid var(--color-danger-600);
-                        border-radius: var(--radius-lg);
-                        font-size: var(--text-base);
-                        font-weight: var(--font-weight-medium);
-                        cursor: pointer;
-                        transition: all var(--transition-fast);
-                    ">Delete</button>
+        <div class="confirm-dialog-overlay">
+            <div class="confirm-dialog-content">
+                <div class="dialog-icon">${icon}</div>
+                <h3 class="dialog-title">${title}</h3>
+                <p class="dialog-message">${message}</p>
+                <div class="dialog-actions">
+                    <button class="dialog-btn dialog-btn-cancel">${cancelText}</button>
+                    <button class="dialog-btn dialog-btn-confirm" style="background: ${type === 'danger' ? 'var(--color-danger-600)' : 'var(--color-primary-600)'}">
+                        ${confirmText}
+                    </button>
                 </div>
             </div>
         </div>
     `);
-    
-    // Add animation styles if not already present
-    if (!$('#dialog-styles').length) {
-        $('<style id="dialog-styles">@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } } .confirm-dialog-cancel:hover { background: var(--bg-secondary); } .confirm-dialog-confirm:hover { background: var(--color-danger-700); border-color: var(--color-danger-700); }</style>').appendTo('head');
-    }
-    
+
     $('body').append(dialog);
-    
+
     // Handle cancel
-    dialog.find('.confirm-dialog-cancel').on('click', function() {
-        dialog.fadeOut(200, function() { 
-            $(this).remove(); 
+    dialog.find('.dialog-btn-cancel').on('click', function () {
+        dialog.fadeOut(200, function () {
+            $(this).remove();
             if (onCancel) onCancel();
         });
     });
-    
+
     // Handle confirm
-    dialog.find('.confirm-dialog-confirm').on('click', function() {
-        dialog.fadeOut(200, function() { 
-            $(this).remove(); 
+    dialog.find('.dialog-btn-confirm').on('click', function () {
+        dialog.fadeOut(200, function () {
+            $(this).remove();
             if (onConfirm) onConfirm();
         });
     });
-    
+
     // Close on overlay click
-    dialog.on('click', function(e) {
+    dialog.on('click', function (e) {
         if (e.target === this) {
-            dialog.fadeOut(200, function() { 
-                $(this).remove(); 
-                if (onCancel) onCancel();
-            });
+            dialog.find('.dialog-btn-cancel').click();
         }
     });
 }
@@ -135,28 +77,28 @@ function showConfirmDialog(message, onConfirm, onCancel) {
 function showNotification(message, type = 'info', duration = 4000) {
     // Remove any existing notifications
     $('.notification-toast').remove();
-    
+
     const icons = {
         success: '✅',
         error: '❌',
         warning: '⚠️',
         info: 'ℹ️'
     };
-    
+
     const colors = {
         success: 'var(--color-success-600)',
         error: 'var(--color-danger-600)',
         warning: 'var(--color-warning-600)',
         info: 'var(--color-primary-600)'
     };
-    
+
     const bgColors = {
         success: 'var(--color-success-50)',
         error: 'var(--color-danger-50)',
         warning: 'var(--color-warning-50)',
         info: 'var(--color-primary-50)'
     };
-    
+
     const notification = $(`
         <div class="notification-toast" style="
             position: fixed;
@@ -188,17 +130,17 @@ function showNotification(message, type = 'info', duration = 4000) {
             ">×</button>
         </div>
     `);
-    
+
     // Add animation styles if not already present
     if (!$('#notification-styles').length) {
         $('<style id="notification-styles">@keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } } body.dark-mode .notification-toast { background: var(--bg-elevated) !important; border-color: ${colors[type]} !important; }</style>').appendTo('head');
     }
-    
+
     $('body').append(notification);
-    
+
     if (duration > 0) {
         setTimeout(() => {
-            notification.fadeOut(300, function() { $(this).remove(); });
+            notification.fadeOut(300, function () { $(this).remove(); });
         }, duration);
     }
 }
@@ -206,9 +148,11 @@ function showNotification(message, type = 'info', duration = 4000) {
 
 
 function formatTimestamp(datetimeStr) {
-    const storedFormat = localStorage.getItem('timeFormat') || '12';
+    if (!datetimeStr) return '';
     const date = new Date(datetimeStr);
+    if (isNaN(date.getTime())) return datetimeStr;
 
+    const storedFormat = localStorage.getItem('timeFormat') || '12';
     const options = {
         year: 'numeric',
         month: '2-digit',
@@ -218,16 +162,37 @@ function formatTimestamp(datetimeStr) {
         hour12: storedFormat === '12'
     };
 
-    return date.toLocaleString('default', options);
+    return date.toLocaleString('he-IL', options);
 }
+
+
+
+
 
 
 window.addEventListener('DOMContentLoaded', () => {
     const user = JSON.parse(localStorage.getItem('user'));
     const benzosType = JSON.parse(localStorage.getItem('user')).benzosType;
     document.getElementById('userNameDisplay').textContent = user.name;
-    document.getElementById('benzosTitle').textContent = `💊 Benzodiazepines Tracker for ${benzosType}`;
+    document.getElementById('benzosTitle').textContent = `Benzodiazepines Tracker for ${benzosType}`;
+
+    // Apply saved theme
+    const savedTheme = localStorage.getItem('appTheme') || 'default';
+    applyTheme(savedTheme);
 });
+
+function applyTheme(theme) {
+    document.body.classList.remove('theme-serenity', 'theme-midnight');
+    if (theme !== 'default') {
+        document.body.classList.add(`theme-${theme}`);
+    }
+    localStorage.setItem('appTheme', theme);
+
+    // Update chart colors if they exist
+    if (dosageChart) renderChart(allEntries);
+    if (dailyChart) renderDailyChart(allEntries);
+}
+
 
 function batchImport(entries) {
     const promises = entries.map(entry =>
@@ -284,8 +249,6 @@ $(document).ready(function () {
         setTimeout(() => { window.location.href = 'login.html'; }, 1000);
         return;
     }
-    const saved = localStorage.getItem('darkMode');
-    if (saved === '1') applyDarkMode(true);
 
     $('#importCsvBtn').click(function () {
         $('#csvFileInput').click();
@@ -319,8 +282,9 @@ $(document).ready(function () {
                     const [day, month, year] = datePart.split('.');
                     const [hour, minute] = timePart.split(':');
                     const iso = new Date(
-                        `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`
+                        `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hour.padStart(2, '0')}:${minute.padStart(2, '0')}:00Z`
                     ).toISOString();
+
 
                     return {
                         dosageMg: dosage,
@@ -377,10 +341,6 @@ $(document).ready(function () {
         window.location.href = 'login.html';
     });
 
-    $('#toggleDarkMode').click(function () {
-        const isDark = $('body').hasClass('dark-mode');
-        applyDarkMode(!isDark);
-    });
 
 
     $('#dailyRange').on('change', function () {
@@ -408,9 +368,7 @@ $(document).ready(function () {
         isPageActive = !document.hidden;
     });
 
-    $('#exportCsvBtn').click(function () {
-        exportToCSV(lastRenderedEntries);
-    });
+    // Export buttons are handled via onclick attributes in HTML
 
     $('#filterBtn').click(function () {
         $('#dosageRange').prop('disabled', true);
@@ -504,18 +462,33 @@ $(document).ready(function () {
     });
 
     function localToUtcIso(localDatetimeStr) {
+        if (!localDatetimeStr) return null;
+        // The most standard way across all browsers/servers:
         return new Date(localDatetimeStr).toISOString();
     }
 
+
+
+
+
     $('#entriesTable').on('click', '.delete-btn', function () {
         const id = $(this).data('id');
-        if (confirm('Delete this entry?')) {
-            $.ajax({
-                url: `${baseUrl}/${id}`,
-                type: 'DELETE',
-                success: loadEntries
-            });
-        }
+        showConfirmDialog({
+            title: 'Delete Entry?',
+            message: 'Are you sure you want to remove this medication record? This action cannot be undone.',
+            confirmText: 'Delete',
+            icon: '🗑️',
+            onConfirm: () => {
+                $.ajax({
+                    url: `${baseUrl}/${id}`,
+                    type: 'DELETE',
+                    success: () => {
+                        loadEntries();
+                        showNotification('Entry deleted.', 'success');
+                    }
+                });
+            }
+        });
     });
 
     $('#entriesTable').on('click', '.edit-btn', function () {
@@ -583,7 +556,91 @@ $(document).ready(function () {
         renderDailyChart(allEntries, selectedRange); // ✅ now passes selected range
     });
 
-    loadEntries();
+    // ---- Export buttons ----
+    $('#exportCsvBtn').on('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const entries = lastRenderedEntries;
+        if (!entries || entries.length === 0) {
+            showNotification('No entries to export.', 'warning');
+            return;
+        }
+
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const benzosType = user.benzosType || 'Unknown';
+        const now = new Date().toLocaleDateString();
+
+        const lines = [
+            `# Benzos Tracker Export - ${benzosType} - ${now}`,
+            'Dosage (mg),Taken At,Reason,Comments',
+            ...entries.map(e => [
+                e.dosageMg ?? '',
+                formatTimestamp(e.takenAt),
+                `"${(e.reason || '').replace(/"/g, '""')}"`,
+                `"${(e.comments || '').replace(/"/g, '""')}"`
+            ].join(','))
+        ].join('\n');
+
+        const blob = new Blob([lines], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `benzos-export-${new Date().toISOString().slice(0, 10)}.csv`;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showNotification(`✅ Exported ${entries.length} entries to CSV`, 'success');
+    });
+
+    $('#exportPdfBtn').on('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const entries = lastRenderedEntries;
+        if (!entries || entries.length === 0) {
+            showNotification('No entries to export.', 'warning');
+            return;
+        }
+
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const benzosType = user.benzosType || 'Unknown';
+        const now = new Date().toLocaleDateString();
+
+        const rows = entries.map(e => `<tr>
+            <td><strong>${e.dosageMg ?? '—'} mg</strong></td>
+            <td>${formatTimestamp(e.takenAt)}</td>
+            <td>${e.reason || '—'}</td>
+            <td>${e.comments || '—'}</td>
+        </tr>`).join('');
+
+        const win = window.open('', '_blank');
+        if (!win) { showNotification('Allow popups for PDF export.', 'warning'); return; }
+
+        win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>Benzos Export</title><style>
+body{font-family:Arial,sans-serif;padding:32px;color:#1a1a2e}
+h1{font-size:20px;margin-bottom:4px}
+.meta{font-size:12px;color:#666;margin-bottom:24px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#4169ff;color:white;padding:10px 12px;text-align:left}
+td{padding:9px 12px;border-bottom:1px solid #e5e7eb}
+tr:nth-child(even) td{background:#f9fafb}
+.footer{margin-top:32px;font-size:11px;color:#999;text-align:center}
+</style></head><body>
+<h1>💊 Benzos Tracker — ${benzosType}</h1>
+<div class="meta">Exported: ${now} | ${entries.length} entries</div>
+<table><thead><tr><th>Dosage</th><th>Taken At</th><th>Reason</th><th>Comments</th></tr></thead>
+<tbody>${rows}</tbody></table>
+<div class="footer">Generated by Benzos Tracker • LiDa Software © 2026</div>
+</body></html>`);
+        win.document.close();
+        win.focus();
+        setTimeout(() => win.print(), 500);
+        showNotification(`🖨️ PDF ready — ${entries.length} entries`, 'success');
+    });
+
+    loadEntries(30);
 });
 
 setInterval(() => {
@@ -598,17 +655,217 @@ setInterval(() => {
     $('#runningTimer').text(`${hours}:${minutes}:${seconds}`);
 }, 1000);
 
-function loadEntries() {
-    $.get(baseUrl, function (entries) {
-        allEntries = entries; // ✅ Update global allEntries
-        renderEntries(entries);
-        updateStats(entries);
-        updateStatsGrid(entries);
-        renderChart(entries);
-        renderDailyChart(entries); // ✅ This will now include today
-        loadEnhancedAnalytics(); // ✅ Load analytics after entries are loaded
+function loadEntries(days = 30) {
+    let endpoint = baseUrl;
+    let timeframeLabel = 'All Data';
+
+    if (days !== 'all') {
+        // Use the new timeframeDays query parameter for better backend performance
+        endpoint = `${baseUrl}?timeframeDays=${days}`;
+        timeframeLabel = `Last ${days} Days`;
+    }
+
+    $('#viewStatusLabel').text(timeframeLabel);
+
+    // Update button states in the UI
+    $('.btn-group-modern .btn-modern').removeClass('btn-primary-modern').addClass('btn-secondary-modern');
+    if (days === 'all') {
+        $('.btn-group-modern .btn-modern[onclick*="all"]').addClass('btn-primary-modern').removeClass('btn-secondary-modern');
+    } else {
+        $(`.btn-group-modern .btn-modern[onclick*="(${days})"]`).addClass('btn-primary-modern').removeClass('btn-secondary-modern');
+    }
+
+    // Show Loading Skeleton
+    const $tbody = $('#entriesTable tbody');
+    $tbody.html(`
+        <tr class="skeleton-row-container">
+            <td colspan="5"><div class="skeleton-row"></div></td>
+        </tr>
+        <tr class="skeleton-row-container">
+            <td colspan="5"><div class="skeleton-row" style="animation-delay: 0.2s"></div></td>
+        </tr>
+        <tr class="skeleton-row-container">
+            <td colspan="5"><div class="skeleton-row" style="animation-delay: 0.4s"></div></td>
+        </tr>
+    `);
+
+    $.ajax({
+        url: endpoint,
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
+        success: function (entries) {
+            allEntries = entries; // Update current view entries
+            renderEntries(entries);
+            updateStats(entries);
+            updateStatsGrid(entries);
+            renderChart(entries);
+            renderDailyChart(entries);
+            updateMedicationAdvisor(entries);
+            loadEnhancedAnalytics();
+
+            // Refresh goal progress to ensure today's dosage is accurate
+            if ($('#taperingGoalSection').is(':visible')) {
+                loadTaperingGoal();
+            }
+        },
+        error: function (xhr) {
+            if (xhr.status === 401) {
+                window.location.href = 'index.html';
+            }
+        }
     });
+
 }
+
+
+function updateMedicationAdvisor(entries) {
+    if (!entries.length) {
+        $('#advisorCard').hide();
+        return;
+    }
+
+    // Get the absolute latest entry from all entries (not just filtered ones)
+    const sorted = [...allEntries].sort((a, b) => new Date(b.takenAt).getTime() - new Date(a.takenAt).getTime());
+    const lastEntry = sorted[0];
+
+    let lastTimeStr = lastEntry.takenAt;
+    if (typeof lastTimeStr === 'string' && !lastTimeStr.includes('Z') && !lastTimeStr.includes('+')) {
+        lastTimeStr += 'Z';
+    }
+    const lastDate = new Date(lastTimeStr);
+    const now = new Date();
+    const diffMs = now - lastDate;
+    const diffHours = diffMs / (1000 * 60 * 60);
+
+    const advisorCard = $('#advisorCard');
+    const advisorIcon = $('#advisorIcon');
+    const advisorText = $('#advisorText');
+    const advisorMessage = $('#advisorMessage');
+
+    let status = '';
+    let icon = '';
+    let message = '';
+    let levelClass = '';
+
+    if (diffHours < 4) {
+        status = 'Strong Red - Avoid';
+        levelClass = 'advisor-strong-red';
+        icon = '🚫';
+        message = 'Please avoid taking another dose right now.';
+    } else if (diffHours < 7) {
+        status = 'Red - Warning';
+        levelClass = 'advisor-red';
+        icon = '⚠️';
+        message = 'Only take if you really have to.';
+    } else if (diffHours < 11) {
+        status = 'Yellow - Caution';
+        levelClass = 'advisor-yellow';
+        icon = '🕒';
+        message = 'Approaching safe time - be aware.';
+    } else {
+        status = 'Green - Safe';
+        levelClass = 'advisor-safe';
+        icon = '✅';
+        message = 'Safe interval reached.';
+    }
+
+    const h = Math.floor(diffHours);
+    const m = Math.floor((diffHours % 1) * 60);
+
+    // State configuration
+    const states = {
+        'strong-red': {
+            bg: 'linear-gradient(135deg, #1a0505 0%, #2d0a0a 100%)',
+            glow: 'radial-gradient(ellipse at 30% 50%, rgba(220,38,38,0.25) 0%, transparent 70%)',
+            ringBg: 'rgba(220,38,38,0.2)',
+            ringBorder: '3px solid #ef4444',
+            badgeBg: 'rgba(220,38,38,0.2)',
+            badgeColor: '#fca5a5',
+            badgeText: '🚫 AVOID — Strong Red',
+            textColor: '#fff',
+            subColor: '#fca5a5',
+            hourColor: '#ef4444',
+            icon: '🚫',
+            title: `It's been <strong>${h}h ${m}m</strong> since your last dose`,
+            msg: 'Please avoid taking another dose right now. The suggested gap is over 11h.'
+        },
+        'red': {
+            bg: 'linear-gradient(135deg, #1a0a05 0%, #2d1005 100%)',
+            glow: 'radial-gradient(ellipse at 30% 50%, rgba(234,88,12,0.25) 0%, transparent 70%)',
+            ringBg: 'rgba(234,88,12,0.2)',
+            ringBorder: '3px solid #f97316',
+            badgeBg: 'rgba(234,88,12,0.2)',
+            badgeColor: '#fdba74',
+            badgeText: '⚠️ WARNING — Red',
+            textColor: '#fff',
+            subColor: '#fdba74',
+            hourColor: '#f97316',
+            icon: '⚠️',
+            title: `It's been <strong>${h}h ${m}m</strong> since your last dose`,
+            msg: 'Only take if you really have to. The suggested gap is over 11h.'
+        },
+        'yellow': {
+            bg: 'linear-gradient(135deg, #1a1505 0%, #2d2005 100%)',
+            glow: 'radial-gradient(ellipse at 30% 50%, rgba(202,138,4,0.25) 0%, transparent 70%)',
+            ringBg: 'rgba(202,138,4,0.2)',
+            ringBorder: '3px solid #eab308',
+            badgeBg: 'rgba(202,138,4,0.2)',
+            badgeColor: '#fde047',
+            badgeText: '🕒 CAUTION — Yellow',
+            textColor: '#fff',
+            subColor: '#fde047',
+            hourColor: '#eab308',
+            icon: '🕒',
+            title: `It's been <strong>${h}h ${m}m</strong> since your last dose`,
+            msg: 'Approaching safe time — be aware. The suggested gap is over 11h.'
+        },
+        'safe': {
+            bg: 'linear-gradient(135deg, #051a0d 0%, #0a2d18 100%)',
+            glow: 'radial-gradient(ellipse at 30% 50%, rgba(16,185,129,0.3) 0%, transparent 70%)',
+            ringBg: 'rgba(16,185,129,0.2)',
+            ringBorder: '3px solid #10b981',
+            badgeBg: 'rgba(16,185,129,0.2)',
+            badgeColor: '#6ee7b7',
+            badgeText: '✅ SAFE — Green',
+            textColor: '#fff',
+            subColor: '#6ee7b7',
+            hourColor: '#10b981',
+            icon: '✅',
+            title: `It's been <strong>${h}h ${m}m</strong> since your last dose`,
+            msg: 'Safe interval reached. The suggested gap is over 11h.'
+        }
+    };
+
+    const cfg = states[levelClass.replace('advisor-', '')] || states['safe'];
+    const card = document.getElementById('advisorCard');
+    const inner = document.getElementById('advisorInner');
+    const ring = document.getElementById('advisorRing');
+    const badge = document.getElementById('advisorBadge');
+    const advisorTextEl = document.getElementById('advisorText');
+    const advisorMsgEl = document.getElementById('advisorMessage');
+    const hourNum = document.getElementById('advisorHourNum');
+    const bgGlow = document.getElementById('advisorBgGlow');
+
+    card.style.display = 'block';
+    card.style.background = cfg.bg;
+    bgGlow.style.background = cfg.glow;
+    ring.style.background = cfg.ringBg;
+    ring.style.border = cfg.ringBorder;
+    ring.style.boxShadow = `0 0 20px ${cfg.hourColor}40`;
+    ring.textContent = cfg.icon;
+    badge.style.background = cfg.badgeBg;
+    badge.style.color = cfg.badgeColor;
+    badge.textContent = cfg.badgeText;
+    advisorTextEl.style.color = cfg.textColor;
+    advisorTextEl.innerHTML = cfg.title;
+    advisorMsgEl.style.color = cfg.subColor;
+    advisorMsgEl.innerHTML = cfg.msg;
+    hourNum.style.color = cfg.hourColor;
+    hourNum.textContent = h;
+}
+
 
 function updateStatsGrid(entries) {
     const $grid = $('#statsGrid');
@@ -637,11 +894,29 @@ function updateStatsGrid(entries) {
     const monthTotal = monthEntries.reduce((sum, e) => sum + e.dosageMg, 0);
     const avgMonth = monthEntries.length ? (monthTotal / monthEntries.length).toFixed(2) : '0.00';
 
-    const lastEntry = entries[0];
-    const lastDosage = lastEntry.dosageMg.toFixed(3);
+    // Trend: compare this week avg vs last 30-day avg
+    const weekAvgNum = parseFloat(avgWeek);
+    const monthAvgNum = parseFloat(avgMonth);
+    const trendDiff = weekAvgNum - monthAvgNum;
+    const absDiff = Math.abs(trendDiff);
+
+    let trendIcon, trendColor, trendText;
+    if (absDiff <= 0.13) {
+        trendIcon = '🔵';
+        trendColor = '#3b82f6';   // Blue — Consistent
+        trendText = 'Consistent';
+    } else if (trendDiff < 0) {
+        trendIcon = '🟢';
+        trendColor = '#10b981';   // Green — Reducing
+        trendText = 'Reducing';
+    } else {
+        trendIcon = '🔴';
+        trendColor = '#ef4444';   // Red — Increasing
+        trendText = 'Increasing';
+    }
 
     $grid.append(`
-        <div class="stat-card">
+        <div class="stat-card premium-blur">
             <div class="stat-icon">💊</div>
             <div class="stat-value">${total}</div>
             <div class="stat-label">Total Entries</div>
@@ -649,29 +924,34 @@ function updateStatsGrid(entries) {
     `);
 
     $grid.append(`
-        <div class="stat-card">
+        <div class="stat-card premium-blur" style="border-bottom: 3px solid ${trendColor}">
+            <div class="stat-icon">${trendIcon}</div>
+            <div class="stat-value" style="background: none; -webkit-text-fill-color: initial; color: ${trendColor}">${avgWeek} mg</div>
+            <div class="stat-label">
+                Weekly Avg: <strong>${trendText}</strong>
+                <br><small style="opacity:.7">vs 30-day avg: ${avgMonth} mg</small>
+            </div>
+        </div>
+    `);
+
+
+    $grid.append(`
+        <div class="stat-card premium-blur">
             <div class="stat-icon">📊</div>
             <div class="stat-value">${avgDosage} mg</div>
-            <div class="stat-label">Average Dosage</div>
+            <div class="stat-label">Overall Average</div>
         </div>
     `);
 
     $grid.append(`
-        <div class="stat-card">
-            <div class="stat-icon">📅</div>
-            <div class="stat-value">${avgWeek} mg</div>
-            <div class="stat-label">Avg Last 7 Days</div>
-        </div>
-    `);
-
-    $grid.append(`
-        <div class="stat-card">
+        <div class="stat-card premium-blur">
             <div class="stat-icon">🗓️</div>
             <div class="stat-value">${avgMonth} mg</div>
-            <div class="stat-label">Avg Last 30 Days</div>
+            <div class="stat-label">Monthly Average</div>
         </div>
     `);
 }
+
 
 function updateFilterStats(entries) {
     if (!entries.length) {
@@ -791,25 +1071,46 @@ function getDatetimeInputValue(dateStr) {
 
 function renderEntries(entries) {
     lastRenderedEntries = entries;
+    updateExportBadge(entries);
     const $tbody = $('#entriesTable tbody');
     $tbody.empty();
+
+    if (!entries.length) {
+        $tbody.append(`
+            <tr>
+                <td colspan="5" style="border: none;">
+                    <div class="pro-empty-state">
+                        <div class="pro-empty-icon">📊</div>
+                        <div class="pro-empty-title">No Entries Found</div>
+                        <div class="pro-empty-text">Start tracking your medication by adding your first entry above. Your data will appear here in a beautiful organized way.</div>
+                    </div>
+                </td>
+            </tr>
+        `);
+        return;
+    }
+
     entries.forEach((entry) => {
         const row = `
- <tr data-id="${entry.id}">
- <td><span class="value dosage">${entry.dosageMg}</span><input type="number" step="0.01" class="form-control form-control-sm edit dosage d-none" value="${entry.dosageMg}" /></td>
- <td>
+ <tr data-id="${entry.id}" class="animate-fade-in">
+ <td data-label="Dosage"><span class="value dosage">${entry.dosageMg}</span><input type="number" step="0.01" class="form-control form-control-sm edit dosage d-none" value="${entry.dosageMg}" /></td>
+ <td data-label="Taken At">
  <span class="value takenAt">${formatTimestamp(entry.takenAt)}</span>
-
  <input type="datetime-local" class="form-control form-control-sm edit takenAt d-none" value="${getDatetimeInputValue(entry.takenAt)}" />
  </td> 
- <td><span class="value reason">${entry.reason || ''}</span><input type="text" class="form-control form-control-sm edit reason d-none" value="${entry.reason || ''}" /></td>
- <td><span class="value comments">${entry.comments || ''}</span><input type="text" class="form-control form-control-sm edit comments d-none" value="${entry.comments || ''}" /></td>
- <td>
- <button class="btn btn-sm btn-secondary edit-btn" data-bs-toggle="tooltip" title="Edit entry">✏️</button>
- <button class="btn btn-sm btn-success save-btn d-none" data-bs-toggle="tooltip" title="Save changes">💾</button>
- <button class="btn btn-sm btn-warning cancel-btn d-none" data-bs-toggle="tooltip" title="Cancel editing">❌</button>
- <button class="btn btn-sm btn-danger delete-btn" data-id="${entry.id}" data-bs-toggle="tooltip" title="Delete entry">🗑</button>
-
+ <td data-label="Reason"><span class="value reason">${entry.reason || '-'}</span><input type="text" class="form-control form-control-sm edit reason d-none" value="${entry.reason || ''}" /></td>
+ <td data-label="Comments"><span class="value comments">${entry.comments || '-'}</span><input type="text" class="form-control form-control-sm edit comments d-none" value="${entry.comments || ''}" /></td>
+ <td style="text-align: center;">
+ <div class="btn-group-modern" style="justify-content: center;">
+ <button class="btn-modern btn-secondary-modern btn-sm edit-btn" title="Edit">
+    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4L18.5 2.5z"></path></svg>
+ </button>
+ <button class="btn-modern btn-primary-modern btn-sm save-btn d-none" title="Save">💾</button>
+ <button class="btn-modern btn-secondary-modern btn-sm cancel-btn d-none" title="Cancel">❌</button>
+ <button class="btn-modern btn-danger-modern btn-sm delete-btn" data-id="${entry.id}" title="Delete">
+    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+ </button>
+ </div>
  </td>
  </tr>`;
         $tbody.append(row);
@@ -825,7 +1126,7 @@ function renderChart(entries, range = 'all') {
         return date >= new Date(today.getTime() - daysAgo * 24 * 60 * 60 * 1000);
     });
 
-    // ✅ FIX: Use filtered entries instead of original entries
+    // Sort entries by date for the chart
     const sorted = [...filtered].sort((a, b) => new Date(a.takenAt) - new Date(b.takenAt));
 
     const labels = sorted.map(e =>
@@ -847,6 +1148,29 @@ function renderChart(entries, range = 'all') {
     }
 
     const ctx = document.getElementById('dosageChart').getContext('2d');
+
+    // Check if there's a target goal to show as an annotation
+    const targetDosage = parseFloat($('#goalTargetDosage').text());
+    const annotations = {};
+
+    if (!isNaN(targetDosage) && $('#taperingGoalSection').is(':visible')) {
+        annotations.targetLine = {
+            type: 'line',
+            yMin: targetDosage,
+            yMax: targetDosage,
+            borderColor: 'var(--color-success)',
+            borderWidth: 2,
+            borderDash: [6, 6],
+            label: {
+                display: true,
+                content: `Target: ${targetDosage}mg`,
+                position: 'end',
+                backgroundColor: 'var(--color-success)',
+                color: 'white'
+            }
+        };
+    }
+
     dosageChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -854,30 +1178,55 @@ function renderChart(entries, range = 'all') {
             datasets: [{
                 label: 'Dosage (mg)',
                 data: data,
-                borderColor: 'rgba(75,192,192,1)',
-                backgroundColor: 'rgba(75,192,192,0.2)',
-                tension: 0.3,
-                fill: true
+                borderColor: 'var(--color-primary-500)',
+                backgroundColor: 'rgba(65, 105, 255, 0.1)',
+                tension: 0.4,
+                fill: true,
+                pointRadius: 4,
+                pointBackgroundColor: 'var(--color-primary-500)',
+                pointBorderColor: 'white',
+                pointBorderWidth: 2,
+                pointHoverRadius: 6
             }]
         },
         options: {
             responsive: true,
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
             plugins: {
                 legend: {
-                    labels: {
-                        color: $('body').hasClass('dark-mode') ? '#e0e0e0' : '#000'
-                    }
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    padding: 12,
+                    titleFont: { size: 14, weight: 'bold' },
+                    bodyFont: { size: 13 },
+                    cornerRadius: 8
+                },
+                annotation: {
+                    annotations: annotations
                 }
             },
             scales: {
                 x: {
                     ticks: {
                         display: false
+                    },
+                    grid: {
+                        display: false
                     }
                 },
                 y: {
                     ticks: {
-                        color: $('body').hasClass('dark-mode') ? '#aaa' : '#000'
+                        color: 'var(--text-secondary)',
+                        font: { size: 11 }
+                    },
+                    grid: {
+                        color: 'var(--border-color)',
+                        drawBorder: false
                     },
                     beginAtZero: true
                 }
@@ -885,10 +1234,6 @@ function renderChart(entries, range = 'all') {
         }
     });
 }
-
-$('.dropdown-item:contains("Settings")').click(function () {
-    $('.settings-overlay').fadeIn();
-});
 
 function closeSettings() {
     $('.settings-overlay').fadeOut();
@@ -1005,7 +1350,7 @@ function renderDailyChart(entries, range = 'all') {
     // ✅ NEW: Calculate average dosing frequency
     let avgFrequencyStr = '';
     let avgFrequency = '';
-    const realRange = +range+1
+    const realRange = +range + 1
     if (sortedEntries.length > 1 && realRange) {
         // Calculate total time span in days
         const firstDose = new Date(sortedEntries[0].takenAt);
@@ -1017,7 +1362,7 @@ function renderDailyChart(entries, range = 'all') {
 
         // Calculate average dosage per dose
         const avgDose = (sortedEntries.reduce((sum, e) => sum + e.dosageMg, 0) / sortedEntries.length).toFixed(2);
-        const avgPerDay = (realRange /  sortedEntries.length).toFixed(2);
+        const avgPerDay = (realRange / sortedEntries.length).toFixed(2);
         avgFrequencyStr = `The dosage was taken ${sortedEntries.length} times over the past ${realRange} days.`;
         avgFrequency = `Average of taking medication every ${avgPerDay} days in the time period of ${realRange} days.`;
     } else if (sortedEntries.length === 1) {
@@ -1097,7 +1442,7 @@ function renderDailyChart(entries, range = 'all') {
             scales: {
                 x: {
                     ticks: {
-                        color: $('body').hasClass('dark-mode') ? '#aaa' : '#000',
+                        color: $('body').hasClass('theme-midnight') ? '#aaa' : '#000',
                         autoSkip: true,
                         maxTicksLimit: 15
                     }
@@ -1112,7 +1457,7 @@ function renderDailyChart(entries, range = 'all') {
             plugins: {
                 legend: {
                     labels: {
-                        color: $('body').hasClass('dark-mode') ? '#e0e0e0' : '#000'
+                        color: $('body').hasClass('theme-midnight') ? '#e0e0e0' : '#000'
                     }
                 }
             }
@@ -1132,11 +1477,6 @@ function renderDailyChart(entries, range = 'all') {
  <strong>${avgFrequencyStr}</strong><br/>
  <strong>${avgFrequency}</strong>
  `);
-}
-function applyDarkMode(enabled) {
-    $('body').toggleClass('dark-mode', enabled);
-    $('#toggleDarkMode').text(enabled ? '☀️ Light Mode' : '🌙 Dark Mode');
-    localStorage.setItem('darkMode', enabled ? '1' : '0');
 }
 
 function settings() {
@@ -1175,14 +1515,14 @@ function loadTaperingGoal() {
     const taperingUrl = location.port === '8080'
         ? 'http://localhost:3000/api/benzos/tapering-progress'
         : '/api/benzos/tapering-progress';
-        
+
     $.ajax({
         url: taperingUrl,
         method: 'GET',
         headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
         },
-        success: function(progress) {
+        success: function (progress) {
             if (progress.hasGoal) {
                 displayTaperingProgress(progress);
                 $('#taperingGoalSection').show();
@@ -1192,7 +1532,7 @@ function loadTaperingGoal() {
                 $('#setGoalPrompt').show();
             }
         },
-        error: function() {
+        error: function () {
             $('#taperingGoalSection').hide();
             $('#setGoalPrompt').show();
         }
@@ -1209,7 +1549,7 @@ function displayTaperingProgress(progress) {
     // Update progress percentage
     $('#goalProgressPercent').text(`${progress.progressPercentage}%`);
     $('#goalProgressBar').css('width', `${progress.progressPercentage}%`);
-    
+
     if (progress.progressPercentage >= 10) {
         $('#goalProgressText').text(`${progress.progressPercentage}%`);
     } else {
@@ -1224,7 +1564,7 @@ function displayTaperingProgress(progress) {
     const statusBox = $('#goalStatus');
     const isTimeComplete = progress.daysRemaining <= 0;
     const isDosageComplete = progress.progressPercentage >= 100;
-    
+
     if (isDosageComplete && isTimeComplete) {
         // Only show congratulations if BOTH conditions are met
         statusBox.removeClass('alert-success alert-warning alert-info')
@@ -1258,17 +1598,49 @@ function displayTaperingProgress(progress) {
     } else {
         $('#goalNotes').hide();
     }
+
+    // NEW: Today's Dosage Progress (Mini Goal)
+    updateTodayGoalProgress(progress);
 }
+
+function updateTodayGoalProgress(progress) {
+    const today = new Date().toISOString().split('T')[0];
+    const todayEntries = allEntries.filter(e => e.takenAt.startsWith(today));
+    const todayTotal = todayEntries.reduce((sum, e) => sum + e.dosageMg, 0);
+
+    // Calculate target for today (simplistic: current target dosage)
+    const dailyTarget = progress.targetDosage || progress.currentAvgDosage;
+
+    let miniGoalHtml = `
+        <div class="mt-4 p-4 premium-blur" style="background: rgba(255,255,255,0.1); border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
+                <span style="font-size: var(--text-sm); font-weight: var(--font-weight-semibold);">📅 Today's Dosage Limit</span>
+                <span style="font-size: var(--text-sm); font-weight: var(--font-weight-bold);">${todayTotal.toFixed(3)} / ${dailyTarget.toFixed(3)} mg</span>
+            </div>
+            <div style="background: var(--bg-tertiary); border-radius: var(--radius-full); height: 10px; overflow: hidden;">
+                <div style="width: ${Math.min(100, (todayTotal / dailyTarget) * 100)}%; height: 100%; background: ${todayTotal > dailyTarget ? 'var(--color-error)' : 'var(--color-primary-500)'}; transition: width 0.3s ease;"></div>
+            </div>
+            ${todayTotal > dailyTarget ? '<div style="font-size: var(--text-xs); color: var(--color-error); margin-top: 4px;">⚠️ Over today\'s target limit!</div>' : ''}
+        </div>
+    `;
+
+    // Insert into tapering section if not already there
+    if (!$('#todayGoalMini').length) {
+        $('#taperingGoalSection .entry-form-card').append('<div id="todayGoalMini"></div>');
+    }
+    $('#todayGoalMini').html(miniGoalHtml);
+}
+
 
 function openTaperingGoalModal() {
     $('#taperingModalTitle').text('Set Tapering Goal');
     $('#taperingModalSubmitText').text('Create Goal');
     $('#taperingGoalForm')[0].reset();
-    
+
     // Set default start date to today
     const today = new Date().toISOString().split('T')[0];
     $('#goalStartDateInput').val(today);
-    
+
     $('#taperingGoalModal').addClass('active');
 }
 
@@ -1276,26 +1648,26 @@ function editTaperingGoal() {
     const taperingUrl = location.port === '8080'
         ? 'http://localhost:3000/api/benzos/tapering-goal'
         : '/api/benzos/tapering-goal';
-        
+
     $.ajax({
         url: taperingUrl,
         method: 'GET',
         headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
         },
-        success: function(goal) {
+        success: function (goal) {
             $('#taperingModalTitle').text('Edit Tapering Goal');
             $('#taperingModalSubmitText').text('Update Goal');
-            
+
             $('#goalStartDosageInput').val(goal.startDosage);
             $('#goalTargetDosageInput').val(goal.targetDosage);
             $('#goalStartDateInput').val(goal.startDate);
             $('#goalTargetDateInput').val(goal.targetDate);
             $('#goalNotesInput').val(goal.notes || '');
-            
+
             $('#taperingGoalModal').addClass('active');
         },
-        error: function() {
+        error: function () {
             showNotification('Failed to load goal details', 'error');
         }
     });
@@ -1306,41 +1678,35 @@ function closeTaperingGoalModal() {
 }
 
 function deleteTaperingGoal() {
-    showConfirmDialog(
-        'Are you sure you want to delete your tapering goal?\n\nThis action is permanent and cannot be undone. All goal progress and data will be lost.',
-        function() {
+    showConfirmDialog({
+        title: 'Delete Tapering Goal?',
+        message: 'Are you sure you want to delete your tapering goal?\n\nThis action is permanent and cannot be undone. All goal progress and data will be lost.',
+        confirmText: 'Delete Permanent',
+        icon: '🎯',
+        onConfirm: function () {
             // On confirm
             const taperingUrl = location.port === '8080'
                 ? 'http://localhost:3000/api/benzos/tapering-goal'
                 : '/api/benzos/tapering-goal';
-            
-            console.log('Deleting tapering goal at:', taperingUrl);
-            
+
             $.ajax({
                 url: taperingUrl,
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`
                 },
-                success: function(response) {
-                    console.log('Delete successful:', response);
+                success: function (response) {
                     $('#taperingGoalSection').hide();
                     $('#setGoalPrompt').show();
                     showNotification('Tapering goal deleted successfully.', 'success');
                 },
-                error: function(xhr, status, error) {
-                    console.error('Delete failed:', {
-                        status: xhr.status,
-                        statusText: xhr.statusText,
-                        responseText: xhr.responseText,
-                        error: error
-                    });
-                    const errorMsg = xhr.responseJSON?.message || `Failed to delete tapering goal. Error: ${xhr.status} ${xhr.statusText}`;
+                error: function (xhr, status, error) {
+                    const errorMsg = xhr.responseJSON?.message || 'Failed to delete tapering goal.';
                     showNotification(errorMsg, 'error');
                 }
             });
         }
-    );
+    });
 }
 
 // ========== ENHANCED ANALYTICS FUNCTIONS ==========
@@ -1348,27 +1714,32 @@ function deleteTaperingGoal() {
 function loadEnhancedAnalytics(range = 'all') {
     // Filter entries based on selected range
     let filteredEntries = allEntries;
-    
+
     if (range !== 'all') {
         const daysAgo = parseInt(range);
         const cutoffDate = new Date();
         cutoffDate.setDate(cutoffDate.getDate() - daysAgo);
-        
+
         filteredEntries = allEntries.filter(e => {
-            const entryDate = new Date(e.takenAt);
+            const entryDateRaw = e.takenAt;
+            let entryDateStr = entryDateRaw;
+            if (typeof entryDateStr === 'string' && !entryDateStr.includes('Z') && !entryDateStr.includes('+')) {
+                entryDateStr += 'Z';
+            }
+            const entryDate = new Date(entryDateStr);
             return entryDate >= cutoffDate;
         });
     }
-    
+
     // If no entries in the filtered range, hide analytics
     if (filteredEntries.length === 0) {
         $('#enhancedAnalyticsSection').hide();
         return;
     }
-    
+
     // Calculate analytics on filtered entries (simplified version for client-side)
-    const analytics = calculateClientSideAnalytics(filteredEntries);
-    
+    const analytics = calculateClientSideAnalytics(filteredEntries, range);
+
     if (analytics.hasData) {
         displayEnhancedAnalytics(analytics);
         $('#enhancedAnalyticsSection').show();
@@ -1377,18 +1748,18 @@ function loadEnhancedAnalytics(range = 'all') {
     }
 }
 
-function calculateClientSideAnalytics(entries) {
+function calculateClientSideAnalytics(entries, range = 'all') {
     if (!entries.length) {
         return { hasData: false };
     }
-    
+
     // Helper function to get entries from N days ago
     const getEntriesFromDaysAgo = (days) => {
         const cutoffDate = new Date();
         cutoffDate.setDate(cutoffDate.getDate() - days);
         return entries.filter(e => new Date(e.takenAt) >= cutoffDate);
     };
-    
+
     // Get time-period entries
     const thisWeek = getEntriesFromDaysAgo(7);
     const lastWeek = entries.filter(e => {
@@ -1399,7 +1770,7 @@ function calculateClientSideAnalytics(entries) {
         twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
         return date >= twoWeeksAgo && date < weekAgo;
     });
-    
+
     const thisMonth = getEntriesFromDaysAgo(30);
     const lastMonth = entries.filter(e => {
         const date = new Date(e.takenAt);
@@ -1409,19 +1780,19 @@ function calculateClientSideAnalytics(entries) {
         twoMonthsAgo.setDate(twoMonthsAgo.getDate() - 60);
         return date >= twoMonthsAgo && date < monthAgo;
     });
-    
+
     // Calculate averages
     const calcAvg = (arr) => arr.length ? arr.reduce((sum, e) => sum + (e.dosageMg || 0), 0) / arr.length : 0;
-    
+
     const thisWeekAvg = calcAvg(thisWeek);
     const lastWeekAvg = calcAvg(lastWeek);
     const thisMonthAvg = calcAvg(thisMonth);
     const lastMonthAvg = calcAvg(lastMonth);
-    
+
     // Calculate trends
     const weekTrend = lastWeekAvg > 0 ? ((thisWeekAvg - lastWeekAvg) / lastWeekAvg) * 100 : 0;
     const monthTrend = lastMonthAvg > 0 ? ((thisMonthAvg - lastMonthAvg) / lastMonthAvg) * 100 : 0;
-    
+
     // Consistency score
     const allDosages = entries.map(e => e.dosageMg || 0).filter(d => d > 0);
     const mean = calcAvg(entries);
@@ -1429,7 +1800,7 @@ function calculateClientSideAnalytics(entries) {
     const stdDev = Math.sqrt(variance);
     const coefficientOfVariation = mean > 0 ? (stdDev / mean) * 100 : 0;
     const consistencyScore = Math.max(0, Math.min(100, 100 - coefficientOfVariation));
-    
+
     // Time patterns
     const timePatterns = { morning: 0, afternoon: 0, evening: 0, night: 0 };
     entries.forEach(e => {
@@ -1439,7 +1810,7 @@ function calculateClientSideAnalytics(entries) {
         else if (hour >= 18 && hour < 24) timePatterns.evening++;
         else timePatterns.night++;
     });
-    
+
     const total = entries.length;
     const timePercentages = {
         morning: ((timePatterns.morning / total) * 100).toFixed(0),
@@ -1447,10 +1818,10 @@ function calculateClientSideAnalytics(entries) {
         evening: ((timePatterns.evening / total) * 100).toFixed(0),
         night: ((timePatterns.night / total) * 100).toFixed(0)
     };
-    
+
     const maxCount = Math.max(...Object.values(timePatterns));
     const peakTime = Object.keys(timePatterns).find(key => timePatterns[key] === maxCount);
-    
+
     // Streaks
     const sortedEntries = [...entries].sort((a, b) => new Date(a.takenAt) - new Date(b.takenAt));
     let longestGap = 0;
@@ -1458,11 +1829,11 @@ function calculateClientSideAnalytics(entries) {
         const gap = new Date(sortedEntries[i].takenAt) - new Date(sortedEntries[i - 1].takenAt);
         if (gap > longestGap) longestGap = gap;
     }
-    
+
     const now = new Date();
     const lastDose = sortedEntries.length ? new Date(sortedEntries[sortedEntries.length - 1].takenAt) : now;
     const currentStreak = now - lastDose;
-    
+
     // Dosage distribution
     const dosageFrequency = {};
     entries.forEach(e => {
@@ -1470,7 +1841,7 @@ function calculateClientSideAnalytics(entries) {
         const rounded = e.dosageMg.toFixed(2);
         dosageFrequency[rounded] = (dosageFrequency[rounded] || 0) + 1;
     });
-    
+
     const sortedDosages = Object.entries(dosageFrequency)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 5)
@@ -1479,7 +1850,7 @@ function calculateClientSideAnalytics(entries) {
             count,
             percentage: ((count / total) * 100).toFixed(0)
         }));
-    
+
     return {
         hasData: true,
         trends: {
@@ -1511,28 +1882,41 @@ function calculateClientSideAnalytics(entries) {
         distribution: {
             mostCommon: sortedDosages,
             average: parseFloat(mean.toFixed(3)),
-            min: Math.min(...allDosages),
-            max: Math.max(...allDosages)
+            min: allDosages.length ? Math.min(...allDosages) : 0,
+            max: allDosages.length ? Math.max(...allDosages) : 0
+        },
+        timeframe: {
+            range: range,
+            days: range === 'all' ? calculateTotalDays(entries) : parseInt(range)
         }
     };
+}
+
+function calculateTotalDays(entries) {
+    if (entries.length < 2) return 1;
+    const sorted = [...entries].sort((a, b) => new Date(a.takenAt) - new Date(b.takenAt));
+    const start = new Date(sorted[0].takenAt);
+    const end = new Date(sorted[sorted.length - 1].takenAt);
+    const diff = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)));
+    return diff;
 }
 
 function displayEnhancedAnalytics(analytics) {
     // Display trends
     const weekTrendIcon = analytics.trends.weekTrend > 0 ? '↗️' : analytics.trends.weekTrend < 0 ? '↘️' : '→';
     const monthTrendIcon = analytics.trends.monthTrend > 0 ? '↗️' : analytics.trends.monthTrend < 0 ? '↘️' : '→';
-    
+
     const weekTrendColor = analytics.trends.weekTrend > 0 ? 'var(--color-danger-600)' : analytics.trends.weekTrend < 0 ? 'var(--color-success-600)' : 'var(--text-primary)';
     const monthTrendColor = analytics.trends.monthTrend > 0 ? 'var(--color-danger-600)' : analytics.trends.monthTrend < 0 ? 'var(--color-success-600)' : 'var(--text-primary)';
-    
+
     $('#analyticsWeekTrend').html(`<span style="color: ${weekTrendColor}">${weekTrendIcon} ${Math.abs(analytics.trends.weekTrend)}%</span>`);
     $('#analyticsMonthTrend').html(`<span style="color: ${monthTrendColor}">${monthTrendIcon} ${Math.abs(analytics.trends.monthTrend)}%</span>`);
-    
+
     // Display consistency score
     const score = analytics.consistency.score;
     let consistencyLabel = '';
     let consistencyColor = '';
-    
+
     if (score >= 80) {
         consistencyLabel = 'Excellent Consistency';
         consistencyColor = 'var(--color-success-600)';
@@ -1546,17 +1930,17 @@ function displayEnhancedAnalytics(analytics) {
         consistencyLabel = 'Variable Dosing';
         consistencyColor = 'var(--color-danger-600)';
     }
-    
+
     $('#analyticsConsistencyScore').text(score).css('color', consistencyColor);
     $('#analyticsConsistencyLabel').text(consistencyLabel);
     $('#analyticsConsistencyDescription').text(`Your dosages vary by an average of ±${analytics.consistency.stdDev}mg (${analytics.consistency.coefficientOfVariation}% coefficient of variation)`);
-    
+
     // Display time patterns
     $('#analyticsMorning').text(`${analytics.timePatterns.percentages.morning}%`);
     $('#analyticsAfternoon').text(`${analytics.timePatterns.percentages.afternoon}%`);
     $('#analyticsEvening').text(`${analytics.timePatterns.percentages.evening}%`);
     $('#analyticsNight').text(`${analytics.timePatterns.percentages.night}%`);
-    
+
     if (analytics.timePatterns.peakTime) {
         const peakTimeLabel = {
             morning: '🌅 Morning (6AM-12PM)',
@@ -1566,36 +1950,42 @@ function displayEnhancedAnalytics(analytics) {
         };
         $('#analyticsPeakTime').html(`<strong>Peak Time:</strong> ${peakTimeLabel[analytics.timePatterns.peakTime]} - You take medication most often during this time.`).show();
     }
-    
+
     // Display streaks
     const longestGapDays = Math.floor(analytics.streaks.longestGapDays);
     const longestGapHours = Math.floor(analytics.streaks.longestGapHours % 24);
     $('#analyticsLongestGap').text(`${longestGapDays} days, ${longestGapHours} hours`);
-    
+
     const currentStreakDays = Math.floor(analytics.streaks.currentStreakDays);
     const currentStreakHours = Math.floor(analytics.streaks.currentStreakHours % 24);
     $('#analyticsCurrentStreak').text(`${currentStreakDays} days, ${currentStreakHours} hours`);
-    
+
     // Display most common dosages
     const mostCommonHtml = analytics.distribution.mostCommon.map(item => `
-        <div style="padding: var(--space-3); background: var(--bg-elevated); border-radius: var(--radius-lg);">
+        <div style="padding: var(--space-3); background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
             <div style="font-size: var(--text-lg); font-weight: var(--font-weight-bold); color: var(--text-primary);">${item.dosage.toFixed(2)} mg</div>
             <div style="font-size: var(--text-sm); color: var(--text-secondary);">${item.count} times (${item.percentage}%)</div>
         </div>
     `).join('');
     $('#analyticsMostCommon').html(mostCommonHtml);
-    
+
     // Display statistical summary
-    $('#analyticsAverage').text(`${analytics.distribution.average.toFixed(3)} mg`);
+    const totalDoses = analytics.distribution.mostCommon.reduce((sum, item) => sum + item.count, 0) || analytics.timePatterns.counts.morning + analytics.timePatterns.counts.afternoon + analytics.timePatterns.counts.evening + analytics.timePatterns.counts.night;
+    const totalDays = analytics.timeframe.days || 1;
+    const dailyDosageAvg = (analytics.distribution.average * (totalDoses / totalDays)).toFixed(3);
+    const intervalAvg = (totalDays / (totalDoses || 1)).toFixed(1);
+
+    $('#analyticsAverage').text(`${dailyDosageAvg} mg`);
+    $('#analyticsInterval').text(`${intervalAvg}`);
     $('#analyticsMin').text(`${analytics.distribution.min.toFixed(3)} mg`);
     $('#analyticsMax').text(`${analytics.distribution.max.toFixed(3)} mg`);
 }
 
 // Handle tapering goal form submission
-$(document).ready(function() {
-    $('#taperingGoalForm').submit(function(e) {
+$(document).ready(function () {
+    $('#taperingGoalForm').submit(function (e) {
         e.preventDefault();
-        
+
         const goalData = {
             startDosage: parseFloat($('#goalStartDosageInput').val()),
             targetDosage: parseFloat($('#goalTargetDosageInput').val()),
@@ -1622,7 +2012,7 @@ $(document).ready(function() {
 
         const isEditing = $('#taperingModalTitle').text().includes('Edit');
         const method = isEditing ? 'PATCH' : 'POST';
-        
+
         const taperingUrl = location.port === '8080'
             ? 'http://localhost:3000/api/benzos/tapering-goal'
             : '/api/benzos/tapering-goal';
@@ -1635,12 +2025,12 @@ $(document).ready(function() {
             },
             contentType: 'application/json',
             data: JSON.stringify(goalData),
-            success: function(response) {
+            success: function (response) {
                 closeTaperingGoalModal();
                 loadTaperingGoal();
                 showNotification(isEditing ? 'Goal updated successfully!' : 'Goal created successfully!', 'success');
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 console.error('Error saving goal:', xhr.responseText);
                 const errorMsg = xhr.responseJSON?.message || 'Failed to save tapering goal. Please try again.';
                 showNotification(errorMsg, 'error');
@@ -1650,18 +2040,142 @@ $(document).ready(function() {
 
     // Load tapering goal on page load
     loadTaperingGoal();
-    
+
     // Refresh tapering progress every 60 seconds
-    setInterval(function() {
+    setInterval(function () {
         if ($('#taperingGoalSection').is(':visible')) {
             loadTaperingGoal();
         }
     }, 60000);
 
     // Close modal when clicking outside
-    $('#taperingGoalModal').on('click', function(e) {
+    $('#taperingGoalModal').on('click', function (e) {
         if (e.target === this) {
             closeTaperingGoalModal();
         }
     });
 });
+
+// ========== EXPORT SYSTEM ==========
+
+function updateExportBadge(entries) {
+    const badge = document.getElementById('exportCountBadge');
+    const label = document.getElementById('exportFilterLabel');
+    if (!badge) return;
+    const isFiltered = entries.length !== allEntries.length;
+    if (entries.length > 0) {
+        badge.textContent = `${entries.length} ${entries.length === 1 ? 'entry' : 'entries'}`;
+        badge.style.display = 'inline-block';
+    } else {
+        badge.style.display = 'none';
+    }
+    if (label) label.style.display = isFiltered ? 'inline' : 'none';
+}
+
+function _exportToast(message, color) {
+    const t = document.createElement('div');
+    t.textContent = message;
+    t.style.cssText = `position:fixed;top:20px;right:20px;background:${color};color:#fff;
+        padding:14px 22px;border-radius:10px;font-size:14px;font-weight:600;
+        z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,.2);`;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+}
+
+function exportEntries(format) {
+    const entries = lastRenderedEntries;
+    if (!entries || entries.length === 0) {
+        _exportToast('⚠️ No entries to export', '#f59e0b');
+        return;
+    }
+    if (format === 'csv') {
+        doExportCsv(entries);
+    } else {
+        doExportPdf(entries);
+    }
+}
+
+function doExportCsv(entries) {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const benzosType = user.benzosType || 'Unknown';
+    const now = new Date().toLocaleDateString();
+
+    const fmt = (ts) => {
+        if (!ts) return '';
+        const d = new Date(ts);
+        return isNaN(d) ? ts : d.toLocaleString();
+    };
+
+    const lines = [
+        `# Benzos Tracker Export - ${benzosType} - ${now}`,
+        'Dosage (mg),Taken At,Reason,Comments',
+        ...entries.map(e => [
+            e.dosageMg ?? '',
+            fmt(e.takenAt),
+            `"${(e.reason || '').replace(/"/g, '""')}"`,
+            `"${(e.comments || '').replace(/"/g, '""')}"`
+        ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([lines], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `benzos-export-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    _exportToast(`✅ Exported ${entries.length} entries`, '#10b981');
+}
+
+function doExportPdf(entries) {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const benzosType = user.benzosType || 'Unknown';
+    const now = new Date().toLocaleDateString();
+
+    const fmt = (ts) => {
+        if (!ts) return '';
+        const d = new Date(ts);
+        return isNaN(d) ? ts : d.toLocaleString();
+    };
+
+    const rows = entries.map(e => `
+        <tr>
+            <td><strong>${e.dosageMg ?? '—'} mg</strong></td>
+            <td>${fmt(e.takenAt)}</td>
+            <td>${e.reason || '—'}</td>
+            <td>${e.comments || '—'}</td>
+        </tr>`).join('');
+
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>Benzos Export</title><style>
+body{font-family:Arial,sans-serif;padding:32px;color:#1a1a2e}
+h1{font-size:20px;margin-bottom:4px}
+.meta{font-size:12px;color:#666;margin-bottom:24px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#4169ff;color:white;padding:10px 12px;text-align:left}
+td{padding:9px 12px;border-bottom:1px solid #e5e7eb}
+tr:nth-child(even) td{background:#f9fafb}
+.footer{margin-top:32px;font-size:11px;color:#999;text-align:center}
+</style></head><body>
+<h1>💊 Benzos Tracker — ${benzosType}</h1>
+<div class="meta">Exported: ${now} | ${entries.length} entries</div>
+<table><thead><tr>
+<th>Dosage</th><th>Taken At</th><th>Reason</th><th>Comments</th>
+</tr></thead><tbody>${rows}</tbody></table>
+<div class="footer">Generated by Benzos Tracker • LiDa Software © 2026</div>
+</body></html>`;
+
+    const win = window.open('', '_blank');
+    if (!win) {
+        _exportToast('⚠️ Allow popups for PDF export', '#f59e0b');
+        return;
+    }
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    setTimeout(() => win.print(), 500);
+    _exportToast(`🖨️ PDF ready — ${entries.length} entries`, '#4169ff');
+}

@@ -1,10 +1,98 @@
 const baseUrl = location.port === '8080'
-    ? 'http://localhost:3000/api/'
+    ? 'http://localhost:3000/api/benzos'
     : '/api/benzos';
 
 const baseAuthUrl = location.port === '8080'
-    ? 'http://localhost:3000/api/'
+    ? 'http://localhost:3000/api/auth'
     : '/api/auth';
+
+// ========== NOTIFICATION SYSTEM ==========
+function showNotification(message, type = 'info') {
+    const colors = {
+        success: '#10b881',
+        error: '#ef4444',
+        warning: '#f59e0b',
+        info: '#4169ff'
+    };
+    
+    const notification = $(`
+        <div class="notification-toast" style="
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 99999;
+            border-left: 5px solid ${colors[type]};
+            animation: slideInRight 0.3s ease-out;
+        ">
+            <span style="font-size: 1.2rem;">${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'}</span>
+            <span style="font-weight: 500;">${message}</span>
+        </div>
+    `);
+    
+    // Check if animation exists in local head
+    if (!$('#notification-styles').length) {
+        $('<style id="notification-styles">@keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }</style>').appendTo('head');
+    }
+    
+    $('body').append(notification);
+    
+    setTimeout(() => {
+        notification.fadeOut(300, function() { $(this).remove(); });
+    }, 3000);
+}
+
+function showConfirmDialog(options) {
+    const { 
+        title = 'Are you sure?', 
+        message = '', 
+        confirmText = 'Confirm', 
+        cancelText = 'Cancel', 
+        icon = '⚠️',
+        type = 'danger',
+        onConfirm, 
+        onCancel 
+    } = options;
+
+    $('.confirm-dialog-overlay').remove();
+    
+    const dialog = $(`
+        <div class="confirm-dialog-overlay">
+            <div class="confirm-dialog-content">
+                <div class="dialog-icon">${icon}</div>
+                <h3 class="dialog-title">${title}</h3>
+                <p class="dialog-message">${message}</p>
+                <div class="dialog-actions">
+                    <button class="dialog-btn dialog-btn-cancel">${cancelText}</button>
+                    <button class="dialog-btn dialog-btn-confirm" style="background: ${type === 'danger' ? 'var(--color-danger-600)' : 'var(--color-primary-600)'}">
+                        ${confirmText}
+                    </button>
+                </div>
+            </div>
+        </div>
+    `);
+    
+    $('body').append(dialog);
+    
+    dialog.find('.dialog-btn-cancel').click(function() {
+        dialog.fadeOut(200, function() { $(this).remove(); });
+        if (onCancel) onCancel();
+    });
+    
+    dialog.find('.dialog-btn-confirm').click(function() {
+        dialog.fadeOut(200, function() { $(this).remove(); });
+        if (onConfirm) onConfirm();
+    });
+
+    dialog.click(function(e) { if (e.target === this) { $(this).find('.dialog-btn-cancel').click(); } });
+}
 
 async function checkValuesOnPassword() {
     const currentPassword = document.getElementById('current-password').value.trim();
@@ -12,29 +100,27 @@ async function checkValuesOnPassword() {
     const confirmPassword = document.getElementById('confirm-password').value.trim();
     const token = localStorage.getItem('token');
 
-    // Basic frontend validation
     if (!currentPassword || !newPassword || !confirmPassword) {
-        alert("⚠️ All fields are required.");
+        showNotification("All fields are required.", "warning");
         return;
     }
 
     if (newPassword === currentPassword) {
-        alert("⚠️ New password must be different from current password.");
+        showNotification("New password must be different from current password.", "warning");
         return;
     }
 
     const isValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(newPassword);
     if (!isValid) {
-        alert("❌ Password must be at least 8 characters long and include upper, lower case letters and a number.");
+        showNotification("Password must be at least 8 characters long and include upper, lower case letters and a number.", "error");
         return;
     }
 
     if (newPassword !== confirmPassword) {
-        alert("❌ New password and confirmation do not match.");
+        showNotification("New password and confirmation do not match.", "error");
         return;
     }
 
-    // Backend call
     try {
         const response = await fetch(`${baseAuthUrl}/change-password`, {
             method: 'PATCH',
@@ -42,10 +128,7 @@ async function checkValuesOnPassword() {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({
-                currentPassword,
-                newPassword
-            })
+            body: JSON.stringify({ currentPassword, newPassword })
         });
 
         if (!response.ok) {
@@ -53,98 +136,85 @@ async function checkValuesOnPassword() {
             throw new Error(errorData.message || 'Failed to change password');
         }
 
-        alert("✅ Password changed successfully. You will now be logged out.");
-        const theme = localStorage.getItem('theme');
+        showNotification("Password changed successfully! Logging out...", "success");
+        const theme = localStorage.getItem('appTheme');
         localStorage.clear();
-        if (theme) {
-            localStorage.setItem('theme', theme);
-        }
+        if (theme) localStorage.setItem('appTheme', theme);
+        
         setTimeout(() => {
             window.location.href = 'login.html';
-        }, 200);
+        }, 2000);
     } catch (err) {
-        alert("❌ " + err.message);
+        showNotification(err.message, "error");
     }
 }
 
-function showTimeFormatSavedPopup(format) {
-    const formatText = format === '24' ? '24-hour (14:30)' : '12-hour (2:30 PM)';
+window.addEventListener('DOMContentLoaded', () => {
+    const savedFormat = localStorage.getItem('timeFormat') || '12';
+    const saveButton = document.querySelector('button[onclick="saveTimeFormat()"]');
 
-    const overlay = document.createElement('div');
-    overlay.className = 'popup-overlay';
+    const currentRadio = document.querySelector(`input[name="time-format"][value="${savedFormat}"]`);
+    if (currentRadio) {
+        currentRadio.checked = true;
+        saveButton.disabled = true;
+    }
 
-    const popup = document.createElement('div');
-    popup.className = 'custom-popup-content';
-    popup.innerHTML = `
-        ✅ <strong>Time format saved!</strong><br>
-        Your preference: <em>${formatText}</em>
-    `;
-
-    overlay.appendChild(popup);
-    document.body.appendChild(overlay);
-
-    setTimeout(() => {
-        overlay.remove();
-    }, 2000); // remove after 2 seconds
-}
-
-
-
-    window.addEventListener('DOMContentLoaded', () => {
-        const savedFormat = localStorage.getItem('timeFormat') || '12';
-        const saveButton = document.querySelector('button[onclick="saveTimeFormat()"]');
-
-        const currentRadio = document.querySelector(`input[name="time-format"][value="${savedFormat}"]`);
-        if (currentRadio) {
-            currentRadio.checked = true;
-            saveButton.disabled = true;
-            saveButton.title = "Change value to enable Save";
-        }
-
-// Add change listeners
-        document.querySelectorAll('input[name="time-format"]').forEach(radio => {
-            radio.addEventListener('change', () => {
-                const selected = document.querySelector('input[name="time-format"]:checked').value;
-                const isSame = selected === savedFormat;
-                saveButton.disabled = isSame;
-                saveButton.title = isSame ? "Change value to enable Save" : "";
-            });
+    document.querySelectorAll('input[name="time-format"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            const selected = document.querySelector('input[name="time-format"]:checked').value;
+            saveButton.disabled = (selected === savedFormat);
         });
-
-        // Set the correct radio button as checked based on saved format
-        const radio = document.querySelector(`input[name="time-format"][value="${savedFormat}"]`);
-        if (radio) {
-            radio.checked = true;
-        }
-
-        // NOW apply visual selection styling
-        document.querySelectorAll('input[name="time-format"]').forEach(radio => {
-            const container = radio.closest('.radio-option');
-            if (radio.checked) {
-                container.classList.add('selected');
-            } else {
-                container.classList.remove('selected');
-            }
-
-            // Update on change
-            radio.addEventListener('change', () => {
-                document.querySelectorAll('.radio-option').forEach(opt => opt.classList.remove('selected'));
-                container.classList.add('selected');
-            });
-        });
-
-        // Optional: load user name + email
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (user?.name) {
-            document.getElementById('userName').value = user.name;
-        }
-        if (user?.email) {
-            document.getElementById('primary-email').value = user.email;
-        }
-        if (user?.benzosType) {
-            document.getElementById('BenzodiazepinesTypeId').value = user.benzosType;
-        }
     });
+
+    // Style selection logic
+    document.querySelectorAll('input[name="time-format"]').forEach(radio => {
+        const container = radio.closest('.radio-option');
+        if (radio.checked) container.classList.add('selected');
+        radio.addEventListener('change', () => {
+            document.querySelectorAll('.radio-option').forEach(opt => opt.classList.remove('selected'));
+            container.classList.add('selected');
+        });
+    });
+
+    // Optional: load user name + email
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user?.name) {
+        document.getElementById('userName').value = user.name;
+    }
+    if (user?.email) {
+        document.getElementById('primary-email').value = user.email;
+    }
+    if (user?.benzosType) {
+        document.getElementById('BenzodiazepinesTypeId').value = user.benzosType;
+    }
+
+    // Initialize theme selection
+    const savedTheme = localStorage.getItem('appTheme') || 'default';
+    const themeRadio = document.querySelector(`input[name="app-theme"][value="${savedTheme}"]`);
+    const saveThemeBtn = document.getElementById('saveThemeBtn');
+    
+    if (themeRadio) {
+        themeRadio.checked = true;
+        const container = themeRadio.closest('.radio-option');
+        container.classList.add('selected');
+    }
+
+    // Add listeners for theme changes
+    document.querySelectorAll('input[name="app-theme"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            const selected = document.querySelector('input[name="app-theme"]:checked').value;
+            const isSame = selected === savedTheme;
+            saveThemeBtn.disabled = isSame;
+            
+            // Update visual selection
+            document.querySelectorAll('#theme-radio-group .radio-option').forEach(opt => opt.classList.remove('selected'));
+            radio.closest('.radio-option').classList.add('selected');
+            
+            // Live preview the theme
+            applyAppTheme(selected);
+        });
+    });
+});
 
 
     function changeBenzodiazepinesType() {
@@ -152,126 +222,76 @@ function showTimeFormatSavedPopup(format) {
         const existingBenzosType = user.benzosType;
         const newEnteredBenzosType = document.getElementById("BenzodiazepinesTypeId")?.value?.trim();
 
-
         if (existingBenzosType === newEnteredBenzosType) {
-          this.showNoChangePopup();
+          showNotification("Same frequency entered — nothing was saved.", "info");
+          return;
         }
 
-         else {
-             const token = localStorage.getItem('token');
-             fetch(`${baseUrl}/changeBenzosType`, {
-                 method: 'POST',
-                 headers: {
-                     'Content-Type': 'application/json',
-                     'Authorization': `Bearer ${token}`,
-                 },
-                 body: JSON.stringify({ newBenzosType: newEnteredBenzosType })
-             })
-                 .then(response => {
-                     if (!response.ok) throw new Error('Failed to update Benzo Type');
-                     return response.json();
-                 })
-                 .then(data => {
-                     console.log('Benzo Type updated successfully:', data);
-                     // Optional: update localStorage, show popup, etc.
-                 }).then(() => {
-                 const user = JSON.parse(localStorage.getItem('user'));
-                 user.benzosType = newEnteredBenzosType;
-                 localStorage.setItem('user', JSON.stringify(user));
+        const token = localStorage.getItem('token');
+        fetch(`${baseUrl}/changeBenzosType`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({ newBenzosType: newEnteredBenzosType })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to update frequency');
+            return response.json();
+        })
+        .then(data => {
+            const user = JSON.parse(localStorage.getItem('user'));
+            user.benzosType = newEnteredBenzosType;
+            localStorage.setItem('user', JSON.stringify(user));
 
-                 showSavedPopup('✅ Benzo Type updated! Going to Benzos screen...');
-                 setTimeout(() => {
-                     window.location.href = '/benzos.html';
-                 }, 1500);
-             })
-                 .catch(err => {
-                     console.error(err);
-                 });
-             this.showSavedPopup('New Benzo Type Saved')
-         }
+            showNotification('✅ Medication frequency updated!', 'success');
+            setTimeout(() => {
+                window.location.href = '/benzos.html';
+            }, 1500);
+        })
+        .catch(err => {
+            showNotification(err.message, 'error');
+        });
     }
-
-    function showSavedPopup(details) {
-        const modal = document.getElementById("settingsModal");
-        const msg = document.getElementById("modalMessage");
-        msg.innerHTML = `${details}<br><br>Going to Benzos screen...`;
-        modal.style.display = "flex";
-    }
-
-    function showUnSavedPopup(details) {
-        const modal = document.getElementById("settingsModal");
-        const msg = document.getElementById("modalMessage");
-        msg.innerHTML = `${details}<br><br>Going to Benzos screen...`;
-        modal.style.display = "flex";
-    }
-
-    function saveInGeneral(feature) {
-        const actions = {
-            uName: checkValuesOnName,
-        };
-
-        const action = actions[feature];
-        if (action) action();
-    }
-
 
     function checkValuesOnName() {
         const existingUser = JSON.parse(localStorage.getItem('user'));
         const newEnteredUser = document.getElementById("userName")?.value?.trim();
 
-
         if (existingUser?.name === newEnteredUser) {
-            this.showNoChangePopup();
+            showNotification("Same name entered — nothing was saved.", "info");
+            return;
         }
 
-        else {
-            const token = localStorage.getItem('token');
-            fetch(`${baseUrl}/changeName`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({ newName: newEnteredUser })
-            })
-                .then(response => {
-                    if (!response.ok) throw new Error('Failed to update name');
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Name updated successfully:', data);
-                    // Optional: update localStorage, show popup, etc.
-                }).then(() => {
-                const user = JSON.parse(localStorage.getItem('user'));
-                user.name = newEnteredUser;
-                localStorage.setItem('user', JSON.stringify(user));
+        const token = localStorage.getItem('token');
+        fetch(`${baseUrl}/changeName`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({ newName: newEnteredUser })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to update name');
+            return response.json();
+        })
+        .then(data => {
+            const user = JSON.parse(localStorage.getItem('user'));
+            user.name = newEnteredUser;
+            localStorage.setItem('user', JSON.stringify(user));
 
-                showSavedPopup('✅ Name updated! Going to Benzos screen...');
-                setTimeout(() => {
-                    window.location.href = '/benzos.html';
-                }, 1500);
-            })
-                .catch(err => {
-                    console.error(err);
-                });
-            this.showSavedPopup('New Name Saved')
-        }
+            showNotification('✅ Name updated successfully!', 'success');
+            setTimeout(() => {
+                window.location.href = '/benzos.html';
+            }, 1500);
+        })
+        .catch(err => {
+            showNotification(err.message, 'error');
+        });
     }
 
-    function showNoChangePopup(message = "Same values entered as existing — nothing was saved.") {
-        document.getElementById("noChangeMessage").innerText = message;
-        document.getElementById("noChangeModal").style.display = "flex";
-    }
-
-    function closeNoChange() {
-        document.getElementById("noChangeModal").style.display = "none";
-    }
-
-    function confirmRedirect() {
-        const modal = document.getElementById("settingsModal");
-        modal.style.display = "none";
-        window.location.href = `../benzos.html`;
-    }
 
     function cancelSettings() {
         window.location.href = `../benzos.html`;
@@ -281,15 +301,15 @@ function showTimeFormatSavedPopup(format) {
         const selectedFormat = document.querySelector('input[name="time-format"]:checked')?.value;
 
         if (!selectedFormat) {
-            alert("⚠️ Please select a time format.");
+            showNotification("Please select a time format.", "warning");
             return;
         }
 
         localStorage.setItem('timeFormat', selectedFormat);
-        showTimeFormatSavedPopup(selectedFormat);
+        showNotification("📝 Time format saved successfully!", "success");
         setTimeout(() => {
             window.location.href = '/benzos.html';
-        }, 2000);
+        }, 1500);
     }
 
 
@@ -303,4 +323,26 @@ function showTimeFormatSavedPopup(format) {
     });
 
     document.querySelector('input[name="time-format"]:checked').closest('.radio-option').classList.add('selected');
+
+
+function saveThemePreference() {
+    const selectedTheme = document.querySelector('input[name="app-theme"]:checked')?.value;
+    if (!selectedTheme) return;
+
+    localStorage.setItem('appTheme', selectedTheme);
+    const themeName = selectedTheme.charAt(0).toUpperCase() + selectedTheme.slice(1);
+    
+    showNotification(`✨ ${themeName} theme saved as default!`, "success");
+    document.getElementById('saveThemeBtn').disabled = true;
+}
+
+function applyAppTheme(theme) {
+    document.body.classList.remove('theme-serenity', 'theme-midnight');
+    if (theme !== 'default') {
+        document.body.classList.add(`theme-${theme}`);
+    }
+}
+
+// Apply theme on initial load of settings page
+applyAppTheme(localStorage.getItem('appTheme') || 'default');
 

@@ -14,7 +14,7 @@ import {MailService} from "./mail.service";
         TypeOrmModule.forFeature([User]),
         PassportModule,
         JwtModule.register({
-            secret: process.env.JWT_SECRET || 'default-secret-key',
+            secret: process.env.JWT_SECRET || 'fallback-clonex-secret-key',
             signOptions: { expiresIn: '7d' },
         }),
     ],

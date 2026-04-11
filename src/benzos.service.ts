@@ -42,11 +42,23 @@ export class BenzosService {
         return this.benzosEntryRepository.save(entry);
     }
 
-    async getAllEntries(userId: number): Promise<BenzosEntry[]> {
-        return this.benzosEntryRepository.find({
-            where: { user: { id: userId } },
-            order: { takenAt: 'DESC' },
-        });
+    async getAllEntries(userId: number, limit?: number, timeframeDays?: number): Promise<BenzosEntry[]> {
+        const query = this.benzosEntryRepository
+            .createQueryBuilder('entry')
+            .where('entry.userId = :userId', { userId })
+            .orderBy('entry.takenAt', 'DESC');
+
+        if (timeframeDays) {
+            const cutoff = new Date();
+            cutoff.setDate(cutoff.getDate() - timeframeDays);
+            query.andWhere('entry.takenAt >= :cutoff', { cutoff });
+        }
+
+        if (limit) {
+            query.limit(limit);
+        }
+
+        return query.getMany();
     }
 
     async getBetweenDates(from: string, to: string, userId: number): Promise<BenzosEntry[]> {

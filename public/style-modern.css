@@ -750,21 +750,165 @@ body.dark-mode .card-glass {
    ================================ */
 
 @media (max-width: 768px) {
+  /* ── Auth ── */
   .auth-card {
     padding: var(--space-6);
   }
-  
+
   .auth-title {
     font-size: var(--text-2xl);
   }
-  
+
+  /* ── Dashboard Header ── */
   .dashboard-header {
-    flex-direction: column;
-    gap: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    flex-wrap: wrap;
+    gap: var(--space-2);
   }
-  
+
+  .dashboard-logo {
+    font-size: var(--text-base);
+  }
+
+  .dashboard-logo img {
+    height: 30px !important;
+    width: 30px !important;
+  }
+
+  .dropdown-toggle-modern {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+  }
+
+  /* ── Main Container ── */
+  .main-container {
+    padding: var(--space-3) !important;
+  }
+
+  /* ── Stat Cards ── */
   .stat-value {
     font-size: var(--text-2xl);
+  }
+
+  /* ── Entry / Filter / Chart Cards ── */
+  .entry-form-card,
+  .filter-card,
+  .chart-card {
+    padding: var(--space-4);
+  }
+
+  /* ── Section Title ── */
+  .section-title {
+    font-size: var(--text-lg) !important;
+  }
+
+  /* ── Buttons — smaller on mobile ── */
+  .btn-modern {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .btn-lg {
+    padding: var(--space-3) var(--space-5);
+    font-size: var(--text-base);
+  }
+
+  .btn-sm {
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-xs);
+  }
+
+  /* ── View Status Bar ── */
+  .view-status-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-3);
+  }
+
+  .view-status-bar .btn-group-modern {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+
+  .view-status-bar .btn-group-modern .btn-modern {
+    flex: 1 1 auto;
+    min-width: 44px;
+    font-size: var(--text-xs);
+    padding: var(--space-2) var(--space-2);
+    text-align: center;
+  }
+
+  /* ── Filter button group ── */
+  .btn-group-modern {
+    flex-wrap: wrap;
+  }
+
+  /* ── Advisor Card ── */
+  #advisorInner {
+    flex-direction: column !important;
+    gap: 12px !important;
+    padding: 16px !important;
+    align-items: flex-start !important;
+  }
+
+  #advisorRing {
+    width: 52px !important;
+    height: 52px !important;
+    font-size: 1.4rem !important;
+  }
+
+  #advisorHourNum {
+    font-size: 1.8rem !important;
+  }
+
+  #advisorInner > div:last-child {
+    border-left: none !important;
+    padding-left: 0 !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ── Running Timer ── */
+  #runningTimer {
+    font-size: var(--text-3xl) !important;
+  }
+
+  /* ── Tapering Goal section ── */
+  #taperingGoalSection .entry-form-card {
+    padding: var(--space-4);
+  }
+
+  /* ── Section header wrap ── */
+  .section-header {
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  /* ── Table header card ── */
+  .table-header-card {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  /* ── Modal ── */
+  .modal-content-modern {
+    padding: var(--space-5);
+    border-radius: var(--radius-xl);
+  }
+
+  /* ── Confirm dialog ── */
+  .confirm-dialog-content {
+    padding: var(--space-5);
+    margin: var(--space-4);
+  }
+
+  .dialog-actions {
+    flex-direction: column;
   }
 }
 
@@ -997,44 +1141,99 @@ body.theme-midnight {
 /* Responsive Table -> Cards on Mobile */
 @media (max-width: 992px) {
   .table-modern thead {
-    display: none; /* Hide headers on mobile */
+    display: none;
   }
-  
-  .table-modern, .table-modern tbody, .table-modern tr, .table-modern td {
+
+  .table-modern,
+  .table-modern tbody,
+  .table-modern tr,
+  .table-modern td {
     display: block;
     width: 100%;
   }
-  
+
   .table-modern tr {
     margin-bottom: var(--space-4);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     background: var(--bg-elevated);
     box-shadow: var(--shadow-sm);
+    overflow: hidden;
   }
-  
+
   .table-modern td {
     text-align: right;
-    padding-left: 50%;
+    padding: var(--space-3) var(--space-4) var(--space-3) 45%;
     position: relative;
     border: none !important;
     border-bottom: 1px solid var(--border-color) !important;
+    word-break: break-word;
+    min-height: 40px;
   }
-  
+
   .table-modern td:last-child {
     border-bottom: none !important;
     text-align: center;
     padding-left: var(--space-4);
   }
-  
+
   .table-modern td::before {
     content: attr(data-label);
     position: absolute;
     left: var(--space-4);
-    width: 45%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40%;
     text-align: left;
-    font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--text-xs);
     color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Action buttons inside table cards */
+  .table-actions {
+    justify-content: center;
+    padding: var(--space-2) 0;
+  }
+}
+
+/* Extra tight on very small phones */
+@media (max-width: 480px) {
+  .table-modern td {
+    padding-left: 40%;
+  }
+
+  .table-modern td::before {
+    width: 35%;
+    font-size: 0.65rem;
+  }
+
+  /* Stack form buttons vertically */
+  .form-grid .btn-modern,
+  .btn-full {
+    font-size: var(--text-sm);
+  }
+
+  /* Compact stat cards */
+  .stat-card {
+    padding: var(--space-4);
+  }
+
+  .stat-value {
+    font-size: var(--text-xl);
+  }
+
+  /* Smaller timer display */
+  #runningTimer {
+    font-size: var(--text-2xl) !important;
+  }
+
+  /* View status bar buttons: even more compact */
+  .view-status-bar .btn-group-modern .btn-modern {
+    padding: var(--space-1) var(--space-2);
+    min-width: 38px;
   }
 }
 

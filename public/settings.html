@@ -287,7 +287,7 @@
             justify-content: center;
             margin-bottom: 15px;
             overflow: hidden;
-            border: 3px solid #white;
+            border: 3px solid white;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
@@ -528,6 +528,32 @@
                 </div>
                 <button class="btn btn-primary" onclick="checkValuesOnPassword()">Save Password</button>
 
+            </div>
+
+            <!-- Theme Preference -->
+            <div class="setting-section">
+                <h2 class="section-title">
+                    <span class="section-icon">🎨</span>
+                    Appearance Theme
+                </h2>
+                <div class="form-group">
+                    <label>Choose your appearance style</label>
+                    <div class="radio-group" id="theme-radio-group">
+                        <label class="radio-option" for="theme-default">
+                            <input type="radio" id="theme-default" name="app-theme" value="default" checked>
+                            <span>✨ Light Modern</span>
+                        </label>
+                        <label class="radio-option" for="theme-serenity">
+                            <input type="radio" id="theme-serenity" name="app-theme" value="serenity">
+                            <span>🌿 Serenity</span>
+                        </label>
+                        <label class="radio-option" for="theme-midnight">
+                            <input type="radio" id="theme-midnight" name="app-theme" value="midnight">
+                            <span>🌌 Midnight</span>
+                        </label>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="saveThemePreference()" id="saveThemeBtn" disabled>Save Theme</button>
             </div>
 
             <!-- Time Format -->

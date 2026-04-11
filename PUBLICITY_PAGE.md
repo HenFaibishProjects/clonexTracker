@@ -382,7 +382,7 @@ This project was born from personal need and grew into a tool for the community.
 **Benzodiazepines Tracker**  
 *Professional medication management made simple*
 
-© 2025 LiDa Software. All rights reserved.
+© 2026 LiDa Software. All rights reserved.
 
 **Made with ❤️ for those on their medication journey**
 

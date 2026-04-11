@@ -1,3 +1,47 @@
+// ========== NOTIFICATION SYSTEM ==========
+function showNotification(message, type = 'info') {
+    const colors = {
+        success: '#10b881',
+        error: '#ef4444',
+        warning: '#f59e0b',
+        info: '#4169ff'
+    };
+    
+    const notification = $(`
+        <div class="notification-toast" style="
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            color: #1a1a1a;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 99999;
+            border-left: 5px solid ${colors[type]};
+            animation: slideInRight 0.3s ease-out;
+            font-family: 'Inter', sans-serif;
+        ">
+            <span style="font-size: 1.2rem;">${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'}</span>
+            <span style="font-weight: 500;">${message}</span>
+        </div>
+    `);
+    
+    if (!$('#notification-styles').length) {
+        $('<style id="notification-styles">@keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }</style>').appendTo('head');
+    }
+    
+    $('body').append(notification);
+    
+    setTimeout(() => {
+        notification.fadeOut(300, function() { $(this).remove(); });
+    }, 3000);
+}
+
 window.addEventListener('DOMContentLoaded', () => {
     const hash = window.location.hash;
 
@@ -74,12 +118,9 @@ $(document).ready(function () {
                 window.location.href = 'benzos.html';
             },
             error: function (xhr) {
-                console.log("XHR object:", xhr);
-                const msg = xhr.responseJSON?.message || 'Login failed';
+                const msg = xhr.responseJSON?.message || 'The credentials you entered do not match.';
                 $('#loginError').text(msg).removeClass('d-none');
-                console.log("Error message displayed in #loginError.");
-                alert('❌ The credentials you entered don\'t match what\'s stored in the system.');
-                console.log("Alert should have been shown.");
+                showNotification(msg, 'error');
             }
         });
     });
@@ -95,12 +136,12 @@ $(document).ready(function () {
 
         const isValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password);
         if (!isValid) {
-            alert("❌ Password must be at least 8 characters long and include upper, lower case letters and a number.");
+            showNotification("Password must be at least 8 characters long and include upper, lower case letters and a number.", "error");
             return;
         }
 
         if (password !== confirmPassword) {
-            alert("❌ New password and confirmation do not match.");
+            showNotification("Passwords do not match.", "error");
             return;
         }
 
@@ -111,14 +152,15 @@ $(document).ready(function () {
             data: JSON.stringify({ userName: name, email, password , benzosType }),
             success: function (data) {
                 console.log('Registration successful:', data);
-                // Show the custom modal (not Bootstrap modal)
-                document.getElementById('successModal').classList.add('active');
+                showNotification('Account created successfully! Switching to login...', 'success');
+                setTimeout(() => {
+                    const triggerTab = new bootstrap.Tab(document.querySelector('#login-tab'));
+                    triggerTab.show();
+                }, 2000);
             },
             error: function (xhr) {
                 const msg = xhr.responseJSON?.message || 'Registration failed';
-                const authMessage = document.getElementById('authMessage');
-                authMessage.className = 'alert-message error';
-                authMessage.innerHTML = '<span>❌</span><span>' + msg + '</span>';
+                showNotification(msg, 'error');
             }
         });
     });

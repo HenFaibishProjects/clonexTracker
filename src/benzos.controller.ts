@@ -39,8 +39,12 @@ export class BenzosController {
     }
 
     @Get()
-    async getAllEntries(@Req() req: AuthenticatedRequest): Promise<BenzosEntry[]> {
-        return this.benzosService.getAllEntries(req.user.id!);
+    async getAllEntries(
+        @Req() req: AuthenticatedRequest,
+        @Query('limit') limit?: number,
+        @Query('timeframeDays') timeframeDays?: number,
+    ): Promise<BenzosEntry[]> {
+        return this.benzosService.getAllEntries(req.user.id!, limit, timeframeDays);
     }
 
     @Get('/between')

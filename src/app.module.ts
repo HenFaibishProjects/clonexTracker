@@ -5,7 +5,6 @@ import { AppService } from './app.service';
 import { BenzosEntry } from './benzos.entity';
 import { BenzosController } from './benzos.controller';
 import { BenzosService } from './benzos.service';
-import * as dotenv from 'dotenv';
 import {User} from "./auth/user.entity";
 import {AuthModule} from "./auth/auth.module";
 import {ContactController} from "./contactMe/contact.controller";
@@ -18,7 +17,6 @@ import {LearningProgress} from "./progress/learning-progress.entity";
 import {Note} from "./Note/notes.entity";
 import {NotesController} from "./Note/notes.controller";
 import {NotesModule} from "./Note/notes.module";
-dotenv.config();
 
 @Module({
     imports: [

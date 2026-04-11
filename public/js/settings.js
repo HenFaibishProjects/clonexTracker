@@ -14,84 +14,100 @@ function showNotification(message, type = 'info') {
         warning: '#f59e0b',
         info: '#4169ff'
     };
-    
-    const notification = $(`
-        <div class="notification-toast" style="
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--bg-elevated);
-            color: var(--text-primary);
-            padding: 16px 24px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            z-index: 99999;
-            border-left: 5px solid ${colors[type]};
-            animation: slideInRight 0.3s ease-out;
-        ">
-            <span style="font-size: 1.2rem;">${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'}</span>
-            <span style="font-weight: 500;">${message}</span>
-        </div>
-    `);
-    
-    // Check if animation exists in local head
-    if (!$('#notification-styles').length) {
-        $('<style id="notification-styles">@keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }</style>').appendTo('head');
+
+    // Inject keyframe animation style once
+    if (!document.getElementById('notification-styles')) {
+        const style = document.createElement('style');
+        style.id = 'notification-styles';
+        style.textContent = '@keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }';
+        document.head.appendChild(style);
     }
-    
-    $('body').append(notification);
-    
+
+    const notification = document.createElement('div');
+    notification.className = 'notification-toast';
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: var(--bg-elevated);
+        color: var(--text-primary);
+        padding: 16px 24px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 99999;
+        border-left: 5px solid ${colors[type]};
+        animation: slideInRight 0.3s ease-out;
+        transition: opacity 0.3s ease;
+    `;
+    const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
+    notification.innerHTML = `
+        <span style="font-size: 1.2rem;">${icon}</span>
+        <span style="font-weight: 500;">${message}</span>
+    `;
+    document.body.appendChild(notification);
+
     setTimeout(() => {
-        notification.fadeOut(300, function() { $(this).remove(); });
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
 
 function showConfirmDialog(options) {
-    const { 
-        title = 'Are you sure?', 
-        message = '', 
-        confirmText = 'Confirm', 
-        cancelText = 'Cancel', 
+    const {
+        title = 'Are you sure?',
+        message = '',
+        confirmText = 'Confirm',
+        cancelText = 'Cancel',
         icon = '⚠️',
         type = 'danger',
-        onConfirm, 
-        onCancel 
+        onConfirm,
+        onCancel
     } = options;
 
-    $('.confirm-dialog-overlay').remove();
-    
-    const dialog = $(`
-        <div class="confirm-dialog-overlay">
-            <div class="confirm-dialog-content">
-                <div class="dialog-icon">${icon}</div>
-                <h3 class="dialog-title">${title}</h3>
-                <p class="dialog-message">${message}</p>
-                <div class="dialog-actions">
-                    <button class="dialog-btn dialog-btn-cancel">${cancelText}</button>
-                    <button class="dialog-btn dialog-btn-confirm" style="background: ${type === 'danger' ? 'var(--color-danger-600)' : 'var(--color-primary-600)'}">
-                        ${confirmText}
-                    </button>
-                </div>
+    // Remove any existing dialog
+    document.querySelectorAll('.confirm-dialog-overlay').forEach(el => el.remove());
+
+    const overlay = document.createElement('div');
+    overlay.className = 'confirm-dialog-overlay';
+    overlay.innerHTML = `
+        <div class="confirm-dialog-content">
+            <div class="dialog-icon">${icon}</div>
+            <h3 class="dialog-title">${title}</h3>
+            <p class="dialog-message">${message}</p>
+            <div class="dialog-actions">
+                <button class="dialog-btn dialog-btn-cancel">${cancelText}</button>
+                <button class="dialog-btn dialog-btn-confirm" style="background: ${type === 'danger' ? 'var(--color-danger-600)' : 'var(--color-primary-600)'}">
+                    ${confirmText}
+                </button>
             </div>
         </div>
-    `);
-    
-    $('body').append(dialog);
-    
-    dialog.find('.dialog-btn-cancel').click(function() {
-        dialog.fadeOut(200, function() { $(this).remove(); });
+    `;
+    document.body.appendChild(overlay);
+
+    const closeDialog = () => {
+        overlay.style.opacity = '0';
+        setTimeout(() => overlay.remove(), 200);
+    };
+
+    overlay.querySelector('.dialog-btn-cancel').addEventListener('click', () => {
+        closeDialog();
         if (onCancel) onCancel();
     });
-    
-    dialog.find('.dialog-btn-confirm').click(function() {
-        dialog.fadeOut(200, function() { $(this).remove(); });
+
+    overlay.querySelector('.dialog-btn-confirm').addEventListener('click', () => {
+        closeDialog();
         if (onConfirm) onConfirm();
     });
 
-    dialog.click(function(e) { if (e.target === this) { $(this).find('.dialog-btn-cancel').click(); } });
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            closeDialog();
+            if (onCancel) onCancel();
+        }
+    });
 }
 
 async function checkValuesOnPassword() {

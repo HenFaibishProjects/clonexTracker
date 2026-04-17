@@ -17,9 +17,13 @@ import {LearningProgress} from "./progress/learning-progress.entity";
 import {Note} from "./Note/notes.entity";
 import {NotesController} from "./Note/notes.controller";
 import {NotesModule} from "./Note/notes.module";
+import { ScheduleModule } from '@nestjs/schedule';
+import { AiStatusModule } from './ai-status/ai-status.module';
 
 @Module({
     imports: [
+        ScheduleModule.forRoot(),
+        AiStatusModule,
         AuthModule,
         TypeOrmModule.forRoot({
             type: 'postgres',
@@ -29,7 +33,7 @@ import {NotesModule} from "./Note/notes.module";
             password: process.env.DB_PASSWORD,
             database: process.env.DB_NAME,
             autoLoadEntities: true,
-            synchronize: true,
+            synchronize: false,
             ssl: {
                 rejectUnauthorized: false
             },

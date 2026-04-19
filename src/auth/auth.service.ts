@@ -29,7 +29,11 @@ export class AuthService {
             throw new UnauthorizedException('Account not activated. Check your email.');
         }
 
-        const isMatch = await bcrypt.compare(pass, user.password!);
+        if (!user.password) {
+            throw new UnauthorizedException('Invalid credentials');
+        }
+
+        const isMatch = await bcrypt.compare(pass, user.password);
         if (!isMatch) {
             throw new UnauthorizedException('Invalid credentials');
         }

@@ -2,7 +2,7 @@ import {BadRequestException, Injectable, NotFoundException, UnauthorizedExceptio
 import {JwtService} from '@nestjs/jwt';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import {User} from './user.entity';
 import {v4 as uuidv4} from 'uuid';
 import {RegisterDto} from "./register.dot";

@@ -29,7 +29,7 @@ export class AuthService {
             throw new UnauthorizedException('Account not activated. Check your email.');
         }
 
-        if (!user.password) {
+        if (!user.password || !pass) {
             throw new UnauthorizedException('Invalid credentials');
         }
 

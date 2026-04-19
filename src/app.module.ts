@@ -33,7 +33,7 @@ import { AiStatusModule } from './ai-status/ai-status.module';
             password: process.env.DB_PASSWORD,
             database: process.env.DB_NAME,
             autoLoadEntities: true,
-            synchronize: false,
+            synchronize: true,
             ssl: {
                 rejectUnauthorized: false
             },

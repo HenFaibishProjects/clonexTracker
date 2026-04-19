@@ -13,8 +13,22 @@ async function bootstrap() {
     app.useStaticAssets(join(__dirname, '..', 'public'));
 
     // ✅ CORS: allow frontend + deployed domain
+    const allowedOrigins = [
+        'https://www.lidasoftware.online',
+        'https://lidasoftware.online',
+        'http://localhost:3000',
+        'http://localhost:4200',
+    ];
     app.enableCors({
-        origin: true,
+        origin: (requestOrigin, callback) => {
+            // Allow requests with no origin (e.g. server-to-server, curl)
+            if (!requestOrigin) return callback(null, true);
+            if (allowedOrigins.includes(requestOrigin)) {
+                callback(null, true);
+            } else {
+                callback(new Error(`CORS blocked: origin "${requestOrigin}" is not allowed`));
+            }
+        },
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: false,

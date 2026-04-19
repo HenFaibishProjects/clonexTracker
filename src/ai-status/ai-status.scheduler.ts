@@ -8,9 +8,12 @@ export class AiStatusScheduler implements OnModuleInit {
 
   constructor(private readonly aiStatusService: AiStatusService) {}
 
-  async onModuleInit() {
-    this.logger.log('Running initial AI status check on startup...');
-    await this.aiStatusService.checkAndStoreAll();
+  onModuleInit() {
+    // Fire-and-forget: do NOT await here.
+    // If the DB table doesn't exist yet, this must NOT block or crash the bootstrap.
+    this.aiStatusService.checkAndStoreAll().catch((err) => {
+      this.logger.error(`Initial AI status check failed (non-fatal): ${err?.message ?? err}`);
+    });
   }
 
   @Cron('0 * * * *')

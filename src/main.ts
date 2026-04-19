@@ -16,17 +16,20 @@ async function bootstrap() {
     const allowedOrigins = [
         'https://www.lidasoftware.online',
         'https://lidasoftware.online',
+        'https://www.benzotracker.support',
+        'https://benzotracker.support',
         'http://localhost:3000',
         'http://localhost:4200',
+        'http://127.0.0.1:5500'
     ];
     app.enableCors({
         origin: (requestOrigin, callback) => {
-            // Allow requests with no origin (e.g. server-to-server, curl)
             if (!requestOrigin) return callback(null, true);
             if (allowedOrigins.includes(requestOrigin)) {
                 callback(null, true);
             } else {
-                callback(new Error(`CORS blocked: origin "${requestOrigin}" is not allowed`));
+                // Return 'false' instead of throwing Error to prevent a 500 Internal Server Error response
+                callback(null, false);
             }
         },
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',

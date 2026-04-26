@@ -16,8 +16,8 @@ export class AiStatusScheduler implements OnModuleInit {
     });
   }
 
-  @Cron('0 * * * *')
-  async handleHourlyCheck() {
-    await this.aiStatusService.checkAndStoreAll();
-  }
+  @Cron('0 3 */2 * *')
+async handleCheck() {
+  await this.aiStatusService.checkAndStoreAll();
+}
 }

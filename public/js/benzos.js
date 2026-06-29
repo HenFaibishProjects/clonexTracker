@@ -1834,6 +1834,13 @@ function calculateClientSideAnalytics(entries, range = 'all') {
     const lastDose = sortedEntries.length ? new Date(sortedEntries[sortedEntries.length - 1].takenAt) : now;
     const currentStreak = now - lastDose;
 
+    // Also consider the gap from last dose to NOW within the selected range
+    // (this represents the ongoing gap since the most recent dose)
+    if (sortedEntries.length > 0) {
+        const gapToNow = now - lastDose;
+        if (gapToNow > longestGap) longestGap = gapToNow;
+    }
+
     // Dosage distribution
     const dosageFrequency = {};
     entries.forEach(e => {
@@ -1850,6 +1857,53 @@ function calculateClientSideAnalytics(entries, range = 'all') {
             count,
             percentage: ((count / total) * 100).toFixed(0)
         }));
+
+    // ── Average including empty (zero-dose) days ──────────────────────────────
+    const totalDosageMg = entries.reduce((sum, e) => sum + (e.dosageMg || 0), 0);
+    let calendarDays;
+    const todayForCalc = new Date();
+    if (range !== 'all') {
+        calendarDays = parseInt(range);
+    } else {
+        const firstEntry = new Date(sortedEntries[0].takenAt);
+        firstEntry.setHours(0, 0, 0, 0);
+        todayForCalc.setHours(0, 0, 0, 0);
+        calendarDays = Math.max(1, Math.round((todayForCalc - firstEntry) / (1000 * 60 * 60 * 24)) + 1);
+    }
+    const averageWithEmptyDays = calendarDays > 0 ? totalDosageMg / calendarDays : 0;
+
+    // ── Active days & zero-dose days ───────────────────────────────────────────
+    // Build a Set of unique calendar dates that had at least one dose
+    const activeDaySet = new Set(
+        entries.map(e => new Date(e.takenAt).toISOString().split('T')[0])
+    );
+    const activeDays = activeDaySet.size;
+    const zeroDoseDays = Math.max(0, calendarDays - activeDays);
+    const zeroDoseRate = calendarDays > 0 ? ((zeroDoseDays / calendarDays) * 100).toFixed(0) : 0;
+
+    // ── Longest & current clean streak (consecutive zero-dose days) ────────────
+    // Build a full list of all calendar dates in the range, mark which are active
+    const rangeStart = new Date(sortedEntries[0].takenAt);
+    rangeStart.setHours(0, 0, 0, 0);
+    const rangeEnd = new Date();
+    rangeEnd.setHours(0, 0, 0, 0);
+
+    let longestCleanStreak = 0;
+    let currentCleanStreak = 0;
+    let runningStreak = 0;
+    const cursor = new Date(rangeStart);
+    while (cursor <= rangeEnd) {
+        const key = cursor.toISOString().split('T')[0];
+        if (!activeDaySet.has(key)) {
+            runningStreak++;
+            if (runningStreak > longestCleanStreak) longestCleanStreak = runningStreak;
+        } else {
+            runningStreak = 0;
+        }
+        cursor.setDate(cursor.getDate() + 1);
+    }
+    // currentCleanStreak = the ongoing streak ending on today
+    currentCleanStreak = runningStreak;
 
     return {
         hasData: true,
@@ -1883,7 +1937,15 @@ function calculateClientSideAnalytics(entries, range = 'all') {
             mostCommon: sortedDosages,
             average: parseFloat(mean.toFixed(3)),
             min: allDosages.length ? Math.min(...allDosages) : 0,
-            max: allDosages.length ? Math.max(...allDosages) : 0
+            max: allDosages.length ? Math.max(...allDosages) : 0,
+            averageWithEmptyDays: parseFloat(averageWithEmptyDays.toFixed(4)),
+            totalDosageMg: parseFloat(totalDosageMg.toFixed(3)),
+            calendarDays,
+            activeDays,
+            zeroDoseDays,
+            zeroDoseRate: parseInt(zeroDoseRate),
+            longestCleanStreak,
+            currentCleanStreak
         },
         timeframe: {
             range: range,
@@ -1970,15 +2032,35 @@ function displayEnhancedAnalytics(analytics) {
     $('#analyticsMostCommon').html(mostCommonHtml);
 
     // Display statistical summary
-    const totalDoses = analytics.distribution.mostCommon.reduce((sum, item) => sum + item.count, 0) || analytics.timePatterns.counts.morning + analytics.timePatterns.counts.afternoon + analytics.timePatterns.counts.evening + analytics.timePatterns.counts.night;
+    // Use total count from all time-pattern buckets (accurate full count)
+    const totalDoses = analytics.timePatterns.counts.morning + analytics.timePatterns.counts.afternoon + analytics.timePatterns.counts.evening + analytics.timePatterns.counts.night;
     const totalDays = analytics.timeframe.days || 1;
-    const dailyDosageAvg = (analytics.distribution.average * (totalDoses / totalDays)).toFixed(3);
+    const dailyDosageAvg = totalDoses > 0 ? (analytics.distribution.average * (totalDoses / totalDays)).toFixed(3) : '0.000';
     const intervalAvg = (totalDays / (totalDoses || 1)).toFixed(1);
 
+    $('#analyticsTotalDosage').text(`${analytics.distribution.totalDosageMg} mg`);
     $('#analyticsAverage').text(`${dailyDosageAvg} mg`);
+    $('#analyticsAverageWithEmpty').text(`${analytics.distribution.averageWithEmptyDays} mg`);
     $('#analyticsInterval').text(`${intervalAvg}`);
     $('#analyticsMin').text(`${analytics.distribution.min.toFixed(3)} mg`);
     $('#analyticsMax').text(`${analytics.distribution.max.toFixed(3)} mg`);
+
+    // Clean Day Stats
+    const calDays = analytics.distribution.calendarDays;
+    $('#analyticsActiveDays').text(`${analytics.distribution.activeDays} / ${calDays}`);
+    $('#analyticsZeroDoseDays').text(`${analytics.distribution.zeroDoseDays}`);
+    $('#analyticsZeroDoseRate').text(`${analytics.distribution.zeroDoseRate}% of ${calDays} calendar days`);
+    $('#analyticsLongestCleanStreak').text(
+        analytics.distribution.longestCleanStreak === 0
+            ? 'None'
+            : `${analytics.distribution.longestCleanStreak} day${analytics.distribution.longestCleanStreak !== 1 ? 's' : ''}`
+    );
+    const ccs = analytics.distribution.currentCleanStreak;
+    $('#analyticsCurrentCleanStreak').html(
+        ccs === 0
+            ? '<span style="color: var(--text-secondary); font-size: var(--text-sm);">Dose taken today</span>'
+            : `<span style="color: var(--color-success-600);">${ccs} day${ccs !== 1 ? 's' : ''} 🌿</span>`
+    );
 }
 
 // Handle tapering goal form submission

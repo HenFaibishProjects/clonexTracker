@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <link rel="icon" type="image/png" href="/icons/pl.png">
@@ -618,9 +618,19 @@
                     </h4>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
                         <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
-                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">AVERAGE DOSAGE</div>
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">TOTAL DOSAGE</div>
+                            <div style="font-size: var(--text-xl); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsTotalDosage">-</div>
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-top: var(--space-1);">mg consumed in period</div>
+                        </div>
+                        <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
+                            >AVERAGE DOSAGE</div>
                             <div style="font-size: var(--text-xl); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsAverage">-</div>
-                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-top: var(--space-1);">mg / day</div>
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-top: var(--space-1);">mg / day (dose days only)</div>
+                        </div>
+                        <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center; border: 1px solid var(--color-primary-200);">
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">AVG INCL. EMPTY DAYS</div>
+                            <div style="font-size: var(--text-xl); font-weight: var(--font-weight-bold); color: var(--color-primary-600);" id="analyticsAverageWithEmpty">-</div>
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-top: var(--space-1);">mg / day (all calendar days)</div>
                         </div>
                         <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
                             <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">AVERAGE INTERVAL</div>
@@ -634,6 +644,32 @@
                         <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
                             <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">MAXIMUM</div>
                             <div style="font-size: var(--text-xl); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsMax">-</div>
+                        </div>
+                    </div>
+                    <!-- Clean Day Stats -->
+                    <h4 style="font-size: var(--text-lg); font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-top: var(--space-6); margin-bottom: var(--space-4); display: flex; align-items: center; gap: var(--space-2);">
+                        <span>🌿</span> Clean Day Stats
+                    </h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-4);">
+                        <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">ACTIVE DAYS</div>
+                            <div style="font-size: var(--text-xl); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsActiveDays">-</div>
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-top: var(--space-1);">days with a dose</div>
+                        </div>
+                        <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center; border: 1px solid rgba(16,185,129,0.3);">
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">ZERO-DOSE DAYS</div>
+                            <div style="font-size: var(--text-xl); font-weight: var(--font-weight-bold); color: var(--color-success-600);" id="analyticsZeroDoseDays">-</div>
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-top: var(--space-1);" id="analyticsZeroDoseRate">out of calendar days</div>
+                        </div>
+                        <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center; border: 1px solid rgba(16,185,129,0.5);">
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">LONGEST CLEAN STREAK</div>
+                            <div style="font-size: var(--text-xl); font-weight: var(--font-weight-bold); color: var(--color-success-600);" id="analyticsLongestCleanStreak">-</div>
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-top: var(--space-1);">consecutive zero-dose days</div>
+                        </div>
+                        <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center; border: 2px solid rgba(16,185,129,0.6);">
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">CURRENT CLEAN STREAK</div>
+                            <div style="font-size: var(--text-xl); font-weight: var(--font-weight-bold); color: var(--color-success-600);" id="analyticsCurrentCleanStreak">-</div>
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-top: var(--space-1);">zero-dose days right now</div>
                         </div>
                     </div>
                 </div>
@@ -734,7 +770,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/benzos.js?v=2.2"></script>
+    <script src="js/benzos.js?v=2.3"></script>
     
     <script>
         function closeImportModal() {

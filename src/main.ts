@@ -39,7 +39,7 @@ async function bootstrap() {
 
     app.useStaticAssets(join(__dirname, '..', 'public'));
 
-    // ✅ Prefix only API routes — excludes static files
+    // ✅ Prefix only API routes, excludes static files
     app.setGlobalPrefix('api');
 
     await app.listen(process.env.PORT || 3000);

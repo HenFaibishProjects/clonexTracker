@@ -6,7 +6,7 @@ function showNotification(message, type = 'info') {
         warning: '#f59e0b',
         info: '#4169ff'
     };
-    
+
     const notification = $(`
         <div class="notification-toast" style="
             position: fixed;
@@ -30,15 +30,15 @@ function showNotification(message, type = 'info') {
             <span style="font-weight: 500;">${message}</span>
         </div>
     `);
-    
+
     if (!$('#notification-styles').length) {
         $('<style id="notification-styles">@keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }</style>').appendTo('head');
     }
-    
+
     $('body').append(notification);
-    
+
     setTimeout(() => {
-        notification.fadeOut(300, function() { $(this).remove(); });
+        notification.fadeOut(300, function () { $(this).remove(); });
     }, 3000);
 }
 
@@ -149,7 +149,7 @@ $(document).ready(function () {
             url: `${apiBase}/api/auth/register`,
             method: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ userName: name, email, password , benzosType }),
+            data: JSON.stringify({ userName: name, email, password, benzosType }),
             success: function (data) {
                 console.log('Registration successful:', data);
                 showNotification('Account created successfully! Switching to login...', 'success');

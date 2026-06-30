@@ -156,7 +156,7 @@ async function checkValuesOnPassword() {
         const theme = localStorage.getItem('appTheme');
         localStorage.clear();
         if (theme) localStorage.setItem('appTheme', theme);
-        
+
         setTimeout(() => {
             window.location.href = 'login.html';
         }, 2000);
@@ -208,7 +208,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('appTheme') || 'default';
     const themeRadio = document.querySelector(`input[name="app-theme"][value="${savedTheme}"]`);
     const saveThemeBtn = document.getElementById('saveThemeBtn');
-    
+
     if (themeRadio) {
         themeRadio.checked = true;
         const container = themeRadio.closest('.radio-option');
@@ -221,11 +221,11 @@ window.addEventListener('DOMContentLoaded', () => {
             const selected = document.querySelector('input[name="app-theme"]:checked').value;
             const isSame = selected === savedTheme;
             saveThemeBtn.disabled = isSame;
-            
+
             // Update visual selection
             document.querySelectorAll('#theme-radio-group .radio-option').forEach(opt => opt.classList.remove('selected'));
             radio.closest('.radio-option').classList.add('selected');
-            
+
             // Live preview the theme
             applyAppTheme(selected);
         });
@@ -233,25 +233,25 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 
-    function changeBenzodiazepinesType() {
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        const existingBenzosType = user.benzosType;
-        const newEnteredBenzosType = document.getElementById("BenzodiazepinesTypeId")?.value?.trim();
+function changeBenzodiazepinesType() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const existingBenzosType = user.benzosType;
+    const newEnteredBenzosType = document.getElementById("BenzodiazepinesTypeId")?.value?.trim();
 
-        if (existingBenzosType === newEnteredBenzosType) {
-          showNotification("Same frequency entered — nothing was saved.", "info");
-          return;
-        }
+    if (existingBenzosType === newEnteredBenzosType) {
+        showNotification("Same frequency entered, nothing was saved.", "info");
+        return;
+    }
 
-        const token = localStorage.getItem('token');
-        fetch(`${baseUrl}/changeBenzosType`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({ newBenzosType: newEnteredBenzosType })
-        })
+    const token = localStorage.getItem('token');
+    fetch(`${baseUrl}/changeBenzosType`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ newBenzosType: newEnteredBenzosType })
+    })
         .then(response => {
             if (!response.ok) throw new Error('Failed to update frequency');
             return response.json();
@@ -269,26 +269,26 @@ window.addEventListener('DOMContentLoaded', () => {
         .catch(err => {
             showNotification(err.message, 'error');
         });
+}
+
+function checkValuesOnName() {
+    const existingUser = JSON.parse(localStorage.getItem('user'));
+    const newEnteredUser = document.getElementById("userName")?.value?.trim();
+
+    if (existingUser?.name === newEnteredUser) {
+        showNotification("Same name entered, nothing was saved.", "info");
+        return;
     }
 
-    function checkValuesOnName() {
-        const existingUser = JSON.parse(localStorage.getItem('user'));
-        const newEnteredUser = document.getElementById("userName")?.value?.trim();
-
-        if (existingUser?.name === newEnteredUser) {
-            showNotification("Same name entered — nothing was saved.", "info");
-            return;
-        }
-
-        const token = localStorage.getItem('token');
-        fetch(`${baseUrl}/changeName`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({ newName: newEnteredUser })
-        })
+    const token = localStorage.getItem('token');
+    fetch(`${baseUrl}/changeName`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ newName: newEnteredUser })
+    })
         .then(response => {
             if (!response.ok) throw new Error('Failed to update name');
             return response.json();
@@ -306,39 +306,39 @@ window.addEventListener('DOMContentLoaded', () => {
         .catch(err => {
             showNotification(err.message, 'error');
         });
+}
+
+
+function cancelSettings() {
+    window.location.href = `../benzos.html`;
+}
+
+function saveTimeFormat() {
+    const selectedFormat = document.querySelector('input[name="time-format"]:checked')?.value;
+
+    if (!selectedFormat) {
+        showNotification("Please select a time format.", "warning");
+        return;
     }
 
-
-    function cancelSettings() {
-        window.location.href = `../benzos.html`;
-    }
-
-    function saveTimeFormat() {
-        const selectedFormat = document.querySelector('input[name="time-format"]:checked')?.value;
-
-        if (!selectedFormat) {
-            showNotification("Please select a time format.", "warning");
-            return;
-        }
-
-        localStorage.setItem('timeFormat', selectedFormat);
-        showNotification("📝 Time format saved successfully!", "success");
-        setTimeout(() => {
-            window.location.href = '/benzos.html';
-        }, 1500);
-    }
+    localStorage.setItem('timeFormat', selectedFormat);
+    showNotification("📝 Time format saved successfully!", "success");
+    setTimeout(() => {
+        window.location.href = '/benzos.html';
+    }, 1500);
+}
 
 
-    document.querySelectorAll('input[name="time-format"]').forEach(radio => {
-        radio.addEventListener('change', function () {
-            document.querySelectorAll('.radio-option').forEach(option => {
-                option.classList.remove('selected');
-            });
-            this.closest('.radio-option').classList.add('selected');
+document.querySelectorAll('input[name="time-format"]').forEach(radio => {
+    radio.addEventListener('change', function () {
+        document.querySelectorAll('.radio-option').forEach(option => {
+            option.classList.remove('selected');
         });
+        this.closest('.radio-option').classList.add('selected');
     });
+});
 
-    document.querySelector('input[name="time-format"]:checked').closest('.radio-option').classList.add('selected');
+document.querySelector('input[name="time-format"]:checked').closest('.radio-option').classList.add('selected');
 
 
 function saveThemePreference() {
@@ -347,7 +347,7 @@ function saveThemePreference() {
 
     localStorage.setItem('appTheme', selectedTheme);
     const themeName = selectedTheme.charAt(0).toUpperCase() + selectedTheme.slice(1);
-    
+
     showNotification(`✨ ${themeName} theme saved as default!`, "success");
     document.getElementById('saveThemeBtn').disabled = true;
 }

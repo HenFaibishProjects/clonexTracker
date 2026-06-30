@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <link rel="icon" type="image/png" href="/icons/pl.png">
     <meta charset="UTF-8">
@@ -13,7 +14,8 @@
             width: 100%;
             height: 100%;
             backdrop-filter: blur(6px);
-            background-color: rgba(0, 0, 255, 0.2); /* light blue tint */
+            background-color: rgba(0, 0, 255, 0.2);
+            /* light blue tint */
             z-index: 9999;
             display: flex;
             align-items: center;
@@ -25,16 +27,22 @@
             background: white;
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
             font-size: 16px;
             text-align: center;
             max-width: 80%;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0 }
-            to { opacity: 1 }
+            from {
+                opacity: 0
+            }
+
+            to {
+                opacity: 1
+            }
         }
+
         .custom-popup {
             position: fixed;
             top: 30%;
@@ -46,12 +54,13 @@
             z-index: 9999;
             border-radius: 12px;
             text-align: center;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
         }
 
         .custom-popup-content button {
             margin-top: 1rem;
         }
+
         * {
             margin: 0;
             padding: 0;
@@ -99,6 +108,7 @@
                 opacity: 0;
                 transform: translateY(-30px) scale(0.95);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
@@ -406,10 +416,14 @@
                 flex-direction: column;
             }
         }
+
         .settings-modal {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6);
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -420,7 +434,7 @@
             background: white;
             border-radius: 16px;
             padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             text-align: center;
             max-width: 400px;
             width: 90%;
@@ -454,38 +468,40 @@
         }
     </style>
 </head>
+
 <body>
-<div class="settings-overlay">
-    <div class="settings-container">
-        <div class="settings-header">
-            <h1 class="settings-title">Settings</h1>
-            <p class="settings-subtitle">Manage your account preferences</p>
-        </div>
-
-        <div class="settings-content">
-            <div class="setting-section">
-                <h2 class="section-title">
-                    <span class="section-icon">@</span>
-                    Email Configuration
-                </h2>
-                <div class="form-group">
-                    <label for="primary-email">Primary Email</label>
-                    <input type="email" id="primary-email" placeholder="us er@example.com" value="user@example.com" readonly disabled>
-                </div>
+    <div class="settings-overlay">
+        <div class="settings-container">
+            <div class="settings-header">
+                <h1 class="settings-title">Settings</h1>
+                <p class="settings-subtitle">Manage your account preferences</p>
             </div>
-            <div class="setting-section">
-                <h2 class="section-title">
-                    <span class="section-icon">👤</span>
-                    Personal Information
-                </h2>
-                <div class="form-group">
-                    <label for="userName">Name</label>
-                    <input type="text" id="userName" placeholder="">
+
+            <div class="settings-content">
+                <div class="setting-section">
+                    <h2 class="section-title">
+                        <span class="section-icon">@</span>
+                        Email Configuration
+                    </h2>
+                    <div class="form-group">
+                        <label for="primary-email">Primary Email</label>
+                        <input type="email" id="primary-email" placeholder="us er@example.com" value="user@example.com"
+                            readonly disabled>
+                    </div>
+                </div>
+                <div class="setting-section">
+                    <h2 class="section-title">
+                        <span class="section-icon">👤</span>
+                        Personal Information
+                    </h2>
+                    <div class="form-group">
+                        <label for="userName">Name</label>
+                        <input type="text" id="userName" placeholder="">
+
+                    </div>
+                    <button class="btn btn-primary" onclick="saveInGeneral('uName')">Save New Name</button>
 
                 </div>
-                <button class="btn btn-primary" onclick="saveInGeneral('uName')">Save New Name</button>
-
-            </div>
                 <div class="setting-section">
                     <h2 class="section-title">
                         <span class="section-icon">⚕️</span>
@@ -496,112 +512,117 @@
                         <input type="text" id="BenzodiazepinesTypeId" placeholder="">
 
                     </div>
-                    <button class="btn btn-primary" onclick="changeBenzodiazepinesType()">Save New Benzodiazepines Type</button>
+                    <button class="btn btn-primary" onclick="changeBenzodiazepinesType()">Save New Benzodiazepines
+                        Type</button>
 
                 </div>
 
 
 
 
-            <!-- Password Settings -->
-            <div class="setting-section">
-                <h2 class="section-title">
-                    <span class="section-icon">🔒</span>
-                    Password & Security
-                </h2>
-                <div class="form-group">
-                    <label for="current-password">Current Password</label>
-                    <input type="password" id="current-password" placeholder="Enter current password">
-                </div>
-                <div class="form-group">
-                    <label for="new-password">New Password</label>
-                    <input type="password" id="new-password" placeholder="Enter new password">
-                </div>
-                <div class="form-group">
-                    <label for="confirm-password">Confirm New Password</label>
-                    <input type="password" id="confirm-password" placeholder="Confirm new password">
-                </div>
-                <div class="password-requirements">
-                    <small style="color: #6b7280; display: block; margin-top: 8px;">
-                        Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.
-                    </small>
-                </div>
-                <button class="btn btn-primary" onclick="checkValuesOnPassword()">Save Password</button>
-
-            </div>
-
-            <!-- Theme Preference -->
-            <div class="setting-section">
-                <h2 class="section-title">
-                    <span class="section-icon">🎨</span>
-                    Appearance Theme
-                </h2>
-                <div class="form-group">
-                    <label>Choose your appearance style</label>
-                    <div class="radio-group" id="theme-radio-group">
-                        <label class="radio-option" for="theme-default">
-                            <input type="radio" id="theme-default" name="app-theme" value="default" checked>
-                            <span>✨ Light Modern</span>
-                        </label>
-                        <label class="radio-option" for="theme-serenity">
-                            <input type="radio" id="theme-serenity" name="app-theme" value="serenity">
-                            <span>🌿 Serenity</span>
-                        </label>
-                        <label class="radio-option" for="theme-midnight">
-                            <input type="radio" id="theme-midnight" name="app-theme" value="midnight">
-                            <span>🌌 Midnight</span>
-                        </label>
+                <!-- Password Settings -->
+                <div class="setting-section">
+                    <h2 class="section-title">
+                        <span class="section-icon">🔒</span>
+                        Password & Security
+                    </h2>
+                    <div class="form-group">
+                        <label for="current-password">Current Password</label>
+                        <input type="password" id="current-password" placeholder="Enter current password">
                     </div>
-                </div>
-                <button class="btn btn-primary" onclick="saveThemePreference()" id="saveThemeBtn" disabled>Save Theme</button>
-            </div>
-
-            <!-- Time Format -->
-            <div class="setting-section">
-                <h2 class="section-title">
-                    <span class="section-icon">🕐</span>
-                    Time Format Preference
-                </h2>
-                <div class="form-group">
-                    <label>Choose your preferred time format</label>
-                    <div class="radio-group">
-                        <label class="radio-option" for="time-12">
-                            <input type="radio" id="time-12" name="time-format" value="12" checked>
-                            <span>12-hour (2:30 PM)</span>
-                        </label>
-                        <label class="radio-option" for="time-24">
-                            <input type="radio" id="time-24" name="time-format" value="24">
-                            <span>24-hour (14:30)</span>
-                        </label>
+                    <div class="form-group">
+                        <label for="new-password">New Password</label>
+                        <input type="password" id="new-password" placeholder="Enter new password">
                     </div>
+                    <div class="form-group">
+                        <label for="confirm-password">Confirm New Password</label>
+                        <input type="password" id="confirm-password" placeholder="Confirm new password">
+                    </div>
+                    <div class="password-requirements">
+                        <small style="color: #6b7280; display: block; margin-top: 8px;">
+                            Password must be at least 8 characters long and contain at least one uppercase letter, one
+                            lowercase letter, and one number.
+                        </small>
+                    </div>
+                    <button class="btn btn-primary" onclick="checkValuesOnPassword()">Save Password</button>
+
                 </div>
-                <button class="btn btn-primary" onclick="saveTimeFormat()">Save Time Format</button>
 
-            </div>
+                <!-- Theme Preference -->
+                <div class="setting-section">
+                    <h2 class="section-title">
+                        <span class="section-icon">🎨</span>
+                        Appearance Theme
+                    </h2>
+                    <div class="form-group">
+                        <label>Choose your appearance style</label>
+                        <div class="radio-group" id="theme-radio-group">
+                            <label class="radio-option" for="theme-default">
+                                <input type="radio" id="theme-default" name="app-theme" value="default" checked>
+                                <span>✨ Light Modern</span>
+                            </label>
+                            <label class="radio-option" for="theme-serenity">
+                                <input type="radio" id="theme-serenity" name="app-theme" value="serenity">
+                                <span>🌿 Serenity</span>
+                            </label>
+                            <label class="radio-option" for="theme-midnight">
+                                <input type="radio" id="theme-midnight" name="app-theme" value="midnight">
+                                <span>🌌 Midnight</span>
+                            </label>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveThemePreference()" id="saveThemeBtn" disabled>Save
+                        Theme</button>
+                </div>
 
-            <!-- Action Buttons -->
-            <div class="save-buttons">
-                <button class="btn btn-secondary" onclick="cancelSettings()">Cancel</button>
+                <!-- Time Format -->
+                <div class="setting-section">
+                    <h2 class="section-title">
+                        <span class="section-icon">🕐</span>
+                        Time Format Preference
+                    </h2>
+                    <div class="form-group">
+                        <label>Choose your preferred time format</label>
+                        <div class="radio-group">
+                            <label class="radio-option" for="time-12">
+                                <input type="radio" id="time-12" name="time-format" value="12" checked>
+                                <span>12-hour (2:30 PM)</span>
+                            </label>
+                            <label class="radio-option" for="time-24">
+                                <input type="radio" id="time-24" name="time-format" value="24">
+                                <span>24-hour (14:30)</span>
+                            </label>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveTimeFormat()">Save Time Format</button>
+
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="save-buttons">
+                    <button class="btn btn-secondary" onclick="cancelSettings()">Cancel</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<div id="settingsModal" class="settings-modal" style="display: none;">
-    <div class="modal-box">
-        <h2>✅ Settings Saved</h2>
-        <p id="modalMessage"></p>
-        <button onclick="confirmRedirect()">OK</button>
+    <div id="settingsModal" class="settings-modal" style="display: none;">
+        <div class="modal-box">
+            <h2>✅ Settings Saved</h2>
+            <p id="modalMessage"></p>
+            <button onclick="confirmRedirect()">OK</button>
+        </div>
     </div>
-</div>
-<div id="noChangeModal" class="settings-modal" style="display: none;">
-    <div class="modal-box">
-        <h2>⚠️ No Changes Made</h2>
-        <p id="noChangeMessage">Same values entered as existing — nothing was saved.</p>
-        <button onclick="closeNoChange()">Cancel</button>
+    <div id="noChangeModal" class="settings-modal" style="display: none;">
+        <div class="modal-box">
+            <h2>⚠️ No Changes Made</h2>
+            <p id="noChangeMessage">Same values entered as existing, nothing was saved.</p>
+            <button onclick="closeNoChange()">Cancel</button>
+        </div>
     </div>
-</div>
-<button class="btn btn-primary" onclick="saveTimeFormat()" id="saveTimeFormatBtn" disabled title="Change value to enable Save">Save Time Format</button>
+    <button class="btn btn-primary" onclick="saveTimeFormat()" id="saveTimeFormatBtn" disabled
+        title="Change value to enable Save">Save Time Format</button>
 
-<script src="js/settings.js"></script>
+    <script src="js/settings.js"></script>
 </body>
+
 </html>

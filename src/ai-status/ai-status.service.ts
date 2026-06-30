@@ -37,7 +37,7 @@ interface GoogleIncident {
 type ResponseFormat = 'statuspage' | 'google-incidents' | 'xai-rss' | 'unsupported';
 
 interface ProviderEndpoint {
-  /** Stored in DB — must fit column length: 50. */
+  /** Stored in DB, must fit column length: 50. */
   name: string;
   url: string;
   format: ResponseFormat;
@@ -104,7 +104,7 @@ const PROVIDERS: ProviderEndpoint[] = [
     url: '',
     format: 'unsupported',
     unsupportedReason:
-      'Perplexity status page (Instatus) requires an API key — no public endpoint available.',
+      'Perplexity status page (Instatus) requires an API key, no public endpoint available.',
   },
 ];
 
@@ -137,7 +137,7 @@ export class AiStatusService {
     private readonly httpService: HttpService,
     @InjectRepository(AiStatusCheck)
     private readonly repo: Repository<AiStatusCheck>,
-  ) {}
+  ) { }
 
   // ─── Public API ─────────────────────────────────────────────────────────────
 
@@ -284,7 +284,7 @@ export class AiStatusService {
         description: (provider.unsupportedReason ?? 'No public status API available.').substring(0, 300),
       });
       await this.repo.save(record);
-      this.logger.log(`[${provider.name}] saved — status=unsupported (no public API)`);
+      this.logger.log(`[${provider.name}] saved, status=unsupported (no public API)`);
       return;
     }
 
@@ -341,7 +341,7 @@ export class AiStatusService {
 
     await this.repo.save(record);
     this.logger.log(
-      `[${provider.name}] saved — status=${status}, latency=${latency ?? '?'}ms`,
+      `[${provider.name}] saved, status=${status}, latency=${latency ?? '?'}ms`,
     );
   }
 
@@ -382,7 +382,7 @@ export class AiStatusService {
   }
 
   /**
-   * Google Cloud incidents.json — filters for AI-related services.
+   * Google Cloud incidents.json, filters for AI-related services.
    *
    *  no active AI incidents       →  operational
    *  active + severity == high    →  outage
@@ -453,7 +453,7 @@ export class AiStatusService {
     const entries = xml.match(entryPattern) ?? [];
 
     if (entries.length === 0) {
-      // Feed is reachable but has no incidents at all — treat as operational
+      // Feed is reachable but has no incidents at all, treat as operational
       return { status: 'operational', description: 'All xAI services operational.' };
     }
 

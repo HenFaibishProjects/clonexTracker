@@ -7,12 +7,13 @@ if (!localStorage.getItem('token')) {
     window.location.href = 'login.html';
 }
 
-let allEntries = [];
+let allEntries = [];         // filtered to current range
+let allEntriesEver = [];     // always ALL entries, used for true streak calculation
 let currentAnalyticsRange = '30'; // tracks the active global range
 
 let lastRenderedEntries = [];
 
-// Export functions defined after utilities — see bottom of file
+// Export functions defined after utilities, see bottom of file
 let dosageChart;
 let isPageActive = true;
 let lastTakenAt;
@@ -180,6 +181,18 @@ window.addEventListener('DOMContentLoaded', () => {
     // Apply saved theme
     const savedTheme = localStorage.getItem('appTheme') || 'default';
     applyTheme(savedTheme);
+
+    // Load ALL entries once for accurate streak calculations
+    const token = localStorage.getItem('token');
+    if (token) {
+        $.ajax({
+            url: baseUrl,
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` },
+            success: function (entries) { allEntriesEver = entries || []; },
+            error: function () { allEntriesEver = []; }
+        });
+    }
 });
 
 function applyTheme(theme) {
@@ -345,8 +358,8 @@ $(document).ready(function () {
 
 
     // ── Global Range Controller ──────────────────────────────────────────────
-    // Single source of truth — all sections respond to one range change.
-    window.setGlobalRange = function(range) {
+    // Single source of truth, all sections respond to one range change.
+    window.setGlobalRange = function (range) {
         const rangeStr = String(range);
         currentAnalyticsRange = rangeStr; // persist for subsequent reloads
 
@@ -361,6 +374,15 @@ $(document).ready(function () {
             '365': 'Last Year', 'all': 'All Time'
         };
         $('#viewStatusLabel').text(labels[rangeStr] || `Last ${rangeStr} Days`);
+
+        // Close insights panel when switching range (data will be stale)
+        if (_insightsPanelOpen) {
+            const panel = document.getElementById('insightsPanel');
+            const btn   = document.getElementById('insightsBtn');
+            if (panel) { panel.style.maxHeight = '0'; panel.style.opacity = '0'; panel.style.marginBottom = '0'; }
+            if (btn)   { btn.style.background = 'linear-gradient(135deg,rgba(65,105,255,0.15),rgba(168,85,247,0.12))'; btn.style.borderColor = 'rgba(65,105,255,0.35)'; }
+            _insightsPanelOpen = false;
+        }
 
         // Drive all sections with the same range
         loadEntries(range === 'all' ? 'all' : parseInt(range));
@@ -643,7 +665,7 @@ td{padding:9px 12px;border-bottom:1px solid #e5e7eb}
 tr:nth-child(even) td{background:#f9fafb}
 .footer{margin-top:32px;font-size:11px;color:#999;text-align:center}
 </style></head><body>
-<h1>💊 Benzos Tracker — ${benzosType}</h1>
+<h1>💊 Benzos Tracker, ${benzosType}</h1>
 <div class="meta">Exported: ${now} | ${entries.length} entries</div>
 <table><thead><tr><th>Dosage</th><th>Taken At</th><th>Reason</th><th>Comments</th></tr></thead>
 <tbody>${rows}</tbody></table>
@@ -652,7 +674,7 @@ tr:nth-child(even) td{background:#f9fafb}
         win.document.close();
         win.focus();
         setTimeout(() => win.print(), 500);
-        showNotification(`🖨️ PDF ready — ${entries.length} entries`, 'success');
+        showNotification(`🖨️ PDF ready, ${entries.length} entries`, 'success');
     });
 
     loadEntries(30);
@@ -669,6 +691,208 @@ setInterval(() => {
 
     $('#runningTimer').text(`${hours}:${minutes}:${seconds}`);
 }, 1000);
+
+// ── Smart Insights Panel ──────────────────────────────────────────────────────
+let _insightsPanelOpen = false;
+
+function toggleInsightsPanel() {
+    const panel = document.getElementById('insightsPanel');
+    const btn = document.getElementById('insightsBtn');
+    _insightsPanelOpen = !_insightsPanelOpen;
+    if (_insightsPanelOpen) {
+        generateInsights();
+        panel.style.maxHeight = '600px';
+        panel.style.opacity = '1';
+        panel.style.marginBottom = 'var(--space-4)';
+        btn.style.background = 'linear-gradient(135deg,rgba(65,105,255,0.3),rgba(168,85,247,0.22))';
+        btn.style.borderColor = 'rgba(65,105,255,0.6)';
+    } else {
+        panel.style.maxHeight = '0';
+        panel.style.opacity = '0';
+        panel.style.marginBottom = '0';
+        btn.style.background = 'linear-gradient(135deg,rgba(65,105,255,0.15),rgba(168,85,247,0.12))';
+        btn.style.borderColor = 'rgba(65,105,255,0.35)';
+    }
+}
+
+function generateInsights() {
+    // Period entries (filtered), for dosage stats
+    const periodEntries = allEntries || [];
+    // All-time entries, for accurate streak (not limited by selected window)
+    const everEntries = (allEntriesEver && allEntriesEver.length > 0) ? allEntriesEver : periodEntries;
+
+    if (periodEntries.length === 0 && everEntries.length === 0) {
+        document.getElementById('insightsList').innerHTML =
+            '<div style="color:var(--text-secondary);font-size:var(--text-sm);">No data available yet.</div>';
+        return;
+    }
+
+    // Label
+    const rangeLabel = document.getElementById('viewStatusLabel')?.textContent || 'Current Period';
+    document.getElementById('insightsPeriodLabel').textContent = rangeLabel;
+
+    // ── Period-specific stats (uses filtered allEntries) ───────────────────────
+    const calDays = currentAnalyticsRange === 'all'
+        ? (function () {
+            if (!periodEntries.length) return 1;
+            const first = new Date([...periodEntries].sort((a, b) => new Date(a.takenAt) - new Date(b.takenAt))[0].takenAt);
+            first.setHours(0, 0, 0, 0);
+            const t = new Date(); t.setHours(0, 0, 0, 0);
+            return Math.max(1, Math.round((t - first) / 86400000) + 1);
+        })()
+        : parseInt(currentAnalyticsRange) || 30;
+
+    const totalMg = periodEntries.reduce((s, e) => s + (e.dosageMg || 0), 0);
+    const periodDaySet = new Set(periodEntries.map(e => new Date(e.takenAt).toISOString().split('T')[0]));
+    const activeDays = periodDaySet.size;
+    const zeroDays = Math.max(0, calDays - activeDays);
+    const zeroPct = calDays > 0 ? Math.round((zeroDays / calDays) * 100) : 0;
+    const avgAll = calDays > 0 ? totalMg / calDays : 0;
+    const avgDoseOnly = activeDays > 0 ? totalMg / activeDays : 0;
+
+    // Longest gap between doses within the selected period
+    // Gap = calendar days between two consecutive dose dates (nextDoseDay - prevDoseDay)
+    // This matches user intuition: dose Jun 25 → dose Jun 30 = 5-day gap
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const periodStart = new Date(today);
+    if (currentAnalyticsRange !== 'all') {
+        periodStart.setDate(today.getDate() - (calDays - 1));
+    } else if (periodEntries.length > 0) {
+        const firstDate = new Date([...periodEntries].sort((a, b) => new Date(a.takenAt) - new Date(b.takenAt))[0].takenAt);
+        firstDate.setHours(0, 0, 0, 0);
+        periodStart.setTime(firstDate.getTime());
+    }
+
+    // Sort the unique dose days within the period
+    const sortedDoseDays = [...periodDaySet].sort(); // ISO strings sort correctly
+    let longestInPeriod = 0;
+    let gapBestStart = null, gapBestEnd = null;
+
+    // Gap from period start → first dose
+    if (sortedDoseDays.length > 0) {
+        const firstDose = new Date(sortedDoseDays[0]);
+        const diff = Math.round((firstDose - periodStart) / 86400000);
+        if (diff > longestInPeriod) {
+            longestInPeriod = diff;
+            gapBestStart = new Date(periodStart);
+            gapBestEnd   = new Date(firstDose);
+        }
+    }
+
+    // Gaps between consecutive dose days
+    for (let i = 0; i < sortedDoseDays.length - 1; i++) {
+        const d1 = new Date(sortedDoseDays[i]);
+        const d2 = new Date(sortedDoseDays[i + 1]);
+        const diff = Math.round((d2 - d1) / 86400000); // e.g. Jun 25→Jun 30 = 5
+        if (diff > longestInPeriod) {
+            longestInPeriod = diff;
+            gapBestStart = new Date(d1); gapBestStart.setDate(gapBestStart.getDate() + 1); // day after dose
+            gapBestEnd   = new Date(d2); // day of next dose
+        }
+    }
+
+    // Gap from last dose → today
+    if (sortedDoseDays.length > 0) {
+        const lastD = new Date(sortedDoseDays[sortedDoseDays.length - 1]);
+        const diff = Math.round((today - lastD) / 86400000);
+        if (diff > longestInPeriod) {
+            longestInPeriod = diff;
+            gapBestStart = new Date(lastD); gapBestStart.setDate(gapBestStart.getDate() + 1);
+            gapBestEnd   = new Date(today);
+        }
+    }
+
+    // Edge case: no doses at all in period
+    if (sortedDoseDays.length === 0) {
+        longestInPeriod = calDays;
+        gapBestStart = new Date(periodStart);
+        gapBestEnd   = new Date(today);
+    }
+
+    // ── True current clean streak (uses ALL-TIME entries) ─────────────────────
+    // Walk backwards from today counting consecutive clean days regardless of selected range
+    const everDaySet = new Set(everEntries.map(e => new Date(e.takenAt).toISOString().split('T')[0]));
+    let trueStreak = 0;
+    const cs = new Date(today);
+    while (trueStreak <= 3650) {
+        const key = cs.toISOString().split('T')[0];
+        if (everDaySet.has(key)) break;
+        trueStreak++;
+        cs.setDate(cs.getDate() - 1);
+    }
+
+    // Last dose ever
+    const everSorted = [...everEntries].sort((a, b) => new Date(b.takenAt) - new Date(a.takenAt));
+    const lastDose = everSorted.length > 0 ? new Date(everSorted[0].takenAt) : null;
+    const lastDoseStr = lastDose
+        ? lastDose.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' })
+        : null;
+
+    // ── Build insight cards ───────────────────────────────────────────────────
+    const insights = [];
+
+    // 1. LONGEST GAP in the selected period
+    //    Gap = days between consecutive dose dates (inclusive of next dose day)
+    const gapEmoji = longestInPeriod >= 30 ? '🏆' : longestInPeriod >= 14 ? '🌿' : longestInPeriod >= 7 ? '✨' : '📊';
+    if (longestInPeriod > 0) {
+        const fmt = d => d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        const gapDateStr = gapBestStart && gapBestEnd ? ` — from ${fmt(gapBestStart)} to ${fmt(gapBestEnd)}` : '';
+        insights.push({ emoji: gapEmoji, color: '#10b981',
+            title: `Longest gap: ${longestInPeriod} day${longestInPeriod !== 1 ? 's' : ''} without a dose`,
+            text: `The longest dose-free stretch in the selected ${calDays}-day period${gapDateStr}.` });
+    } else {
+        insights.push({ emoji: '📊', color: '#6b7280',
+            title: 'No gap in this period',
+            text: `A dose was taken every single day in the selected ${calDays}-day window.` });
+    }
+
+    // 2. Zero-dose days in selected period
+    if (calDays > 0) {
+        const doseLabel = periodEntries.length === 0
+            ? `All ${calDays} days were dose-free in this period.`
+            : `${zeroDays} of ${calDays} days had no dose (${zeroPct}%). Active dose days: ${activeDays}.`;
+        insights.push({
+            emoji: '📅', color: '#4169ff',
+            title: `${zeroPct}% dose-free in ${calDays} days`,
+            text: doseLabel
+        });
+    }
+
+    // 3. Dosage averages (only if there were doses in period)
+    if (totalMg > 0) {
+        insights.push({
+            emoji: '📉', color: '#a855f7',
+            title: `${avgAll.toFixed(3)} mg / day (${calDays}-day avg)`,
+            text: `On dose days only: ${avgDoseOnly.toFixed(3)} mg/day. Total consumed this period: ${totalMg.toFixed(2)} mg.`
+        });
+    } else if (calDays > 0) {
+        insights.push({
+            emoji: '🎯', color: '#a855f7',
+            title: `0 mg consumed this period`,
+            text: `Zero dosage in the selected ${calDays}-day window. Outstanding!`
+        });
+    }
+
+    // 4. Dose count in period
+    if (periodEntries.length > 0) {
+        insights.push({
+            emoji: '💊', color: '#f59e0b',
+            title: `${periodEntries.length} dose${periodEntries.length !== 1 ? 's' : ''} in period`,
+            text: `Across ${activeDays} day${activeDays !== 1 ? 's' : ''} out of ${calDays}. Total: ${totalMg.toFixed(2)} mg.`
+        });
+    }
+
+    // Render
+    const list = document.getElementById('insightsList');
+    list.innerHTML = insights.map(i => `
+        <div style="background:var(--bg-elevated);border:1px solid var(--border-color);border-left:3px solid ${i.color};border-radius:14px;padding:16px 18px;display:flex;align-items:flex-start;gap:12px;">
+            <span style="font-size:1.5rem;line-height:1;flex-shrink:0;">${i.emoji}</span>
+            <div>
+                <div style="font-size:var(--text-base);font-weight:700;color:var(--text-primary);margin-bottom:3px;">${i.title}</div>
+                <div style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.55;">${i.text}</div>
+            </div>
+        </div>`).join('');
+}
 
 function loadEntries(days = 30) {
     let endpoint = baseUrl;
@@ -798,7 +1022,7 @@ function updateMedicationAdvisor(entries) {
             ringBorder: '3px solid #ef4444',
             badgeBg: 'rgba(220,38,38,0.2)',
             badgeColor: '#fca5a5',
-            badgeText: '🚫 AVOID — Strong Red',
+            badgeText: '🚫 AVOID, Strong Red',
             textColor: '#fff',
             subColor: '#fca5a5',
             hourColor: '#ef4444',
@@ -813,7 +1037,7 @@ function updateMedicationAdvisor(entries) {
             ringBorder: '3px solid #f97316',
             badgeBg: 'rgba(234,88,12,0.2)',
             badgeColor: '#fdba74',
-            badgeText: '⚠️ WARNING — Red',
+            badgeText: '⚠️ WARNING, Red',
             textColor: '#fff',
             subColor: '#fdba74',
             hourColor: '#f97316',
@@ -828,13 +1052,13 @@ function updateMedicationAdvisor(entries) {
             ringBorder: '3px solid #eab308',
             badgeBg: 'rgba(202,138,4,0.2)',
             badgeColor: '#fde047',
-            badgeText: '🕒 CAUTION — Yellow',
+            badgeText: '🕒 CAUTION, Yellow',
             textColor: '#fff',
             subColor: '#fde047',
             hourColor: '#eab308',
             icon: '🕒',
             title: `It's been <strong>${h}h ${m}m</strong> since your last dose`,
-            msg: 'Approaching safe time — be aware. The suggested gap is over 11h.'
+            msg: 'Approaching safe time, be aware. The suggested gap is over 11h.'
         },
         'safe': {
             bg: 'linear-gradient(135deg, #051a0d 0%, #0a2d18 100%)',
@@ -843,7 +1067,7 @@ function updateMedicationAdvisor(entries) {
             ringBorder: '3px solid #10b981',
             badgeBg: 'rgba(16,185,129,0.2)',
             badgeColor: '#6ee7b7',
-            badgeText: '✅ SAFE — Green',
+            badgeText: '✅ SAFE, Green',
             textColor: '#fff',
             subColor: '#6ee7b7',
             hourColor: '#10b981',
@@ -918,15 +1142,15 @@ function updateStatsGrid(entries) {
     let trendIcon, trendColor, trendText;
     if (absDiff <= 0.13) {
         trendIcon = '🔵';
-        trendColor = '#3b82f6';   // Blue — Consistent
+        trendColor = '#3b82f6';   // Blue, Consistent
         trendText = 'Consistent';
     } else if (trendDiff < 0) {
         trendIcon = '🟢';
-        trendColor = '#10b981';   // Green — Reducing
+        trendColor = '#10b981';   // Green, Reducing
         trendText = 'Reducing';
     } else {
         trendIcon = '🔴';
-        trendColor = '#ef4444';   // Red — Increasing
+        trendColor = '#ef4444';   // Red, Increasing
         trendText = 'Increasing';
     }
 
@@ -1159,7 +1383,7 @@ function updateTodayBanner() {
                 </div>
             </div>`;
     } else {
-        // 2+ days — the main case the user wants to see loudly
+        // 2+ days, the main case the user wants to see loudly
         const intensity = Math.min(daysSince / 14, 1); // max out at 14 days for color scale
         const g = Math.round(120 + intensity * 65); // 120 → 185
         bg = `linear-gradient(135deg, rgba(16,${g},89,0.15) 0%, rgba(16,185,129,0.08) 100%)`;
@@ -2370,7 +2594,7 @@ td{padding:9px 12px;border-bottom:1px solid #e5e7eb}
 tr:nth-child(even) td{background:#f9fafb}
 .footer{margin-top:32px;font-size:11px;color:#999;text-align:center}
 </style></head><body>
-<h1>💊 Benzos Tracker — ${benzosType}</h1>
+<h1>💊 Benzos Tracker, ${benzosType}</h1>
 <div class="meta">Exported: ${now} | ${entries.length} entries</div>
 <table><thead><tr>
 <th>Dosage</th><th>Taken At</th><th>Reason</th><th>Comments</th>
@@ -2387,5 +2611,5 @@ tr:nth-child(even) td{background:#f9fafb}
     win.document.close();
     win.focus();
     setTimeout(() => win.print(), 500);
-    _exportToast(`🖨️ PDF ready — ${entries.length} entries`, '#4169ff');
+    _exportToast(`🖨️ PDF ready, ${entries.length} entries`, '#4169ff');
 }

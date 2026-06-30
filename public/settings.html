@@ -497,9 +497,7 @@
                     <div class="form-group">
                         <label for="userName">Name</label>
                         <input type="text" id="userName" placeholder="">
-
                     </div>
-                    <button class="btn btn-primary" onclick="saveInGeneral('uName')">Save New Name</button>
 
                 </div>
                 <div class="setting-section">
@@ -510,10 +508,7 @@
                     <div class="form-group">
                         <label for="BenzodiazepinesTypeId">Medication Type</label>
                         <input type="text" id="BenzodiazepinesTypeId" placeholder="">
-
                     </div>
-                    <button class="btn btn-primary" onclick="changeBenzodiazepinesType()">Save New Benzodiazepines
-                        Type</button>
 
                 </div>
 
@@ -541,10 +536,9 @@
                     <div class="password-requirements">
                         <small style="color: #6b7280; display: block; margin-top: 8px;">
                             Password must be at least 8 characters long and contain at least one uppercase letter, one
-                            lowercase letter, and one number.
+                            lowercase letter, and one number. Leave all fields empty to skip changing password.
                         </small>
                     </div>
-                    <button class="btn btn-primary" onclick="checkValuesOnPassword()">Save Password</button>
 
                 </div>
 
@@ -571,8 +565,6 @@
                             </label>
                         </div>
                     </div>
-                    <button class="btn btn-primary" onclick="saveThemePreference()" id="saveThemeBtn" disabled>Save
-                        Theme</button>
                 </div>
 
                 <!-- Time Format -->
@@ -594,13 +586,12 @@
                             </label>
                         </div>
                     </div>
-                    <button class="btn btn-primary" onclick="saveTimeFormat()">Save Time Format</button>
-
                 </div>
 
                 <!-- Action Buttons -->
                 <div class="save-buttons">
                     <button class="btn btn-secondary" onclick="cancelSettings()">Cancel</button>
+                    <button class="btn btn-primary" id="saveAllBtn" onclick="saveAllSettings()">Save All Changes</button>
                 </div>
             </div>
         </div>
@@ -619,8 +610,6 @@
             <button onclick="closeNoChange()">Cancel</button>
         </div>
     </div>
-    <button class="btn btn-primary" onclick="saveTimeFormat()" id="saveTimeFormatBtn" disabled
-        title="Change value to enable Save">Save Time Format</button>
 
     <script src="js/settings.js"></script>
 </body>

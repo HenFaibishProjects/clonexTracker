@@ -167,29 +167,20 @@ async function checkValuesOnPassword() {
 
 window.addEventListener('DOMContentLoaded', () => {
     const savedFormat = localStorage.getItem('timeFormat') || '12';
-    const saveButton = document.querySelector('button[onclick="saveTimeFormat()"]');
-
     const currentRadio = document.querySelector(`input[name="time-format"][value="${savedFormat}"]`);
-    if (currentRadio) {
-        currentRadio.checked = true;
-        saveButton.disabled = true;
-    }
+    if (currentRadio) currentRadio.checked = true;
 
+    // Style selection for time-format radios
     document.querySelectorAll('input[name="time-format"]').forEach(radio => {
         radio.addEventListener('change', () => {
-            const selected = document.querySelector('input[name="time-format"]:checked').value;
-            saveButton.disabled = (selected === savedFormat);
+            document.querySelectorAll('.radio-option').forEach(opt => opt.classList.remove('selected'));
+            radio.closest('.radio-option').classList.add('selected');
         });
     });
 
-    // Style selection logic
     document.querySelectorAll('input[name="time-format"]').forEach(radio => {
         const container = radio.closest('.radio-option');
         if (radio.checked) container.classList.add('selected');
-        radio.addEventListener('change', () => {
-            document.querySelectorAll('.radio-option').forEach(opt => opt.classList.remove('selected'));
-            container.classList.add('selected');
-        });
     });
 
     // Optional: load user name + email
@@ -215,18 +206,12 @@ window.addEventListener('DOMContentLoaded', () => {
         container.classList.add('selected');
     }
 
-    // Add listeners for theme changes
+    // Add listeners for theme live-preview
     document.querySelectorAll('input[name="app-theme"]').forEach(radio => {
         radio.addEventListener('change', () => {
             const selected = document.querySelector('input[name="app-theme"]:checked').value;
-            const isSame = selected === savedTheme;
-            saveThemeBtn.disabled = isSame;
-
-            // Update visual selection
             document.querySelectorAll('#theme-radio-group .radio-option').forEach(opt => opt.classList.remove('selected'));
             radio.closest('.radio-option').classList.add('selected');
-
-            // Live preview the theme
             applyAppTheme(selected);
         });
     });
@@ -308,6 +293,133 @@ function checkValuesOnName() {
         });
 }
 
+
+async function saveAllSettings() {
+    const btn = document.getElementById('saveAllBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+
+    const user    = JSON.parse(localStorage.getItem('user') || '{}');
+    const token   = localStorage.getItem('token');
+    const saved   = [];
+    let hasErrors = false;
+    let needsLogout = false;
+
+    // ── 1. Theme (localStorage) ───────────────────────────────────
+    const selectedTheme = document.querySelector('input[name="app-theme"]:checked')?.value;
+    if (selectedTheme) {
+        localStorage.setItem('appTheme', selectedTheme);
+        saved.push('Theme');
+    }
+
+    // ── 2. Time Format (localStorage) ────────────────────────────
+    const selectedFormat = document.querySelector('input[name="time-format"]:checked')?.value;
+    if (selectedFormat) {
+        localStorage.setItem('timeFormat', selectedFormat);
+        saved.push('Time Format');
+    }
+
+    // ── 3. Name (API) ─────────────────────────────────────────────
+    const newName = document.getElementById('userName')?.value?.trim();
+    if (newName && newName !== user.name) {
+        try {
+            const resp = await fetch(`${baseUrl}/changeName`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ newName })
+            });
+            if (!resp.ok) throw new Error('Failed to update name');
+            user.name = newName;
+            localStorage.setItem('user', JSON.stringify(user));
+            saved.push('Name');
+        } catch (err) {
+            showNotification('Name: ' + err.message, 'error');
+            hasErrors = true;
+        }
+    }
+
+    // ── 4. Medication Type (API) ──────────────────────────────────
+    const newBenzosType = document.getElementById('BenzodiazepinesTypeId')?.value?.trim();
+    if (newBenzosType && newBenzosType !== user.benzosType) {
+        try {
+            const resp = await fetch(`${baseUrl}/changeBenzosType`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ newBenzosType })
+            });
+            if (!resp.ok) throw new Error('Failed to update medication type');
+            user.benzosType = newBenzosType;
+            localStorage.setItem('user', JSON.stringify(user));
+            saved.push('Medication Type');
+        } catch (err) {
+            showNotification('Medication Type: ' + err.message, 'error');
+            hasErrors = true;
+        }
+    }
+
+    // ── 5. Password (API) — only if any field is filled ──────────
+    const currentPwd = document.getElementById('current-password')?.value?.trim();
+    const newPwd     = document.getElementById('new-password')?.value?.trim();
+    const confirmPwd = document.getElementById('confirm-password')?.value?.trim();
+
+    if (currentPwd || newPwd || confirmPwd) {
+        if (!currentPwd || !newPwd || !confirmPwd) {
+            showNotification('Fill all 3 password fields or leave them all empty.', 'warning');
+            hasErrors = true;
+        } else if (newPwd === currentPwd) {
+            showNotification('New password must differ from current.', 'warning');
+            hasErrors = true;
+        } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(newPwd)) {
+            showNotification('Password: 8+ chars, upper, lower & number required.', 'error');
+            hasErrors = true;
+        } else if (newPwd !== confirmPwd) {
+            showNotification('Passwords do not match.', 'error');
+            hasErrors = true;
+        } else {
+            try {
+                const resp = await fetch(`${baseAuthUrl}/change-password`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ currentPassword: currentPwd, newPassword: newPwd })
+                });
+                if (!resp.ok) {
+                    const err = await resp.json();
+                    throw new Error(err.message || 'Failed to change password');
+                }
+                saved.push('Password');
+                needsLogout = true;
+            } catch (err) {
+                showNotification(err.message, 'error');
+                hasErrors = true;
+            }
+        }
+    }
+
+    // ── Result ────────────────────────────────────────────────────
+    if (hasErrors) {
+        btn.disabled = false;
+        btn.textContent = 'Save All Changes';
+        return;
+    }
+
+    if (saved.length === 0) {
+        showNotification('No changes detected.', 'info');
+        btn.disabled = false;
+        btn.textContent = 'Save All Changes';
+        return;
+    }
+
+    showNotification('✅ Saved: ' + saved.join(', '), 'success');
+
+    if (needsLogout) {
+        const theme = localStorage.getItem('appTheme');
+        localStorage.clear();
+        if (theme) localStorage.setItem('appTheme', theme);
+        setTimeout(() => window.location.href = 'login.html', 1800);
+    } else {
+        setTimeout(() => window.location.href = '/benzos.html', 1200);
+    }
+}
 
 function cancelSettings() {
     window.location.href = `../benzos.html`;

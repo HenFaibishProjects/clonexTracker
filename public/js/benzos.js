@@ -189,7 +189,10 @@ window.addEventListener('DOMContentLoaded', () => {
             url: baseUrl,
             method: 'GET',
             headers: { Authorization: `Bearer ${token}` },
-            success: function (entries) { allEntriesEver = entries || []; },
+            success: function (entries) {
+                allEntriesEver = entries || [];
+                updateHeaderMonthlySummary();
+            },
             error: function () { allEntriesEver = []; }
         });
     }
@@ -205,6 +208,42 @@ function applyTheme(theme) {
     // Update chart colors if they exist
     if (dosageChart) renderChart(allEntries);
     if (dailyChart) renderDailyChart(allEntries);
+}
+
+function updateHeaderMonthlySummary() {
+    if (!allEntriesEver || allEntriesEver.length === 0) return;
+
+    const now   = new Date();
+    const thisY = now.getFullYear();
+    const thisM = now.getMonth(); // 0-indexed
+    const lastM = thisM === 0 ? 11 : thisM - 1;
+    const lastY = thisM === 0 ? thisY - 1 : thisY;
+
+    const monthName = d => d.toLocaleString([], { month: 'short', year: 'numeric' });
+    const thisLabel = monthName(new Date(thisY, thisM, 1));
+    const lastLabel = monthName(new Date(lastY, lastM, 1));
+
+    let thisMg = 0, lastMg = 0;
+    allEntriesEver.forEach(e => {
+        const d = new Date(e.takenAt);
+        const mg = e.dosageMg || 0;
+        if (d.getFullYear() === thisY && d.getMonth() === thisM) thisMg += mg;
+        if (d.getFullYear() === lastY && d.getMonth() === lastM) lastMg += mg;
+    });
+
+    // First entry date + months tracking
+    const sorted = [...allEntriesEver].sort((a, b) => new Date(a.takenAt) - new Date(b.takenAt));
+    const firstDate  = new Date(sorted[0].takenAt);
+    const sinceStr   = firstDate.toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' });
+    const monthsTracking = (thisY - firstDate.getFullYear()) * 12 + (thisM - firstDate.getMonth()) + 1;
+
+    const el = id => document.getElementById(id);
+    if (el('headerTrackingSince'))   el('headerTrackingSince').textContent   = sinceStr;
+    if (el('headerMonthsTracking'))  el('headerMonthsTracking').textContent  = monthsTracking + (monthsTracking === 1 ? ' month' : ' months');
+    if (el('headerThisMonthLabel'))  el('headerThisMonthLabel').textContent  = thisLabel;
+    if (el('headerThisMonth'))       el('headerThisMonth').textContent       = thisMg.toFixed(2) + ' mg';
+    if (el('headerLastMonthLabel'))  el('headerLastMonthLabel').textContent  = lastLabel;
+    if (el('headerLastMonth'))       el('headerLastMonth').textContent       = lastMg.toFixed(2) + ' mg';
 }
 
 
@@ -646,7 +685,7 @@ $(document).ready(function () {
 
         const rows = entries.map(e => `<tr>
             <td><strong>${e.dosageMg ?? '—'} mg</strong></td>
-            <td>${formatTimestamp(e.takenAt)}</td>
+            <td style="white-space: nowrap;">${formatTimestamp(e.takenAt)}</td>
             <td>${e.reason || '—'}</td>
             <td>${e.comments || '—'}</td>
         </tr>`).join('');

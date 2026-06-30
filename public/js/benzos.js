@@ -8,6 +8,7 @@ if (!localStorage.getItem('token')) {
 }
 
 let allEntries = [];
+let currentAnalyticsRange = '30'; // tracks the active global range
 
 let lastRenderedEntries = [];
 
@@ -343,20 +344,34 @@ $(document).ready(function () {
 
 
 
-    $('#dailyRange').on('change', function () {
-        const selected = $(this).val(); // Will be "14" for the new option
-        renderDailyChart(lastRenderedEntries, selected);
-    });
+    // ── Global Range Controller ──────────────────────────────────────────────
+    // Single source of truth — all sections respond to one range change.
+    window.setGlobalRange = function(range) {
+        const rangeStr = String(range);
+        currentAnalyticsRange = rangeStr; // persist for subsequent reloads
 
-    $('#dosageRange').on('change', function () {
-        const selected = $(this).val();
-        renderChart(lastRenderedEntries, selected);
-    });
+        // Update active button styling
+        $('#globalRangeButtons .range-btn').removeClass('range-btn-active');
+        $(`#globalRangeButtons .range-btn[data-range="${rangeStr}"]`).addClass('range-btn-active');
 
-    $('#analyticsRange').on('change', function () {
-        const selected = $(this).val();
-        loadEnhancedAnalytics(selected);
-    });
+        // Update "Viewing" label
+        const labels = {
+            '7': 'Last 7 Days', '14': 'Last 14 Days', '30': 'Last 30 Days',
+            '60': 'Last 60 Days', '90': 'Last 90 Days', '180': 'Last 6 Months',
+            '365': 'Last Year', 'all': 'All Time'
+        };
+        $('#viewStatusLabel').text(labels[rangeStr] || `Last ${rangeStr} Days`);
+
+        // Drive all sections with the same range
+        loadEntries(range === 'all' ? 'all' : parseInt(range));
+        loadEnhancedAnalytics(rangeStr);
+        // Charts will re-render when loadEntries finishes (entries passed to renderChart/renderDailyChart)
+        // But also re-render immediately with current data for instant feedback
+        if (lastRenderedEntries && lastRenderedEntries.length) {
+            renderChart(lastRenderedEntries, rangeStr);
+            renderDailyChart(lastRenderedEntries, rangeStr);
+        }
+    };
 
     $.ajaxSetup({
         headers: {
@@ -703,7 +718,7 @@ function loadEntries(days = 30) {
             renderChart(entries);
             renderDailyChart(entries);
             updateMedicationAdvisor(entries);
-            loadEnhancedAnalytics();
+            loadEnhancedAnalytics(currentAnalyticsRange);
 
             // Refresh goal progress to ensure today's dosage is accurate
             if ($('#taperingGoalSection').is(':visible')) {
@@ -1069,8 +1084,116 @@ function getDatetimeInputValue(dateStr) {
     return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
+// ── Today Banner ──────────────────────────────────────────────────────────
+function updateTodayBanner() {
+    const $banner = $('#todayBanner');
+    if (!allEntries || !allEntries.length) { $banner.hide(); return; }
+
+    // Always use the full allEntries to get the true last dose
+    const sorted = [...allEntries].sort((a, b) => new Date(b.takenAt) - new Date(a.takenAt));
+    const last = sorted[0];
+
+    let lastDateStr = last.takenAt;
+    if (typeof lastDateStr === 'string' && !lastDateStr.includes('Z') && !lastDateStr.includes('+')) {
+        lastDateStr += 'Z';
+    }
+    const lastDate = new Date(lastDateStr);
+
+    // Compare calendar dates (ignore time)
+    const todayMidnight = new Date();
+    todayMidnight.setHours(0, 0, 0, 0);
+    const lastMidnight = new Date(lastDate);
+    lastMidnight.setHours(0, 0, 0, 0);
+    const daysSince = Math.round((todayMidnight - lastMidnight) / (1000 * 60 * 60 * 24));
+
+    // Format today's date for display in every banner state
+    const todayStr = new Date().toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const todayPill = `<span style="
+        display:inline-block;
+        font-size:var(--text-xs);
+        font-weight:600;
+        color:var(--text-secondary);
+        background:var(--bg-tertiary);
+        border:1px solid var(--border-color);
+        border-radius:999px;
+        padding:3px 10px;
+        margin-top:6px;
+        letter-spacing:0.02em;
+    ">📅 Today: ${todayStr}</span>`;
+
+    let html, bg, border;
+
+    if (daysSince === 0) {
+        // Took a dose today
+        const timeStr = lastDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const doseAmt = last.dosageMg ? `${last.dosageMg} mg` : '';
+        bg = 'linear-gradient(135deg, rgba(59,130,246,0.12) 0%, rgba(99,102,241,0.10) 100%)';
+        border = 'var(--color-primary-400)';
+        html = `
+            <div style="display:flex; align-items:center; gap:16px;">
+                <span style="font-size:2.4rem; line-height:1;">💊</span>
+                <div>
+                    <div style="font-size:var(--text-xl); font-weight:800; color:var(--text-primary); letter-spacing:-0.5px;">
+                        You took a dose today
+                    </div>
+                    <div style="font-size:var(--text-sm); color:var(--text-secondary); margin-top:2px;">
+                        ${doseAmt} at ${timeStr}
+                    </div>
+                    ${todayPill}
+                </div>
+            </div>`;
+    } else if (daysSince === 1) {
+        bg = 'linear-gradient(135deg, rgba(234,179,8,0.12) 0%, rgba(251,146,60,0.10) 100%)';
+        border = '#eab308';
+        html = `
+            <div style="display:flex; align-items:center; gap:16px;">
+                <span style="font-size:2.4rem; line-height:1;">🌙</span>
+                <div>
+                    <div style="font-size:var(--text-xl); font-weight:800; color:var(--text-primary); letter-spacing:-0.5px;">
+                        Day 1 without a dose
+                    </div>
+                    <div style="font-size:var(--text-sm); color:var(--text-secondary); margin-top:2px;">
+                        Last dose was yesterday
+                    </div>
+                    ${todayPill}
+                </div>
+            </div>`;
+    } else {
+        // 2+ days — the main case the user wants to see loudly
+        const intensity = Math.min(daysSince / 14, 1); // max out at 14 days for color scale
+        const g = Math.round(120 + intensity * 65); // 120 → 185
+        bg = `linear-gradient(135deg, rgba(16,${g},89,0.15) 0%, rgba(16,185,129,0.08) 100%)`;
+        border = `rgba(16,185,129,${0.4 + intensity * 0.5})`;
+        const emoji = daysSince >= 7 ? '🌿' : '✨';
+        html = `
+            <div style="display:flex; align-items:center; gap:16px;">
+                <span style="font-size:2.4rem; line-height:1;">${emoji}</span>
+                <div>
+                    <div style="font-size:var(--text-2xl); font-weight:900; color:var(--color-success-600); letter-spacing:-0.5px;">
+                        Day ${daysSince} without a dose
+                    </div>
+                    <div style="font-size:var(--text-sm); color:var(--text-secondary); margin-top:2px;">
+                        Last dose: ${lastDate.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' })}
+                    </div>
+                    ${todayPill}
+                </div>
+            </div>`;
+    }
+
+    $banner.html(`
+        <div style="
+            background: ${bg};
+            border-left: 4px solid ${border};
+            border-radius: var(--radius-lg);
+            padding: 20px 24px;
+            margin: 0 0 16px 0;
+        ">${html}</div>
+    `).show();
+}
+
 function renderEntries(entries) {
     lastRenderedEntries = entries;
+    updateTodayBanner();
     updateExportBadge(entries);
     const $tbody = $('#entriesTable tbody');
     $tbody.empty();
@@ -1712,40 +1835,37 @@ function deleteTaperingGoal() {
 // ========== ENHANCED ANALYTICS FUNCTIONS ==========
 
 function loadEnhancedAnalytics(range = 'all') {
-    // Filter entries based on selected range
-    let filteredEntries = allEntries;
+    const token = localStorage.getItem('token');
 
-    if (range !== 'all') {
-        const daysAgo = parseInt(range);
-        const cutoffDate = new Date();
-        cutoffDate.setDate(cutoffDate.getDate() - daysAgo);
+    // Always fetch from the server for the selected analytics range
+    // so the data is accurate regardless of what the main view has loaded
+    const endpoint = range === 'all'
+        ? baseUrl
+        : `${baseUrl}?timeframeDays=${range}`;
 
-        filteredEntries = allEntries.filter(e => {
-            const entryDateRaw = e.takenAt;
-            let entryDateStr = entryDateRaw;
-            if (typeof entryDateStr === 'string' && !entryDateStr.includes('Z') && !entryDateStr.includes('+')) {
-                entryDateStr += 'Z';
+    $.ajax({
+        url: endpoint,
+        method: 'GET',
+        headers: { Authorization: `Bearer ${token}` },
+        success: function (entries) {
+            if (!entries || entries.length === 0) {
+                $('#enhancedAnalyticsSection').hide();
+                return;
             }
-            const entryDate = new Date(entryDateStr);
-            return entryDate >= cutoffDate;
-        });
-    }
 
-    // If no entries in the filtered range, hide analytics
-    if (filteredEntries.length === 0) {
-        $('#enhancedAnalyticsSection').hide();
-        return;
-    }
+            const analytics = calculateClientSideAnalytics(entries, range);
 
-    // Calculate analytics on filtered entries (simplified version for client-side)
-    const analytics = calculateClientSideAnalytics(filteredEntries, range);
-
-    if (analytics.hasData) {
-        displayEnhancedAnalytics(analytics);
-        $('#enhancedAnalyticsSection').show();
-    } else {
-        $('#enhancedAnalyticsSection').hide();
-    }
+            if (analytics.hasData) {
+                displayEnhancedAnalytics(analytics);
+                $('#enhancedAnalyticsSection').show();
+            } else {
+                $('#enhancedAnalyticsSection').hide();
+            }
+        },
+        error: function (xhr) {
+            if (xhr.status === 401) window.location.href = 'index.html';
+        }
+    });
 }
 
 function calculateClientSideAnalytics(entries, range = 'all') {
@@ -1882,11 +2002,19 @@ function calculateClientSideAnalytics(entries, range = 'all') {
     const zeroDoseRate = calendarDays > 0 ? ((zeroDoseDays / calendarDays) * 100).toFixed(0) : 0;
 
     // ── Longest & current clean streak (consecutive zero-dose days) ────────────
-    // Build a full list of all calendar dates in the range, mark which are active
-    const rangeStart = new Date(sortedEntries[0].takenAt);
-    rangeStart.setHours(0, 0, 0, 0);
+    // rangeStart must respect the SELECTED time window, not the first entry ever.
     const rangeEnd = new Date();
     rangeEnd.setHours(0, 0, 0, 0);
+    const rangeStart = new Date(rangeEnd);
+    if (range === 'all') {
+        // For "all time" walk from the very first entry
+        const firstAll = new Date(sortedEntries[0].takenAt);
+        firstAll.setHours(0, 0, 0, 0);
+        rangeStart.setTime(firstAll.getTime());
+    } else {
+        // For a fixed window (7/14/30/60/90/180/365) start from today minus N days
+        rangeStart.setDate(rangeEnd.getDate() - (parseInt(range) - 1));
+    }
 
     let longestCleanStreak = 0;
     let currentCleanStreak = 0;

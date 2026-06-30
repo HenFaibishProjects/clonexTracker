@@ -1,430 +1,392 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/png" href="/icons/pl.png">
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Benzos Tracker - Sign In</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
-    <link rel="stylesheet" href="style-modern.css" />
-    <style>
-        /* Additional authentication-specific styles */
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-        }
-        
-        .auth-link {
-            color: var(--color-primary-500);
-            text-decoration: none;
-            font-weight: var(--font-weight-medium);
-            transition: color var(--transition-fast);
-        }
-        
-        .auth-link:hover {
-            color: var(--color-primary-600);
-            text-decoration: underline;
-        }
-        
-        .divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            margin: var(--space-6) 0;
-        }
-        
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .divider span {
-            padding: 0 var(--space-4);
-            color: var(--text-secondary);
-            font-size: var(--text-sm);
-        }
-        
-        .password-requirements {
-            font-size: var(--text-xs);
-            color: var(--text-secondary);
-            margin-top: var(--space-2);
-            line-height: 1.5;
-        }
-        
-        .back-to-login {
-            text-align: center;
-            margin-top: var(--space-6);
-        }
-        
-        .success-icon {
-            width: 80px;
-            height: 80px;
-            background: var(--gradient-primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto var(--space-6);
-            font-size: 2.5rem;
-        }
-        
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: var(--z-modal);
-            padding: var(--space-6);
-        }
-        
-        .modal-overlay.active {
-            display: flex;
-        }
-        
-        .modal-content-modern {
-            background: var(--bg-elevated);
-            border-radius: var(--radius-2xl);
-            padding: var(--space-8);
-            max-width: 500px;
-            width: 100%;
-            box-shadow: var(--shadow-2xl);
-            border: 1px solid var(--border-color);
-            animation: slideUp 0.3s ease-out;
-        }
-        
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .alert-message {
-            padding: var(--space-4);
-            border-radius: var(--radius-lg);
-            margin-bottom: var(--space-4);
-            display: flex;
-            align-items: center;
-            gap: var(--space-3);
-            animation: fadeIn 0.3s ease-out;
-        }
-        
-        .alert-message.success {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid var(--color-success);
-            color: var(--color-success);
-        }
-        
-        .alert-message.error {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid var(--color-error);
-            color: var(--color-error);
-        }
-        
-        .alert-message.info {
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid var(--color-info);
-            color: var(--color-info);
-        }
-    </style>
+  <link rel="icon" type="image/png" href="/icons/pl.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BenzoTracker — Sign In</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style-modern.css" />
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --p:#4169ff;--s:#a855f7;
+      --bg:#070b14;--bg2:#0d1220;--bg3:#111827;
+      --border:rgba(255,255,255,0.08);
+      --text:#e5e7eb;--muted:#6b7280;
+    }
+    body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
+    a{text-decoration:none}
+
+    /* BACKGROUND MESH */
+    .bg-mesh{position:fixed;inset:0;z-index:0;pointer-events:none;
+      background:
+        radial-gradient(ellipse 70% 50% at 20% 10%, rgba(65,105,255,.14) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 80% 80%, rgba(168,85,247,.10) 0%, transparent 55%),
+        var(--bg);
+    }
+    .bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;
+      background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);
+      background-size:56px 56px;
+      mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 20%,transparent 100%);
+    }
+
+    /* LAYOUT */
+    .page{position:relative;z-index:1;display:flex;min-height:100vh}
+
+    /* LEFT PANEL */
+    .left-panel{flex:1;display:flex;flex-direction:column;justify-content:center;padding:60px 80px;border-right:1px solid var(--border)}
+    .brand{display:flex;align-items:center;gap:12px;margin-bottom:64px}
+    .brand-icon{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--p),var(--s));display:flex;align-items:center;justify-content:center;font-size:1.3rem;box-shadow:0 4px 20px rgba(65,105,255,.4)}
+    .brand-name{font-size:1.1rem;font-weight:800;background:linear-gradient(135deg,var(--p),var(--s));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .panel-headline{font-size:2.6rem;font-weight:900;line-height:1.15;margin-bottom:20px}
+    .panel-headline em{font-style:normal;background:linear-gradient(135deg,var(--p),var(--s));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .panel-sub{color:var(--muted);font-size:1rem;line-height:1.7;max-width:420px;margin-bottom:48px}
+    .feature-list{display:flex;flex-direction:column;gap:18px}
+    .feature-item{display:flex;align-items:center;gap:14px;color:var(--muted);font-size:.93rem}
+    .feature-dot{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,rgba(65,105,255,.2),rgba(168,85,247,.2));border:1px solid rgba(65,105,255,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem}
+
+    /* RIGHT PANEL */
+    .right-panel{width:480px;display:flex;align-items:center;justify-content:center;padding:40px 48px}
+    .auth-card{width:100%;background:rgba(13,18,32,.9);border:1px solid var(--border);border-radius:24px;padding:40px;backdrop-filter:blur(20px);box-shadow:0 24px 80px rgba(0,0,0,.5)}
+
+    /* TABS */
+    .tabs{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:4px;margin-bottom:32px}
+    .tab{flex:1;padding:10px;text-align:center;font-size:.88rem;font-weight:600;color:var(--muted);background:transparent;border:none;border-radius:10px;cursor:pointer;transition:.2s;font-family:"Inter",sans-serif}
+    .tab.active{background:linear-gradient(135deg,var(--p),var(--s));color:#fff;box-shadow:0 4px 16px rgba(65,105,255,.4)}
+
+    /* GOOGLE BTN */
+    .btn-google{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:13px;background:var(--bg);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:.92rem;font-weight:600;font-family:"Inter",sans-serif;cursor:pointer;transition:.2s;margin-bottom:20px}
+    .btn-google:hover{border-color:rgba(65,105,255,.4);background:rgba(65,105,255,.06);transform:translateY(-1px)}
+    .btn-google svg{width:18px;height:18px;flex-shrink:0}
+
+    /* DIVIDER */
+    .or-divider{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+    .or-divider::before,.or-divider::after{content:"";flex:1;height:1px;background:var(--border)}
+    .or-divider span{font-size:.78rem;color:var(--muted);font-weight:500;white-space:nowrap}
+
+    /* FORM */
+    .field{margin-bottom:18px}
+    .field label{display:block;font-size:.78rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px}
+    .field input{width:100%;background:#0d1220;border:1px solid var(--border);border-radius:12px;padding:13px 16px;font-size:.95rem;color:#e5e7eb;font-family:"Inter",sans-serif;outline:none;transition:.2s;color-scheme:dark}
+    .field input:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(65,105,255,.15);background:#0d1220}
+    .field input::placeholder{color:#4b5563}
+    /* Override browser autofill background */
+    .field input:-webkit-autofill,
+    .field input:-webkit-autofill:hover,
+    .field input:-webkit-autofill:focus,
+    .field input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 1000px #0d1220 inset !important;
+      -webkit-text-fill-color: #e5e7eb !important;
+      caret-color: #e5e7eb;
+      border-color: var(--border) !important;
+      transition: background-color 9999s ease-in-out 0s;
+    }
+    .hint{font-size:.75rem;color:var(--muted);margin-top:6px;line-height:1.5}
+
+    /* SUBMIT */
+    .btn-submit{width:100%;padding:14px;background:linear-gradient(135deg,var(--p),var(--s));color:#fff;border:none;border-radius:12px;font-size:.96rem;font-weight:700;font-family:"Inter",sans-serif;cursor:pointer;transition:.2s;box-shadow:0 4px 20px rgba(65,105,255,.4);margin-top:8px}
+    .btn-submit:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(65,105,255,.55)}
+    .btn-submit:disabled{opacity:.6;transform:none;cursor:not-allowed}
+
+    /* FORGOT */
+    .forgot-link{text-align:center;margin-top:14px}
+    .forgot-link a{font-size:.83rem;color:var(--muted);transition:.2s}
+    .forgot-link a:hover{color:#fff}
+
+    /* ALERT */
+    .auth-alert{padding:12px 16px;border-radius:10px;margin-bottom:16px;font-size:.87rem;display:none;align-items:center;gap:8px}
+    .auth-alert.error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#f87171;display:flex}
+    .auth-alert.success{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:#34d399;display:flex}
+    .auth-alert.info{background:rgba(65,105,255,.12);border:1px solid rgba(65,105,255,.3);color:#93b4ff;display:flex}
+
+    /* MODAL OVERLAY */
+    .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(12px);z-index:9999;display:none;align-items:center;justify-content:center;padding:24px}
+    .modal-ov.show{display:flex}
+    .modal-box{background:var(--bg2);border:1px solid var(--border);border-radius:24px;padding:48px 40px;max-width:460px;width:100%;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,.6);animation:popIn .35s cubic-bezier(.34,1.56,.64,1)}
+    @keyframes popIn{from{opacity:0;transform:scale(.85) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+    .modal-emoji{font-size:3.5rem;margin-bottom:20px;display:block}
+    .modal-title{font-size:1.6rem;font-weight:900;margin-bottom:12px;background:linear-gradient(135deg,var(--p),var(--s));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .modal-body{color:var(--muted);font-size:.95rem;line-height:1.7;margin-bottom:28px}
+    .modal-body strong{color:#fff}
+    .modal-cta{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:linear-gradient(135deg,var(--p),var(--s));color:#fff;border-radius:999px;font-weight:700;font-size:.95rem;transition:.2s;box-shadow:0 4px 20px rgba(65,105,255,.4)}
+    .modal-cta:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(65,105,255,.55)}
+
+    /* SUCCESS MODAL */
+    .success-modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(12px);z-index:9999;display:none;align-items:center;justify-content:center;padding:24px}
+    .success-modal-ov.show{display:flex}
+
+    /* FORGOT SECTION */
+    .section{display:none}.section.active{display:block}
+
+    /* MOBILE */
+    @media(max-width:900px){
+      .left-panel{display:none}
+      .right-panel{width:100%;padding:16px;align-items:flex-start;padding-top:72px}
+      .auth-card{padding:24px 20px;border-radius:20px}
+    }
+    /* Compact mobile top bar */
+    .mobile-brand{display:none;position:fixed;top:0;left:0;right:0;z-index:200;
+      padding:14px 20px;background:rgba(7,11,20,.92);backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--border);
+      align-items:center;gap:10px}
+    .mobile-brand-icon{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--p),var(--s));display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+    .mobile-brand-name{font-size:.95rem;font-weight:800;background:linear-gradient(135deg,var(--p),var(--s));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    @media(max-width:900px){
+      .mobile-brand{display:flex}
+    }
+    /* Touch-friendly inputs */
+    @media(max-width:600px){
+      .right-panel{padding:12px;padding-top:68px}
+      .auth-card{padding:20px 16px;border-radius:18px}
+      .field input{padding:14px 14px;font-size:1rem} /* 1rem prevents iOS zoom */
+      .btn-google{padding:14px;font-size:.95rem}
+      .btn-submit{padding:15px;font-size:1rem}
+      .tab{padding:11px 8px;font-size:.82rem}
+      .modal-box{padding:32px 24px;border-radius:20px}
+      .modal-title{font-size:1.35rem}
+      .modal-emoji{font-size:2.8rem}
+    }
+  </style>
 </head>
 <body>
-    <div class="auth-container-modern">
-        <div class="auth-card animate-fade-in">
-            <!-- Auth Header -->
-            <div class="auth-header">
-                <div class="auth-logo">💊</div>
-                <h1 class="auth-title">Welcome Back</h1>
-                <p class="auth-subtitle">Sign in to continue tracking your progress</p>
-            </div>
+<!-- Mobile Brand Bar (hidden on desktop) -->
+<div class="mobile-brand">
+  <div class="mobile-brand-icon">🧬</div>
+  <span class="mobile-brand-name">BenzoTracker</span>
+</div>
+<div class="bg-mesh"></div>
+<div class="bg-grid"></div>
+<div class="page">
 
-            <!-- Alert Messages -->
-            <div id="authMessage" class="hidden"></div>
-
-            <!-- Login/Register Tabs -->
-            <div class="tabs-modern" id="authTabs">
-                <button class="tab-modern active" onclick="switchTab('login')">Sign In</button>
-                <button class="tab-modern" onclick="switchTab('register')">Sign Up</button>
-            </div>
-
-            <!-- Login Form -->
-            <div id="loginSection">
-                <form id="loginForm">
-                    <div class="form-group-modern">
-                        <label for="loginEmail" class="form-label-modern">Email Address</label>
-                        <input 
-                            type="email" 
-                            class="form-input-modern" 
-                            id="loginEmail" 
-                            placeholder="your.email@example.com" 
-                            required 
-                        />
-                    </div>
-                    
-                    <div class="form-group-modern">
-                        <label for="loginPassword" class="form-label-modern">Password</label>
-                        <input 
-                            type="password" 
-                            class="form-input-modern" 
-                            id="loginPassword" 
-                            placeholder="Enter your password" 
-                            required 
-                        />
-                    </div>
-
-                    <button type="submit" class="btn-modern btn-primary-modern btn-full btn-lg">
-                        Sign In
-                    </button>
-
-                    <div class="text-center mt-4">
-                        <a href="#" class="auth-link" onclick="showForgotPassword(event)">
-                            Forgot your password?
-                        </a>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Register Form -->
-            <div id="registerSection" class="hidden">
-                <form id="registerForm">
-                    <div class="form-group-modern">
-                        <label for="registerName" class="form-label-modern">Full Name</label>
-                        <input 
-                            type="text" 
-                            class="form-input-modern" 
-                            id="registerName" 
-                            placeholder="John Doe" 
-                            required 
-                        />
-                    </div>
-
-                    <div class="form-group-modern">
-                        <label for="registerEmail" class="form-label-modern">Email Address</label>
-                        <input 
-                            type="email" 
-                            class="form-input-modern" 
-                            id="registerEmail" 
-                            placeholder="your.email@example.com" 
-                            required 
-                        />
-                    </div>
-
-                    <div class="form-group-modern">
-                        <label for="registerPassword" class="form-label-modern">Password</label>
-                        <input 
-                            type="password" 
-                            class="form-input-modern" 
-                            id="registerPassword" 
-                            placeholder="Create a strong password" 
-                            required 
-                        />
-                        <div class="password-requirements">
-                            Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.
-                        </div>
-                    </div>
-
-                    <div class="form-group-modern">
-                        <label for="confirmPassword" class="form-label-modern">Confirm Password</label>
-                        <input 
-                            type="password" 
-                            class="form-input-modern" 
-                            id="confirmPassword" 
-                            placeholder="Confirm your password" 
-                            required 
-                        />
-                    </div>
-
-                    <div class="form-group-modern">
-                        <label for="benzos" class="form-label-modern">Benzodiazepine Type</label>
-                        <input 
-                            type="text" 
-                            class="form-input-modern" 
-                            id="benzos" 
-                            placeholder="e.g., Clonazepam, Diazepam" 
-                            required 
-                        />
-                    </div>
-
-                    <button type="submit" class="btn-modern btn-primary-modern btn-full btn-lg">
-                        Create Account
-                    </button>
-                </form>
-            </div>
-
-            <!-- Forgot Password Section -->
-            <div id="forgotSection" class="hidden">
-                <div class="back-to-login">
-                    <a href="#" class="auth-link" onclick="hideForgotPassword(event)">
-                        ← Back to Sign In
-                    </a>
-                </div>
-
-                <div class="text-center mb-6">
-                    <div class="auth-logo">🔑</div>
-                    <h2 class="auth-title" style="font-size: var(--text-2xl);">Reset Password</h2>
-                    <p class="auth-subtitle">Enter your email and we'll send you a reset link</p>
-                </div>
-
-                <form id="forgotForm">
-                    <div class="form-group-modern">
-                        <label for="forgotEmail" class="form-label-modern">Email Address</label>
-                        <input 
-                            type="email" 
-                            class="form-input-modern" 
-                            id="forgotEmail" 
-                            placeholder="your.email@example.com" 
-                            required 
-                        />
-                    </div>
-
-                    <button type="submit" class="btn-modern btn-primary-modern btn-full btn-lg">
-                        Send Reset Link
-                    </button>
-
-                    <div class="alert-message info mt-4">
-                        <span>ℹ️</span>
-                        <small>If your email is registered, you'll receive a reset link shortly.</small>
-                    </div>
-                </form>
-            </div>
-        </div>
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="brand">
+      <div class="brand-icon">🧬</div>
+      <span class="brand-name">BenzoTracker</span>
     </div>
-
-    <!-- Registration Success Modal -->
-    <div class="modal-overlay" id="successModal">
-        <div class="modal-content-modern">
-            <div class="success-icon">✅</div>
-            <h2 class="text-center mb-4" style="font-size: var(--text-2xl); font-weight: var(--font-weight-bold); color: var(--text-primary);">
-                Registration Successful!
-            </h2>
-            <p class="text-center mb-4" style="color: var(--text-secondary);">
-                We've sent an activation code to your email. Check your inbox for instructions.
-            </p>
-            <div class="alert-message info mb-4">
-                <span>📬</span>
-                <small>Look for an email from <strong>Benzos Tracker</strong></small>
-            </div>
-            <a href="activate.html" class="btn-modern btn-primary-modern btn-full btn-lg">
-                Go to Activation
-            </a>
-        </div>
+    <h1 class="panel-headline">Track your journey<br>with <em>clarity</em> &amp;<br><em>precision</em></h1>
+    <p class="panel-sub">A private, secure platform for benzodiazepine management. Log doses, track streaks, and understand your tapering progress.</p>
+    <div class="feature-list">
+      <div class="feature-item"><div class="feature-dot">🌿</div><span>Clean streak tracker — know every day you succeeded</span></div>
+      <div class="feature-item"><div class="feature-dot">📊</div><span>Advanced analytics with dosage trends and averages</span></div>
+      <div class="feature-item"><div class="feature-dot">🔒</div><span>100% private — your data never shared or sold</span></div>
+      <div class="feature-item"><div class="feature-dot">📱</div><span>Works on any device, anytime</span></div>
     </div>
+  </div>
 
-    <footer class="text-center" style="position: fixed; bottom: var(--space-4); left: 0; right: 0; color: white; font-size: var(--text-sm); z-index: 0;">
-        © 2026 LiDa Software. All rights reserved.
-    </footer>
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="auth-card">
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="js/login.js"></script>
-    
-    <script>
-        // Tab switching functionality
-        function switchTab(tab) {
-            const loginSection = document.getElementById('loginSection');
-            const registerSection = document.getElementById('registerSection');
-            const forgotSection = document.getElementById('forgotSection');
-            const tabs = document.querySelectorAll('.tab-modern');
-            const authTitle = document.querySelector('.auth-title');
-            const authSubtitle = document.querySelector('.auth-subtitle');
-            
-            // Hide all sections
-            loginSection.classList.add('hidden');
-            registerSection.classList.add('hidden');
-            forgotSection.classList.add('hidden');
-            
-            // Remove active class from all tabs
-            tabs.forEach(t => t.classList.remove('active'));
-            
-            // Show selected section and activate tab
-            if (tab === 'login') {
-                loginSection.classList.remove('hidden');
-                tabs[0].classList.add('active');
-                authTitle.textContent = 'Welcome Back';
-                authSubtitle.textContent = 'Sign in to continue tracking your progress';
-            } else if (tab === 'register') {
-                registerSection.classList.remove('hidden');
-                tabs[1].classList.add('active');
-                authTitle.textContent = 'Get Started';
-                authSubtitle.textContent = 'Create your account to start tracking your progress';
-            }
-            
-            // Clear alert messages
-            document.getElementById('authMessage').className = 'hidden';
-        }
-        
-        // Show forgot password section
-        function showForgotPassword(event) {
-            if (event) event.preventDefault();
-            const loginSection = document.getElementById('loginSection');
-            const registerSection = document.getElementById('registerSection');
-            const forgotSection = document.getElementById('forgotSection');
-            const tabs = document.querySelectorAll('.tab-modern');
-            
-            loginSection.classList.add('hidden');
-            registerSection.classList.add('hidden');
-            forgotSection.classList.remove('hidden');
-            
-            tabs.forEach(t => t.classList.remove('active'));
-            
-            document.getElementById('authMessage').className = 'hidden';
-        }
-        
-        // Hide forgot password section
-        function hideForgotPassword(event) {
-            if (event) event.preventDefault();
-            switchTab('login');
-        }
-        
-        // Show success modal
-        function showSuccessModal() {
-            document.getElementById('successModal').classList.add('active');
-        }
-        
-        // Close modal when clicking outside
-        document.getElementById('successModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.classList.remove('active');
-            }
-        });
-        
-        // Check URL hash for register
-        if (window.location.hash === '#register') {
-            switchTab('register');
-        }
-        
-        // Show alert message
-        function showAlert(message, type = 'info') {
-            const alertEl = document.getElementById('authMessage');
-            alertEl.className = `alert-message ${type}`;
-            
-            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
-            alertEl.innerHTML = `<span>${icon}</span><span>${message}</span>`;
-        }
-        
-        // Override the original modal trigger if needed
-        const originalShowModal = window.showRegistrationSuccessModal;
-        window.showRegistrationSuccessModal = function() {
-            showSuccessModal();
-        };
-    </script>
+      <div id="authAlert" class="auth-alert"></div>
+
+      <!-- TABS -->
+      <div class="tabs" id="authTabs">
+        <button class="tab active" onclick="switchTab(event,'login')">Sign In</button>
+        <button class="tab" onclick="switchTab(event,'register')">Sign Up</button>
+      </div>
+
+      <!-- LOGIN SECTION -->
+      <div class="section active" id="loginSection">
+        <button class="btn-google" onclick="handleGoogleAuth()">
+          <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Continue with Google
+        </button>
+        <div class="or-divider"><span>or sign in with email</span></div>
+        <form id="loginForm" onsubmit="return false">
+          <div class="field"><label>Email Address</label><input type="email" id="loginEmail" placeholder="you@example.com" required></div>
+          <div class="field"><label>Password</label><input type="password" id="loginPassword" placeholder="Enter your password" required></div>
+          <button type="submit" class="btn-submit" id="loginBtn" onclick="doLogin()">Sign In</button>
+        </form>
+        <div class="forgot-link"><a href="#" onclick="showForgot(event)">Forgot your password?</a></div>
+      </div>
+
+      <!-- REGISTER SECTION -->
+      <div class="section" id="registerSection">
+        <button class="btn-google" onclick="handleGoogleAuth()">
+          <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Sign up with Google
+        </button>
+        <div class="or-divider"><span>or create an account</span></div>
+        <form id="registerForm" onsubmit="return false">
+          <div class="field"><label>Full Name</label><input type="text" id="registerName" placeholder="John Doe" required></div>
+          <div class="field"><label>Email Address</label><input type="email" id="registerEmail" placeholder="you@example.com" required></div>
+          <div class="field"><label>Password</label><input type="password" id="registerPassword" placeholder="Create a strong password" required><div class="hint">Minimum 8 characters with uppercase, lowercase, and a number.</div></div>
+          <div class="field"><label>Confirm Password</label><input type="password" id="confirmPassword" placeholder="Confirm your password" required></div>
+          <div class="field"><label>Benzodiazepine Type</label><input type="text" id="benzos" placeholder="e.g. Clonazepam, Diazepam" required></div>
+          <div class="field"><label>Access Password</label><input type="password" id="accessPassword" placeholder="Enter access code" required><div class="hint">Required to create an account. Contact LiDa Software if you don&apos;t have it.</div></div>
+          <button type="submit" class="btn-submit" id="registerBtn" onclick="doRegister()">Create Account</button>
+        </form>
+      </div>
+
+      <!-- FORGOT SECTION -->
+      <div class="section" id="forgotSection">
+        <div style="margin-bottom:24px"><a href="#" onclick="switchTab(event,'login')" style="color:var(--muted);font-size:.85rem;font-weight:500">← Back to Sign In</a></div>
+        <div style="text-align:center;margin-bottom:28px">
+          <div style="font-size:2.5rem;margin-bottom:12px">🔑</div>
+          <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:8px">Reset Password</h2>
+          <p style="color:var(--muted);font-size:.9rem">Enter your email and we will send a reset link</p>
+        </div>
+        <form id="forgotForm" onsubmit="return false">
+          <div class="field"><label>Email Address</label><input type="email" id="forgotEmail" placeholder="you@example.com" required></div>
+          <button type="submit" class="btn-submit" onclick="doForgot()">Send Reset Link</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ACCESS DENIED MODAL -->
+<div class="modal-ov" id="accessModal">
+  <div class="modal-box">
+    <span class="modal-emoji">🚫</span>
+    <div class="modal-title">Access Restricted</div>
+    <div class="modal-body">
+      This platform is <strong>invite-only</strong>.<br><br>
+      To get access, you need a valid access code provided by <strong>LiDa Software</strong>.<br><br>
+      Please reach out to us and we will get you set up.
+    </div>
+    <a href="mailto:contact@lidasoftware.com" class="modal-cta">✉️ Contact LiDa Software</a>
+    <div style="margin-top:16px"><button onclick="closeAccessModal()" style="background:none;border:none;color:var(--muted);font-size:.83rem;cursor:pointer;font-family:Inter,sans-serif">Dismiss</button></div>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="success-modal-ov" id="successModal">
+  <div class="modal-box">
+    <span class="modal-emoji">🎉</span>
+    <div class="modal-title">Account Created!</div>
+    <div class="modal-body">We sent an activation link to your email.<br>Check your inbox for an email from <strong>BenzoTracker</strong>.</div>
+    <a href="activate.html" class="modal-cta">Go to Activation →</a>
+  </div>
+</div>
+
+<!-- GOOGLE COMING SOON MODAL -->
+<div class="modal-ov" id="googleModal">
+  <div class="modal-box">
+    <span class="modal-emoji">🔜</span>
+    <div class="modal-title">Coming Soon</div>
+    <div class="modal-body">Google sign-in is currently being set up. For now, please use the email and password option below.</div>
+    <button onclick="closeGoogleModal()" class="modal-cta">Got it</button>
+  </div>
+</div>
+
+<footer style="position:fixed;bottom:16px;left:0;right:0;text-align:center;color:rgba(255,255,255,.25);font-size:.78rem;z-index:1;pointer-events:none">
+  © 2026 LiDa Software — Private &amp; Secure
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="js/login.js"></script>
+<script>
+  const ACCESS_CODE = "50055212";
+
+  function switchTab(e, tab) {
+    if (e) e.preventDefault();
+    document.querySelectorAll(".tab").forEach((t,i) => t.classList.toggle("active", (tab==="login"&&i===0)||(tab==="register"&&i===1)));
+    document.getElementById("loginSection").classList.toggle("active", tab==="login");
+    document.getElementById("registerSection").classList.toggle("active", tab==="register");
+    document.getElementById("forgotSection").classList.remove("active");
+    clearAlert();
+  }
+
+  function showForgot(e) {
+    if (e) e.preventDefault();
+    document.getElementById("loginSection").classList.remove("active");
+    document.getElementById("registerSection").classList.remove("active");
+    document.getElementById("forgotSection").classList.add("active");
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    clearAlert();
+  }
+
+  function showAlert(msg, type) {
+    const el = document.getElementById("authAlert");
+    el.className = "auth-alert " + type;
+    el.innerHTML = (type==="error"?"❌ ":type==="success"?"✅ ":"ℹ️ ") + msg;
+  }
+  function clearAlert() { const el = document.getElementById("authAlert"); el.className="auth-alert"; }
+
+  function doLogin() {
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+    if (!email || !password) { showAlert("Please fill in all fields.", "error"); return; }
+    document.getElementById("loginBtn").disabled = true;
+    document.getElementById("loginBtn").textContent = "Signing in...";
+    $.ajax({
+      url: "/api/auth/login",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({ email, password }),
+      success: function(res) {
+        localStorage.setItem("token", res.access_token);
+        window.location.href = "benzos.html";
+      },
+      error: function(xhr) {
+        const msg = xhr.responseJSON?.message || "Invalid credentials. Please try again.";
+        showAlert(msg, "error");
+        document.getElementById("loginBtn").disabled = false;
+        document.getElementById("loginBtn").textContent = "Sign In";
+      }
+    });
+  }
+
+  function doRegister() {
+    const name = document.getElementById("registerName").value.trim();
+    const email = document.getElementById("registerEmail").value.trim();
+    const password = document.getElementById("registerPassword").value;
+    const confirm = document.getElementById("confirmPassword").value;
+    const benzosVal = document.getElementById("benzos").value.trim();
+    const accessCode = document.getElementById("accessPassword").value.trim();
+
+    if (!name||!email||!password||!confirm||!benzosVal||!accessCode) { showAlert("Please fill in all fields.", "error"); return; }
+    if (password !== confirm) { showAlert("Passwords do not match.", "error"); return; }
+    if (accessCode !== ACCESS_CODE) { document.getElementById("accessModal").classList.add("show"); return; }
+
+    document.getElementById("registerBtn").disabled = true;
+    document.getElementById("registerBtn").textContent = "Creating account...";
+    $.ajax({
+      url: "/api/auth/register",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({ name, email, password, benzos: benzosVal }),
+      success: function() { document.getElementById("successModal").classList.add("show"); },
+      error: function(xhr) {
+        const msg = xhr.responseJSON?.message || "Registration failed. Please try again.";
+        showAlert(msg, "error");
+        document.getElementById("registerBtn").disabled = false;
+        document.getElementById("registerBtn").textContent = "Create Account";
+      }
+    });
+  }
+
+  function doForgot() {
+    const email = document.getElementById("forgotEmail").value.trim();
+    if (!email) { showAlert("Please enter your email.", "error"); return; }
+    $.ajax({
+      url: "/api/auth/forgot-password",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({ email }),
+      success: function() { showAlert("Reset link sent! Check your inbox.", "success"); },
+      error: function() { showAlert("Could not send reset email. Please try again.", "error"); }
+    });
+  }
+
+  function handleGoogleAuth() { document.getElementById("googleModal").classList.add("show"); }
+  function closeAccessModal() { document.getElementById("accessModal").classList.remove("show"); }
+  function closeGoogleModal() { document.getElementById("googleModal").classList.remove("show"); }
+
+  window.showRegistrationSuccessModal = function() { document.getElementById("successModal").classList.add("show"); };
+
+  if (window.location.hash === "#register") switchTab(null, "register");
+
+  document.querySelectorAll(".modal-ov,.success-modal-ov").forEach(ov => {
+    ov.addEventListener("click", e => { if (e.target === ov) ov.classList.remove("show"); });
+  });
+
+  document.getElementById("loginForm").addEventListener("keydown", e => { if(e.key==="Enter") doLogin(); });
+  document.getElementById("registerForm").addEventListener("keydown", e => { if(e.key==="Enter") doRegister(); });
+</script>
 </body>
 </html>

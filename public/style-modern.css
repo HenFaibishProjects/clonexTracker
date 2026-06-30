@@ -1,4 +1,4 @@
-/* ================================
+﻿/* ================================
    MODERN DESIGN SYSTEM
    ================================ */
 
@@ -1378,4 +1378,330 @@ body.theme-midnight {
 @keyframes dialog-pop-in {
   from { opacity: 0; transform: scale(0.9) translateY(20px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+
+/* ================================================================
+   LUXURY UPGRADE — Premium Visual Layer
+   No logic changes — pure aesthetic elevation
+   ================================================================ */
+
+/* ── Body & Background ─────────────────────────────────────────── */
+body {
+  background-image: radial-gradient(ellipse at 20% 0%, rgba(65,105,255,0.06) 0%, transparent 55%),
+                    radial-gradient(ellipse at 80% 100%, rgba(168,85,247,0.05) 0%, transparent 55%);
+  background-attachment: fixed;
+}
+
+body.dark-mode {
+  background-color: #080b12;
+  background-image: radial-gradient(ellipse at 20% 0%, rgba(65,105,255,0.10) 0%, transparent 55%),
+                    radial-gradient(ellipse at 80% 100%, rgba(168,85,247,0.08) 0%, transparent 55%);
+}
+
+/* ── Dashboard Header ──────────────────────────────────────────── */
+.dashboard-header {
+  background: linear-gradient(135deg, #0f1117 0%, #161b2e 50%, #0d1424 100%);
+  border-bottom: 1px solid rgba(65,105,255,0.18);
+  box-shadow: 0 2px 24px rgba(0,0,0,0.4), 0 1px 0 rgba(65,105,255,0.12);
+}
+
+body.dark-mode .dashboard-header {
+  background: linear-gradient(135deg, #080b12 0%, #0f1520 50%, #080e1a 100%);
+  border-bottom: 1px solid rgba(65,105,255,0.14);
+  box-shadow: 0 2px 32px rgba(0,0,0,0.55);
+}
+
+/* ── Stat Cards ────────────────────────────────────────────────── */
+.stat-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 2px 12px rgba(65,105,255,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--gradient-primary);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.stat-card:hover {
+  box-shadow: 0 8px 32px rgba(65,105,255,0.13), 0 2px 8px rgba(0,0,0,0.07);
+  transform: translateY(-3px);
+}
+
+.stat-card:hover::before {
+  opacity: 1;
+}
+
+/* ── Entry Form Card ───────────────────────────────────────────── */
+.entry-form-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-2xl);
+  box-shadow: 0 4px 24px rgba(65,105,255,0.06), 0 1px 4px rgba(0,0,0,0.04);
+}
+
+body.dark-mode .entry-form-card {
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+
+/* ── Chart Cards ───────────────────────────────────────────────── */
+.chart-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-2xl);
+  box-shadow: 0 4px 24px rgba(65,105,255,0.05), 0 1px 3px rgba(0,0,0,0.04);
+  transition: box-shadow 0.25s ease;
+}
+
+.chart-card:hover {
+  box-shadow: 0 8px 40px rgba(65,105,255,0.10), 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* ── Table Card ────────────────────────────────────────────────── */
+.table-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-2xl);
+  box-shadow: 0 4px 24px rgba(65,105,255,0.05), 0 1px 3px rgba(0,0,0,0.04);
+  overflow: hidden;
+}
+
+/* ── Table ─────────────────────────────────────────────────────── */
+.table-modern thead {
+  background: linear-gradient(90deg, var(--bg-tertiary) 0%, var(--bg-elevated) 100%);
+}
+
+.table-modern th {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  padding: 14px 20px;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.table-modern td {
+  padding: 14px 20px;
+  font-size: var(--text-sm);
+  border-bottom: 1px solid var(--border-color);
+  border-right: none;
+}
+
+.table-modern tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.table-modern tbody tr:hover {
+  background: linear-gradient(90deg, rgba(65,105,255,0.04) 0%, transparent 100%);
+}
+
+.table-modern tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── Filter Card ───────────────────────────────────────────────── */
+.filter-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-2xl);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+
+/* ── Form Inputs ───────────────────────────────────────────────── */
+.form-input-modern {
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-tertiary);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.form-input-modern:focus {
+  border-color: var(--color-primary-500);
+  background: var(--bg-elevated);
+  box-shadow: 0 0 0 4px rgba(65,105,255,0.12);
+}
+
+/* ── Select Modern ─────────────────────────────────────────────── */
+.select-modern {
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-tertiary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.select-modern:focus {
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 4px rgba(65,105,255,0.12);
+  outline: none;
+}
+
+/* ── Buttons ───────────────────────────────────────────────────── */
+.btn-primary-modern {
+  background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-secondary-500) 100%);
+  box-shadow: 0 4px 14px rgba(65,105,255,0.35);
+  letter-spacing: 0.01em;
+  transition: box-shadow 0.2s ease, transform 0.15s ease, filter 0.15s ease;
+}
+
+.btn-primary-modern:hover {
+  box-shadow: 0 6px 20px rgba(65,105,255,0.45);
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+
+.btn-primary-modern:active {
+  transform: translateY(0);
+  filter: brightness(0.98);
+}
+
+.btn-secondary-modern {
+  border: 1.5px solid var(--border-color);
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.btn-secondary-modern:hover {
+  border-color: var(--color-primary-400);
+  background: rgba(65,105,255,0.05);
+  transform: translateY(-1px);
+}
+
+/* ── Action Buttons (table) ────────────────────────────────────── */
+.action-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  transition: all 0.18s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.action-btn:hover {
+  transform: scale(1.12);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+}
+
+.action-btn.edit-btn:hover {
+  background: rgba(65,105,255,0.12);
+  border-color: var(--color-primary-300);
+  color: var(--color-primary-600);
+}
+
+.action-btn.delete-btn:hover {
+  background: rgba(239,68,68,0.12);
+  border-color: #fca5a5;
+  color: #dc2626;
+}
+
+/* ── Global Range Bar ──────────────────────────────────────────── */
+#globalRangeButtons {
+  gap: 6px;
+}
+
+.range-btn {
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1.5px solid var(--border-color);
+}
+
+.range-btn:hover {
+  border-color: var(--color-primary-400);
+  background: rgba(65,105,255,0.07);
+  color: var(--color-primary-600);
+  transform: translateY(-1px);
+}
+
+.range-btn.range-btn-active {
+  background: linear-gradient(135deg, var(--color-primary-500), var(--color-secondary-500));
+  border-color: transparent;
+  box-shadow: 0 3px 12px rgba(65,105,255,0.35);
+  transform: translateY(-1px);
+}
+
+/* ── Today Banner ──────────────────────────────────────────────── */
+#todayBanner > div {
+  border-radius: var(--radius-xl) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: box-shadow 0.25s ease;
+  animation: bannerSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes bannerSlideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Section Titles ────────────────────────────────────────────── */
+.section-title {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* ── Card hover shimmer (Analytics stat cards) ─────────────────── */
+[id^="analytics"] {
+  transition: color 0.2s ease;
+}
+
+/* ── Main container max width & padding ────────────────────────── */
+.main-container {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── Badge pulse glow ──────────────────────────────────────────── */
+.badge-pulse {
+  box-shadow: 0 0 0 0 rgba(16,185,129,0.7);
+}
+
+/* ── Dark mode extra richness ──────────────────────────────────── */
+body.dark-mode .stat-card {
+  background: linear-gradient(135deg, var(--bg-elevated) 0%, rgba(37,41,50,0.8) 100%);
+}
+
+body.dark-mode .table-modern thead {
+  background: linear-gradient(90deg, #1a1d26 0%, #1f232e 100%);
+}
+
+body.dark-mode .table-modern tbody tr:hover {
+  background: linear-gradient(90deg, rgba(65,105,255,0.07) 0%, transparent 100%);
+}
+
+body.dark-mode .entry-form-card,
+body.dark-mode .chart-card,
+body.dark-mode .filter-card,
+body.dark-mode .table-card {
+  box-shadow: 0 4px 32px rgba(0,0,0,0.35);
+}
+
+body.dark-mode .range-btn.range-btn-active {
+  box-shadow: 0 3px 16px rgba(65,105,255,0.4);
 }

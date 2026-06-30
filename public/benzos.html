@@ -202,17 +202,34 @@
         }
 
         @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .filter-grid {
-                grid-template-columns: 1fr;
-            }
+            .form-grid, .stats-grid, .filter-grid { grid-template-columns: 1fr; }
+            .range-btn { padding: 5px 10px; font-size: 11px; }
+        }
+
+        .range-btn {
+            padding: 6px 16px;
+            font-size: var(--text-sm);
+            font-weight: var(--font-weight-semibold);
+            font-family: var(--font-sans);
+            color: var(--text-secondary);
+            background: var(--bg-tertiary);
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all 0.18s ease;
+            white-space: nowrap;
+        }
+        .range-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--color-primary-400);
+            background: var(--color-primary-50);
+        }
+        .range-btn.range-btn-active {
+            color: #fff;
+            background: var(--color-primary-600);
+            border-color: var(--color-primary-600);
+            font-weight: var(--font-weight-bold);
+            box-shadow: 0 2px 10px rgba(65,105,255,0.3);
         }
     </style>
 </head>
@@ -377,6 +394,25 @@
             </form>
         </div>
 
+        <!-- Global Range Selector -->
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-4); margin-bottom: var(--space-6); padding: var(--space-4) var(--space-6); background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--shadow-sm);">
+            <div style="display: flex; align-items: center; gap: var(--space-3);">
+                <span class="badge-pulse"></span>
+                <span style="font-size: var(--text-sm); font-weight: var(--font-weight-semibold); color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Viewing</span>
+                <span style="font-size: var(--text-base); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="viewStatusLabel">Last 30 Days</span>
+            </div>
+            <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;" id="globalRangeButtons">
+                <button type="button" class="range-btn" data-range="7"   onclick="setGlobalRange(7)">7 Days</button>
+                <button type="button" class="range-btn" data-range="14"  onclick="setGlobalRange(14)">14 Days</button>
+                <button type="button" class="range-btn range-btn-active" data-range="30"  onclick="setGlobalRange(30)">30 Days</button>
+                <button type="button" class="range-btn" data-range="60"  onclick="setGlobalRange(60)">60 Days</button>
+                <button type="button" class="range-btn" data-range="90"  onclick="setGlobalRange(90)">90 Days</button>
+                <button type="button" class="range-btn" data-range="180" onclick="setGlobalRange(180)">6 Months</button>
+                <button type="button" class="range-btn" data-range="365" onclick="setGlobalRange(365)">1 Year</button>
+                <button type="button" class="range-btn" data-range="all" onclick="setGlobalRange('all')">All Time</button>
+            </div>
+        </div>
+
         <!-- Filter Card -->
         <div class="filter-card">
             <h3 class="section-title">
@@ -416,22 +452,6 @@
             <div id="filterStatsBox" class="alert-modern alert-warning mt-4" style="display: none;"></div>
         </div>
 
-        <!-- View Status & entries Table -->
-        <div class="view-status-bar">
-            <div>
-                <span class="badge-pulse"></span>
-                <strong>Viewing:</strong> <span id="viewStatusLabel">Last 30 Days</span>
-            </div>
-            <div class="btn-group-modern">
-                <button type="button" class="btn-modern btn-secondary-modern btn-sm" onclick="loadEntries(7)">7D</button>
-                <button type="button" class="btn-modern btn-secondary-modern btn-sm" onclick="loadEntries(14)">14D</button>
-                <button type="button" class="btn-modern btn-primary-modern btn-sm" onclick="loadEntries(30)">30D</button>
-                <button type="button" class="btn-modern btn-secondary-modern btn-sm" onclick="loadEntries(60)">60D</button>
-                <button type="button" class="btn-modern btn-secondary-modern btn-sm" onclick="loadEntries(90)">90D</button>
-                <button type="button" class="btn-modern btn-secondary-modern btn-sm" onclick="loadEntries('all')">View All History</button>
-            </div>
-        </div>
-
         <!-- Entries Table -->
         <div class="table-card">
             <div class="table-header-card" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3);">
@@ -458,6 +478,9 @@
                     ">📌 Filtered view</span>
                 </div>
             </div>
+            <!-- Today Banner -->
+            <div id="todayBanner"></div>
+
             <div style="overflow-x: auto;">
                 <table class="table-modern" id="entriesTable">
                     <thead>
@@ -475,35 +498,14 @@
                 </table>
             </div>
         </div>
-
         <!-- Charts -->
         <div class="chart-card">
-            <div class="chart-header">
-                <h3 class="chart-title">📈 Dosage Over Time</h3>
-                <select id="dosageRange" class="select-modern">
-                    <option value="all">📅 All Time</option>
-                    <option value="8">📆 Last 8 Days</option>
-                    <option value="14">📆 Last 14 Days</option>
-                    <option value="30">🗓️ Last 30 Days</option>
-                    <option value="180">🗓️ Last 6 Months</option>
-                    <option value="365">📅 Last Year</option>
-                </select>
-            </div>
+            <div class="chart-header"><h3 class="chart-title">📈 Dosage Over Time</h3></div>
             <canvas id="dosageChart" height="80"></canvas>
         </div>
 
         <div class="chart-card">
-            <div class="chart-header">
-                <h3 class="chart-title">📊 Daily Dosage Summary</h3>
-                <select id="dailyRange" class="select-modern">
-                    <option value="all">📅 All Time</option>
-                    <option value="7">📆 Last 8 Days</option>
-                    <option value="14">📆 Last 15 Days</option>
-                    <option value="30">🗓️ Last 31 Days</option>
-                    <option value="180">🗓️ Last 6 Months</option>
-                    <option value="365">📅 Last Year</option>
-                </select>
-            </div>
+            <div class="chart-header"><h3 class="chart-title">📊 Daily Dosage Summary</h3></div>
             <canvas id="dailyChart" height="80"></canvas>
             <div id="dailyAverageBox" class="alert-modern alert-info mt-4" style="display: none;"></div>
         </div>
@@ -516,15 +518,6 @@
                         <span>📈</span>
                         <span>Enhanced Analytics</span>
                     </h3>
-                    <select id="analyticsRange" class="select-modern">
-                        <option value="all">📅 All Time</option>
-                        <option value="7">📆 Last 7 Days</option>
-                        <option value="14">📆 Last 14 Days</option>
-                        <option value="30">🗓️ Last 30 Days</option>
-                        <option value="90">🗓️ Last 90 Days</option>
-                        <option value="180">🗓️ Last 6 Months</option>
-                        <option value="365">📅 Last Year</option>
-                    </select>
                 </div>
 
                 <!-- Trends Section -->
@@ -616,14 +609,14 @@
                     <h4 style="font-size: var(--text-lg); font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-bottom: var(--space-4); display: flex; align-items: center; gap: var(--space-2);">
                         <span>📐</span> Statistical Summary
                     </h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: var(--space-4);">
                         <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
                             <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">TOTAL DOSAGE</div>
                             <div style="font-size: var(--text-xl); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsTotalDosage">-</div>
                             <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-top: var(--space-1);">mg consumed in period</div>
                         </div>
                         <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
-                            >AVERAGE DOSAGE</div>
+                            <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">AVERAGE DOSAGE</div>
                             <div style="font-size: var(--text-xl); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsAverage">-</div>
                             <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-top: var(--space-1);">mg / day (dose days only)</div>
                         </div>
@@ -646,11 +639,12 @@
                             <div style="font-size: var(--text-xl); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsMax">-</div>
                         </div>
                     </div>
+
                     <!-- Clean Day Stats -->
                     <h4 style="font-size: var(--text-lg); font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-top: var(--space-6); margin-bottom: var(--space-4); display: flex; align-items: center; gap: var(--space-2);">
                         <span>🌿</span> Clean Day Stats
                     </h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-4);">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: var(--space-4);">
                         <div style="padding: var(--space-4); background: var(--bg-elevated); border-radius: var(--radius-lg); text-align: center;">
                             <div style="font-size: var(--text-xs); color: var(--text-secondary); margin-bottom: var(--space-1);">ACTIVE DAYS</div>
                             <div style="font-size: var(--text-xl); font-weight: var(--font-weight-bold); color: var(--text-primary);" id="analyticsActiveDays">-</div>
@@ -676,7 +670,6 @@
             </div>
         </div>
     </div>
-
     <!-- Import Modal -->
     <div class="modal-overlay" id="importModal">
         <div class="modal-content-modern">

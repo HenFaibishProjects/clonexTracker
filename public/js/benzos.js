@@ -1156,7 +1156,7 @@ function updateStatsGrid(entries) {
 
     const total = entries.length;
     const totalDosage = entries.reduce((sum, e) => sum + e.dosageMg, 0);
-    const avgDosage = (totalDosage / total).toFixed(3);
+    const avgDosage = (totalDosage / total).toFixed(2);
 
     // Last 7 days
     const oneWeekAgo = new Date();
@@ -2426,32 +2426,61 @@ function displayEnhancedAnalytics(analytics) {
     // Use total count from all time-pattern buckets (accurate full count)
     const totalDoses = analytics.timePatterns.counts.morning + analytics.timePatterns.counts.afternoon + analytics.timePatterns.counts.evening + analytics.timePatterns.counts.night;
     const totalDays = analytics.timeframe.days || 1;
-    const dailyDosageAvg = totalDoses > 0 ? (analytics.distribution.average * (totalDoses / totalDays)).toFixed(3) : '0.000';
-    const intervalAvg = (totalDays / (totalDoses || 1)).toFixed(1);
+    const dailyDosageAvg = analytics.distribution.activeDays > 0 ? (analytics.distribution.totalDosageMg / analytics.distribution.activeDays).toFixed(2) : '0.00';
+    const intervalAvg = (totalDays / (totalDoses || 1)).toFixed(2);
 
-    $('#analyticsTotalDosage').text(`${analytics.distribution.totalDosageMg} mg`);
+    $('#analyticsTotalDosage').text(`${Number(analytics.distribution.totalDosageMg).toFixed(2)} mg`);
     $('#analyticsAverage').text(`${dailyDosageAvg} mg`);
-    $('#analyticsAverageWithEmpty').text(`${analytics.distribution.averageWithEmptyDays} mg`);
+    $('#analyticsAverageWithEmpty').text(`${Number(analytics.distribution.averageWithEmptyDays).toFixed(2)} mg`);
     $('#analyticsInterval').text(`${intervalAvg}`);
-    $('#analyticsMin').text(`${analytics.distribution.min.toFixed(3)} mg`);
-    $('#analyticsMax').text(`${analytics.distribution.max.toFixed(3)} mg`);
+    $('#analyticsMin').text(`${Number(analytics.distribution.min).toFixed(2)} mg`);
+    $('#analyticsMax').text(`${Number(analytics.distribution.max).toFixed(2)} mg`);
 
     // Clean Day Stats
     const calDays = analytics.distribution.calendarDays;
     $('#analyticsActiveDays').text(`${analytics.distribution.activeDays} / ${calDays}`);
     $('#analyticsZeroDoseDays').text(`${analytics.distribution.zeroDoseDays}`);
     $('#analyticsZeroDoseRate').text(`${analytics.distribution.zeroDoseRate}% of ${calDays} calendar days`);
-    $('#analyticsLongestCleanStreak').text(
-        analytics.distribution.longestCleanStreak === 0
-            ? 'None'
-            : `${analytics.distribution.longestCleanStreak} day${analytics.distribution.longestCleanStreak !== 1 ? 's' : ''}`
-    );
-    const ccs = analytics.distribution.currentCleanStreak;
-    $('#analyticsCurrentCleanStreak').html(
-        ccs === 0
-            ? '<span style="color: var(--text-secondary); font-size: var(--text-sm);">Dose taken today</span>'
-            : `<span style="color: var(--color-success-600);">${ccs} day${ccs !== 1 ? 's' : ''} 🌿</span>`
-    );
+    const formatStreakWithHours = (totalHours) => {
+        if (!totalHours || totalHours <= 0) return 'None';
+        const d = Math.floor(totalHours / 24);
+        const h = Math.floor(totalHours % 24);
+        const baseDayStr = (d === 1) ? 'A day' : `${d} days`;
+        const nextDayStr = `${d + 1} days`;
+        
+        if (d === 0) {
+            if (h < 11) return `${h} hour${h !== 1 ? 's' : ''}`;
+            if (h === 11) return `Half a day`;
+            if (h >= 12 && h < 18) return `Almost a day`;
+            return `1 day`;
+        }
+        
+        if (h < 11) {
+            if (h === 0) return baseDayStr;
+            return `${baseDayStr} and ${h} hour${h !== 1 ? 's' : ''}`;
+        } else if (h === 11) {
+            return `${baseDayStr} and a half`;
+        } else if (h >= 12 && h < 18) {
+            return `Almost ${nextDayStr}`;
+        } else {
+            return nextDayStr;
+        }
+    };
+
+    const lcsHours = analytics.streaks.longestGapHours;
+    const ccsHours = analytics.streaks.currentStreakHours;
+
+    $('#analyticsLongestCleanStreak').text(formatStreakWithHours(lcsHours));
+    
+    if (ccsHours < 24 && analytics.distribution.currentCleanStreak === 0) {
+        $('#analyticsCurrentCleanStreak').html(
+            `<span style="color: var(--text-secondary); font-size: var(--text-sm);">Dose taken today (${formatStreakWithHours(ccsHours)})</span>`
+        );
+    } else {
+        $('#analyticsCurrentCleanStreak').html(
+            `<span style="color: var(--color-success-600);">${formatStreakWithHours(ccsHours)} 🌿</span>`
+        );
+    }
 }
 
 // Handle tapering goal form submission

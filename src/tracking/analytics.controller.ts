@@ -5,7 +5,7 @@ import { TrackPageViewDto } from './analytics.dto';
 
 const VALID_PERIODS: AnalyticsPeriod[] = ['today', '7d', '14d', '30d', 'all'];
 
-@Controller('api/analytics')
+@Controller('analytics')
 export class AnalyticsController {
     constructor(private readonly analyticsService: AnalyticsService) { }
 

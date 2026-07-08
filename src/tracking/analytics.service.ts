@@ -8,6 +8,8 @@ export interface TrackingData {
     userAgent: string;
     ip: string;
     country: string;
+    /** Persistent anonymous browser identifier from localStorage (may be undefined for old clients) */
+    anonymous_visitor_id?: string;
 }
 
 /** Allowed period values for the analytics read endpoint */
@@ -42,10 +44,10 @@ export class AnalyticsService {
 
         // 3. Write to the database
         const query = `
-            INSERT INTO page_views (path, referrer, country, visitor_hash)
-            VALUES ($1, $2, $3, $4)
+            INSERT INTO page_views (path, referrer, country, visitor_hash, anonymous_visitor_id)
+            VALUES ($1, $2, $3, $4, $5)
         `;
-        const values = [data.path, data.referrer || null, data.country, visitorHash];
+        const values = [data.path, data.referrer || null, data.country, visitorHash, data.anonymous_visitor_id || null];
 
         try {
             await this.pool.query(query, values);
@@ -73,12 +75,12 @@ export class AnalyticsService {
         const since = intervalMap[period] ?? intervalMap['7d'];
 
         const query = since
-            ? `SELECT id, path, referrer, country, visitor_hash, created_at
+            ? `SELECT id, path, referrer, country, visitor_hash, anonymous_visitor_id, created_at
                FROM page_views
                WHERE created_at >= ${since}
                ORDER BY created_at DESC
                LIMIT 500`
-            : `SELECT id, path, referrer, country, visitor_hash, created_at
+            : `SELECT id, path, referrer, country, visitor_hash, anonymous_visitor_id, created_at
                FROM page_views
                ORDER BY created_at DESC
                LIMIT 500`;

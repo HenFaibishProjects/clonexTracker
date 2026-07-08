@@ -23,7 +23,8 @@ export class AnalyticsController {
             referrer: body.referrer,
             userAgent,
             ip,
-            country
+            country,
+            anonymous_visitor_id: body.anonymous_visitor_id,
         });
 
         // Always return success so the client is not blocked
@@ -44,4 +45,4 @@ export class AnalyticsController {
         }
         return this.analyticsService.getViews(period as AnalyticsPeriod);
     }
-}
+}

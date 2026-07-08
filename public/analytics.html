@@ -37,6 +37,8 @@
 
         body {
             font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            line-height: 1.6;
             background: var(--bg-base);
             color: var(--text-primary);
             min-height: 100vh;
@@ -338,50 +340,50 @@
         }
 
         thead {
-            background: rgba(255,255,255,0.02);
+            background: rgba(255,255,255,0.05);
         }
 
         thead th {
-            padding: 12px 24px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            letter-spacing: 0.9px;
+            padding: 14px 24px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 1px;
             text-transform: uppercase;
-            color: var(--text-muted);
+            color: #c4cfe8;
             text-align: left;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 2px solid rgba(255,255,255,0.12);
         }
 
         tbody tr {
-            border-bottom: 1px solid rgba(255,255,255,0.04);
+            border-bottom: 1px solid rgba(255,255,255,0.10);
             transition: background var(--transition);
         }
 
         tbody tr:last-child { border-bottom: none; }
 
-        tbody tr:hover { background: rgba(255,255,255,0.03); }
+        tbody tr:hover { background: rgba(255,255,255,0.06); }
 
         tbody td {
-            padding: 14px 24px;
-            font-size: 18px;
-            color: var(--text-secondary);
+            padding: 16px 24px;
+            font-size: 0.95rem;
+            color: #c4cfe8;
             vertical-align: middle;
         }
 
         .path-pill {
             font-family: 'Courier New', monospace;
-            font-size: 18px;
-            color: var(--text-primary);
+            font-size: 0.9rem;
+            color: #f0f4ff;
             font-weight: 600;
         }
 
         .referrer-link {
             color: var(--accent-blue);
-            font-size: 18px;
+            font-size: 0.92rem;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 220px;
+            max-width: 240px;
             display: block;
             text-decoration: none;
         }
@@ -389,27 +391,28 @@
         .referrer-link:hover { text-decoration: underline; }
 
         .direct-label {
-            color: var(--text-muted);
+            color: #8b96b0;
             font-style: italic;
-            font-size: 18px;
+            font-size: 0.92rem;
         }
 
         .country-badge {
-            display: inline-block;
-            padding: 3px 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
             border-radius: 6px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid var(--border);
-            font-family: 'Courier New', monospace;
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-primary);
-            letter-spacing: 1px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.14);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #f0f4ff;
         }
 
         .time-str {
-            font-size: 18px;
-            color: var(--text-muted);
+            font-size: 0.88rem;
+            color: #8b96b0;
             white-space: nowrap;
         }
 
@@ -489,6 +492,40 @@
 
         .chart-card  { animation: fadeUp 0.5s 0.25s ease both; }
         .table-card  { animation: fadeUp 0.5s 0.35s ease both; }
+
+        /* ─── Chart tab buttons ─── */
+        .chart-tabs {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .chart-tab {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 5px 14px;
+            border-radius: 7px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .chart-tab:hover {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-secondary);
+        }
+        .chart-tab.active {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 2px 10px rgba(59,130,246,0.3);
+        }
 
         /* ─── Scrollbar ─── */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -624,6 +661,119 @@
         .empty-state p { color: var(--text-muted); font-size: 0.88rem; }
         .empty-state strong { color: var(--text-secondary); display:block; margin-bottom:4px; font-size:1rem; }
 
+        /* ─── Active filter banner ─── */
+        .filter-banner {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 18px;
+            margin-bottom: 16px;
+            border-radius: 10px;
+            background: rgba(245,158,11,0.08);
+            border: 1px solid rgba(245,158,11,0.28);
+            font-size: 0.83rem;
+            color: #f59e0b;
+            font-weight: 500;
+            flex-wrap: wrap;
+        }
+        .filter-banner.visible { display: flex; }
+        .filter-banner strong { color: #fbbf24; font-weight: 700; }
+        .filter-clear-btn {
+            margin-left: auto;
+            background: transparent;
+            border: 1px solid rgba(245,158,11,0.4);
+            color: #f59e0b;
+            border-radius: 6px;
+            padding: 3px 10px;
+            font-size: 0.75rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+        .filter-clear-btn:hover { background: rgba(245,158,11,0.12); }
+
+        /* ─── Insights card ─── */
+        .insights-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 20px 28px;
+            margin-bottom: 32px;
+            animation: fadeUp 0.5s 0.18s ease both;
+        }
+        .insights-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--accent-blue);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .insights-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .insight-chip {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 0.83rem;
+            color: #c4cfe8;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .insight-chip .ic-em { color: #f0f4ff; font-weight: 600; }
+
+        /* ─── Spike badge on KPI card ─── */
+        .spike-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-top: 4px;
+        }
+        .spike-up   { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+        .spike-down { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+
+        /* ─── Weekday toggle ─── */
+        .overtime-toggle {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+        .ot-btn {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.74rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .ot-btn.active { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.35); color: var(--accent-blue); }
+
+        /* ─── Returning visitors sub-label ─── */
+        .kpi-sub {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+        .kpi-sub .ret { color: #10b981; font-weight: 600; }
+
         /* ─── Responsive ─── */
         @media (max-width: 640px) {
             nav { padding: 0 16px; }
@@ -675,6 +825,7 @@
                     <p class="kpi-label">Total Views</p>
                     <h3 class="kpi-value" id="kpiTotalViews">--</h3>
                     <div class="kpi-trend" id="trendViews"></div>
+                    <div id="spikeBadge"></div>
                 </div>
                 <div class="kpi-icon"><i class="fa-regular fa-eye"></i></div>
             </div>
@@ -684,6 +835,7 @@
                     <p class="kpi-label">Unique Visitors</p>
                     <h3 class="kpi-value" id="kpiUniqueVisitors">--</h3>
                     <div class="kpi-trend" id="trendVisitors"></div>
+                    <div class="kpi-sub" id="returningVisitors"></div>
                 </div>
                 <div class="kpi-icon"><i class="fa-solid fa-users"></i></div>
             </div>
@@ -707,13 +859,55 @@
             </div>
         </div>
 
+        <!-- Active filter banner -->
+        <div class="filter-banner" id="filterBanner">
+            <i class="fa-solid fa-filter"></i>
+            <span id="filterBannerText">Filtered by: —</span>
+            <button class="filter-clear-btn" onclick="clearChartFilter()">✕ Clear filter</button>
+        </div>
+
+        <!-- Top Insights -->
+        <div class="insights-card" id="insightsCard" style="display:none">
+            <div class="insights-title"><i class="fa-solid fa-lightbulb"></i> Top Insights</div>
+            <div class="insights-list" id="insightsList"></div>
+        </div>
+
         <!-- Chart -->
         <div class="chart-card">
-            <div class="card-header">
-                <span class="card-title"><i class="fa-solid fa-chart-bar"></i> Views by Page</span>
-                <span class="card-badge" id="chartBadge">7 Days</span>
+            <div class="card-header" style="flex-wrap:wrap;gap:12px;">
+                <div class="chart-tabs" id="chartTabs">
+                    <button class="chart-tab active" data-chart="pages"    onclick="setChartView('pages')">
+                        <i class="fa-solid fa-chart-bar"></i> Pages
+                    </button>
+                    <button class="chart-tab" data-chart="overtime"  onclick="setChartView('overtime')">
+                        <i class="fa-solid fa-chart-line"></i> Over Time
+                    </button>
+                    <button class="chart-tab" data-chart="referrers" onclick="setChartView('referrers')">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Referrers
+                    </button>
+                    <button class="chart-tab" data-chart="countries" onclick="setChartView('countries')">
+                        <i class="fa-solid fa-globe"></i> Countries
+                    </button>
+                    <button class="chart-tab" data-chart="hours"     onclick="setChartView('hours')">
+                        <i class="fa-solid fa-clock"></i> Hours
+                    </button>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="card-badge" id="chartBadge">7 Days</span>
+                    <span id="tzNote" style="display:none;font-size:0.72rem;font-weight:600;
+                        padding:3px 10px;border-radius:20px;
+                        background:rgba(245,158,11,0.15);color:#f59e0b;
+                        border:1px solid rgba(245,158,11,0.3);
+                        white-space:nowrap;">
+                        <i class="fa-solid fa-clock" style="margin-right:4px;"></i>Israel Time (UTC+3)
+                    </span>
+                </div>
             </div>
             <div class="chart-wrapper">
+                <div id="otToggle" class="overtime-toggle" style="display:none;">
+                    <button class="ot-btn active" data-mode="daily"   onclick="setOvertimeMode('daily')">By Day</button>
+                    <button class="ot-btn"        data-mode="weekday" onclick="setOvertimeMode('weekday')">By Weekday</button>
+                </div>
                 <canvas id="trafficChart"></canvas>
             </div>
         </div>
@@ -822,12 +1016,10 @@
         function formatPath(raw) {
             if (!raw) return { label: 'N/A', original: '' };
             if (PATH_LABELS[raw]) return { label: PATH_LABELS[raw], original: raw };
-            // Auto-prettify: split on "/", capitalise each segment, join with " › "
-            const label = raw
-                .split('/')
-                .filter(Boolean)
-                .map(s => s.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()))
-                .join(' › ') || raw;
+            // Auto-prettify: use only the last URL segment (e.g. /tools/json-to-zod → "Json To Zod")
+            const segments = raw.split('/').filter(Boolean);
+            const lastSegment = segments[segments.length - 1] || raw;
+            const label = lastSegment.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
             return { label, original: raw };
         }
 
@@ -841,6 +1033,9 @@
         function setPeriod(period) {
             if (period === activePeriod) return;
             activePeriod = period;
+            // Clear any active chart filter when switching periods
+            activeFilter = null;
+            document.getElementById('filterBanner').classList.remove('visible');
 
             document.querySelectorAll('.period-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.period === period);
@@ -856,16 +1051,19 @@
             try {
                 let data;
                 if (USE_MOCK) {
-                    // Client-side mock: filter MOCK_ALL by the selected period
                     const cutoff = periodCutoff(activePeriod);
                     data = cutoff
                         ? MOCK_ALL.filter(r => new Date(r.created_at) >= cutoff)
                         : MOCK_ALL;
+                    window._prevData = [];
                 } else {
-                    // Real API — swap USE_MOCK to false when NestJS is ready
-                    const response = await fetch(`${API_ENDPOINT}?period=${activePeriod}`);
+                    const [response, prevData] = await Promise.all([
+                        fetch(`${API_ENDPOINT}?period=${activePeriod}`),
+                        fetchPreviousPeriodData()
+                    ]);
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     data = await response.json();
+                    window._prevData = prevData;
                 }
                 renderDashboard(data);
             } catch (error) {
@@ -890,19 +1088,76 @@
                 '<tr class="state-row"><td colspan="4"><i class="fa-solid fa-circle-notch fa-spin" style="margin-right:8px;color:var(--accent-blue)"></i>Loading…</td></tr>';
         }
 
+        // ─── ISO 3166-1 alpha-2 → Full country name ───────────────────────────────
+        const COUNTRY_NAMES = {
+            AF:'Afghanistan', AL:'Albania', DZ:'Algeria', AD:'Andorra', AO:'Angola',
+            AG:'Antigua & Barbuda', AR:'Argentina', AM:'Armenia', AU:'Australia',
+            AT:'Austria', AZ:'Azerbaijan', BS:'Bahamas', BH:'Bahrain', BD:'Bangladesh',
+            BB:'Barbados', BY:'Belarus', BE:'Belgium', BZ:'Belize', BJ:'Benin',
+            BT:'Bhutan', BO:'Bolivia', BA:'Bosnia & Herzegovina', BW:'Botswana',
+            BR:'Brazil', BN:'Brunei', BG:'Bulgaria', BF:'Burkina Faso', BI:'Burundi',
+            CV:'Cape Verde', KH:'Cambodia', CM:'Cameroon', CA:'Canada',
+            CF:'Central African Republic', TD:'Chad', CL:'Chile', CN:'China',
+            CO:'Colombia', KM:'Comoros', CG:'Congo', CD:'Congo (DRC)', CR:'Costa Rica',
+            HR:'Croatia', CU:'Cuba', CY:'Cyprus', CZ:'Czech Republic', DK:'Denmark',
+            DJ:'Djibouti', DM:'Dominica', DO:'Dominican Republic', EC:'Ecuador',
+            EG:'Egypt', SV:'El Salvador', GQ:'Equatorial Guinea', ER:'Eritrea',
+            EE:'Estonia', SZ:'Eswatini', ET:'Ethiopia', FJ:'Fiji', FI:'Finland',
+            FR:'France', GA:'Gabon', GM:'Gambia', GE:'Georgia', DE:'Germany',
+            GH:'Ghana', GR:'Greece', GD:'Grenada', GT:'Guatemala', GN:'Guinea',
+            GW:'Guinea-Bissau', GY:'Guyana', HT:'Haiti', HN:'Honduras', HU:'Hungary',
+            IS:'Iceland', IN:'India', ID:'Indonesia', IR:'Iran', IQ:'Iraq',
+            IE:'Ireland', IL:'Israel', IT:'Italy', JM:'Jamaica', JP:'Japan',
+            JO:'Jordan', KZ:'Kazakhstan', KE:'Kenya', KI:'Kiribati', KP:'North Korea',
+            KR:'South Korea', KW:'Kuwait', KG:'Kyrgyzstan', LA:'Laos', LV:'Latvia',
+            LB:'Lebanon', LS:'Lesotho', LR:'Liberia', LY:'Libya', LI:'Liechtenstein',
+            LT:'Lithuania', LU:'Luxembourg', MG:'Madagascar', MW:'Malawi',
+            MY:'Malaysia', MV:'Maldives', ML:'Mali', MT:'Malta', MH:'Marshall Islands',
+            MR:'Mauritania', MU:'Mauritius', MX:'Mexico', FM:'Micronesia',
+            MD:'Moldova', MC:'Monaco', MN:'Mongolia', ME:'Montenegro', MA:'Morocco',
+            MZ:'Mozambique', MM:'Myanmar', NA:'Namibia', NR:'Nauru', NP:'Nepal',
+            NL:'Netherlands', NZ:'New Zealand', NI:'Nicaragua', NE:'Niger',
+            NG:'Nigeria', MK:'North Macedonia', NO:'Norway', OM:'Oman', PK:'Pakistan',
+            PW:'Palau', PS:'Palestine', PA:'Panama', PG:'Papua New Guinea',
+            PY:'Paraguay', PE:'Peru', PH:'Philippines', PL:'Poland', PT:'Portugal',
+            QA:'Qatar', RO:'Romania', RU:'Russia', RW:'Rwanda',
+            KN:'Saint Kitts & Nevis', LC:'Saint Lucia',
+            VC:'Saint Vincent & Grenadines', WS:'Samoa', SM:'San Marino',
+            ST:'São Tomé & Príncipe', SA:'Saudi Arabia', SN:'Senegal', RS:'Serbia',
+            SC:'Seychelles', SL:'Sierra Leone', SG:'Singapore', SK:'Slovakia',
+            SI:'Slovenia', SB:'Solomon Islands', SO:'Somalia', ZA:'South Africa',
+            SS:'South Sudan', ES:'Spain', LK:'Sri Lanka', SD:'Sudan',
+            SR:'Suriname', SE:'Sweden', CH:'Switzerland', SY:'Syria',
+            TW:'Taiwan', TJ:'Tajikistan', TZ:'Tanzania', TH:'Thailand',
+            TL:'Timor-Leste', TG:'Togo', TO:'Tonga', TT:'Trinidad & Tobago',
+            TN:'Tunisia', TR:'Turkey', TM:'Turkmenistan', TV:'Tuvalu',
+            UG:'Uganda', UA:'Ukraine', AE:'United Arab Emirates',
+            GB:'United Kingdom', US:'United States', UY:'Uruguay', UZ:'Uzbekistan',
+            VU:'Vanuatu', VE:'Venezuela', VN:'Vietnam', YE:'Yemen',
+            ZM:'Zambia', ZW:'Zimbabwe',
+        };
+
+        /** Returns the full country name for an ISO 3166-1 alpha-2 code, or the code itself as fallback */
+        function countryName(code) {
+            if (!code) return 'Unknown';
+            return COUNTRY_NAMES[code.toUpperCase()] || code.toUpperCase();
+        }
+
         // ─── Country flag image (flagcdn.com) ───────────────────────────────────
         // Unicode regional indicators don't render as flags on Windows — use images instead.
         function flagImg(code, size = 20) {
             if (!code || code.length !== 2) return '';
             const c = code.toLowerCase();
+            const name = countryName(code);
             return `<img src="https://flagcdn.com/${size}x${Math.round(size * 0.75)}/${c}.png"
-                         alt="${code}" title="${code}"
+                         alt="${name}" title="${name}"
                          style="border-radius:2px;vertical-align:middle;margin-right:5px;"
                          onerror="this.style.display='none'">`;
         }
 
         function countryCell(code) {
-            return `<span class="country-badge" title="${code || 'Unknown'}">${flagImg(code, 16)}${code || 'N/A'}</span>`;
+            const name = countryName(code);
+            return `<span class="country-badge" title="${name}">${flagImg(code, 16)}${name}</span>`;
         }
 
         // ─── Relative time ─────────────────────────────────────────────────────
@@ -943,25 +1198,181 @@
             return `<span class="trend-flat">→ No change vs prev period</span>`;
         }
 
-        function getPreviousPeriodData() {
-            const cutoff = periodCutoff(activePeriod);
-            if (!cutoff || activePeriod === 'all') return [];
-            const days = { today:1, '7d':7, '14d':14, '30d':30 }[activePeriod] || 7;
-            const prevEnd   = new Date(cutoff);
-            const prevStart = new Date(cutoff); prevStart.setDate(prevStart.getDate() - days);
-            return MOCK_ALL.filter(r => {
-                const t = new Date(r.created_at);
-                return t >= prevStart && t < prevEnd;
+        // ─── Active chart filter ───────────────────────────────────────────────────
+        let activeFilter = null; // { field: 'path'|'referrer'|'country', value: string, label: string }
+
+        function applyActiveFilter(data) {
+            if (!activeFilter) return data;
+            return data.filter(r => {
+                if (activeFilter.field === 'path')
+                    return formatPath(r.path).label === activeFilter.value;
+                if (activeFilter.field === 'referrer') {
+                    const dom = r.referrer
+                        ? (() => { try { return new URL(r.referrer).hostname.replace(/^www\./, ''); } catch { return r.referrer; } })()
+                        : 'Direct';
+                    return dom === activeFilter.value;
+                }
+                if (activeFilter.field === 'country')
+                    return countryName(r.country) === activeFilter.value;
+                return true;
             });
         }
 
-        function renderDashboard(data) {
-            if (!data || data.length === 0) {
-                // Empty state
+        function setChartFilter(field, value, label) {
+            // Toggle off if same filter clicked again
+            if (activeFilter && activeFilter.field === field && activeFilter.value === value) {
+                clearChartFilter(); return;
+            }
+            activeFilter = { field, value, label };
+            const banner = document.getElementById('filterBanner');
+            banner.classList.add('visible');
+            document.getElementById('filterBannerText').innerHTML =
+                `<i class="fa-solid fa-filter"></i> Filtered by <strong>${label}</strong>`;
+            if (window._lastData) renderDashboard(window._lastData, true);
+        }
+
+        function clearChartFilter() {
+            activeFilter = null;
+            document.getElementById('filterBanner').classList.remove('visible');
+            if (window._lastData) renderDashboard(window._lastData, true);
+        }
+
+        // ─── Israel local hour helper ─────────────────────────────────────────────
+        const IL_HOUR_FMT = new Intl.DateTimeFormat('en-IL', {
+            timeZone: 'Asia/Jerusalem', hour: 'numeric', hour12: false
+        });
+        function ilHour(isoStr) {
+            return parseInt(IL_HOUR_FMT.format(new Date(isoStr)), 10);
+        }
+        function ilDateStr(isoStr) {
+            return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jerusalem',
+                year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(isoStr));
+        }
+
+        // ─── Avg pages per session ────────────────────────────────────────────────
+        function avgPagesPerSession(data, windowMs = 30 * 60 * 1000) {
+            const byHash = {};
+            data.forEach(r => { (byHash[r.visitor_hash] = byHash[r.visitor_hash] || []).push(new Date(r.created_at).getTime()); });
+            let totalPages = 0, totalSessions = 0;
+            Object.values(byHash).forEach(times => {
+                times.sort((a,b) => a-b);
+                let sessionPages = 1;
+                for (let i = 1; i < times.length; i++) {
+                    if (times[i] - times[i-1] > windowMs) {
+                        totalSessions++; totalPages += sessionPages; sessionPages = 1;
+                    } else { sessionPages++; }
+                }
+                totalSessions++; totalPages += sessionPages;
+            });
+            return totalSessions === 0 ? 0 : Math.round((totalPages / totalSessions) * 10) / 10;
+        }
+
+        // ─── Spike detection (same-hour comparison) ───────────────────────────────
+        function computeSpike(data) {
+            if (activePeriod === 'today' || activePeriod === 'all') return null;
+            const nowIL = ilHour(new Date().toISOString());
+            const todayStr = ilDateStr(new Date().toISOString());
+
+            const todayCount = data.filter(r => ilDateStr(r.created_at) === todayStr && ilHour(r.created_at) <= nowIL).length;
+
+            const prevDayCounts = {};
+            data.forEach(r => {
+                const d = ilDateStr(r.created_at);
+                if (d === todayStr) return;
+                if (ilHour(r.created_at) > nowIL) return;
+                prevDayCounts[d] = (prevDayCounts[d] || 0) + 1;
+            });
+            const prevDays = Object.values(prevDayCounts);
+            if (prevDays.length === 0) return null;
+            const avg = prevDays.reduce((s,v) => s+v, 0) / prevDays.length;
+            if (avg === 0) return null;
+            return { ratio: Math.round((todayCount / avg) * 10) / 10, todayCount, avg: Math.round(avg * 10) / 10, hour: nowIL };
+        }
+
+        // ─── Returning visitors ───────────────────────────────────────────────────
+        function computeReturning(data) {
+            if (!data.some(r => r.anonymous_visitor_id)) return null;
+            const cutoff = periodCutoff(activePeriod);
+            if (!cutoff) return null;
+            const seenBefore = new Set();
+            const seenDuring = new Set();
+            data.forEach(r => {
+                if (!r.anonymous_visitor_id) return;
+                if (new Date(r.created_at) < cutoff) seenBefore.add(r.anonymous_visitor_id);
+                else seenDuring.add(r.anonymous_visitor_id);
+            });
+            const returning = [...seenDuring].filter(id => seenBefore.has(id)).length;
+            return { returning, total: seenDuring.size };
+        }
+
+        // ─── Insights generator ───────────────────────────────────────────────────
+        function buildInsights(data) {
+            if (!data || data.length < 2) { document.getElementById('insightsCard').style.display = 'none'; return; }
+            const chips = [];
+
+            // Best day
+            const dayCounts = {};
+            data.forEach(r => { const d = ilDateStr(r.created_at); dayCounts[d] = (dayCounts[d] || 0) + 1; });
+            const bestDay = Object.entries(dayCounts).sort((a,b) => b[1]-a[1])[0];
+            if (bestDay) {
+                const label = new Date(bestDay[0]).toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' });
+                chips.push(`<div class="insight-chip">📅 Peak day: <span class="ic-em">${label}</span> &nbsp;(${bestDay[1]} views)</div>`);
+            }
+
+            // Top referrer
+            const refCounts = {};
+            data.forEach(r => {
+                let l = 'Direct';
+                if (r.referrer) { try { l = new URL(r.referrer).hostname.replace(/^www\./,''); } catch {} }
+                refCounts[l] = (refCounts[l] || 0) + 1;
+            });
+            const topRef = Object.entries(refCounts).sort((a,b)=>b[1]-a[1])[0];
+            if (topRef) chips.push(`<div class="insight-chip">🔗 Top source: <span class="ic-em">${topRef[0]}</span> &nbsp;(${topRef[1]} visits)</div>`);
+
+            // Avg session
+            const avg = avgPagesPerSession(data);
+            chips.push(`<div class="insight-chip">📄 Avg pages/session: <span class="ic-em">${avg}</span></div>`);
+
+            // Unique countries
+            const countries = new Set(data.map(r => r.country).filter(Boolean));
+            chips.push(`<div class="insight-chip">🌍 Countries reached: <span class="ic-em">${countries.size}</span></div>`);
+
+            document.getElementById('insightsList').innerHTML = chips.join('');
+            document.getElementById('insightsCard').style.display = '';
+        }
+
+        async function fetchPreviousPeriodData() {
+            if (USE_MOCK || activePeriod === 'all') return [];
+            const periodDays = { today: 1, '7d': 7, '14d': 14, '30d': 30 };
+            const days = periodDays[activePeriod];
+            if (!days) return [];
+            // Fetch twice the period, then take the older half
+            const doubleMap = { today: '14d', '7d': '14d', '14d': '30d', '30d': 'all' };
+            try {
+                const res = await fetch(`${API_ENDPOINT}?period=${doubleMap[activePeriod]}`);
+                if (!res.ok) return [];
+                const all = await res.json();
+                const cutoff = periodCutoff(activePeriod);
+                const prevEnd = new Date(cutoff);
+                const prevStart = new Date(cutoff); prevStart.setDate(prevStart.getDate() - days);
+                return all.filter(r => {
+                    const t = new Date(r.created_at);
+                    return t >= prevStart && t < prevEnd;
+                });
+            } catch { return []; }
+        }
+
+        function renderDashboard(data, fromFilter = false) {
+            if (!fromFilter) window._lastData = data;
+            const viewData = applyActiveFilter(data);
+
+            if (!viewData || viewData.length === 0) {
                 document.getElementById('kpiTotalViews').innerText    = '0';
                 document.getElementById('kpiUniqueVisitors').innerText = '0';
                 document.getElementById('kpiTopCountry').innerText     = '—';
                 document.getElementById('kpiTopPage').innerText        = '—';
+                document.getElementById('returningVisitors').innerHTML = '';
+                document.getElementById('spikeBadge').innerHTML = '';
                 ['trendViews','trendVisitors','trendCountry','trendPage'].forEach(id =>
                     document.getElementById(id).innerHTML = '');
                 document.getElementById('tableBody').innerHTML =
@@ -971,39 +1382,30 @@
                         <p>Try selecting a wider time range above.</p>
                     </div></td></tr>`;
                 document.getElementById('rowCount').textContent = '0 entries';
+                document.getElementById('insightsCard').style.display = 'none';
                 return;
             }
 
-            // 1. Calculate KPIs
-            const totalViews     = data.length;
-            const uniqueVisitors = new Set(data.map(item => item.visitor_hash)).size;
+            // 1. KPIs
+            const totalViews     = viewData.length;
+            const uniqueVisitors = new Set(viewData.map(r => r.visitor_hash)).size;
 
-            const countryCounts = data.reduce((acc, curr) => {
-                acc[curr.country] = (acc[curr.country] || 0) + 1; return acc;
-            }, {});
-            const topCountry = Object.keys(countryCounts).reduce((a, b) =>
-                countryCounts[a] > countryCounts[b] ? a : b
-            );
+            const countryCounts = viewData.reduce((acc, r) => { acc[r.country] = (acc[r.country]||0)+1; return acc; }, {});
+            const topCountry = Object.keys(countryCounts).reduce((a,b) => countryCounts[a]>countryCounts[b]?a:b);
 
-            const pageCounts = data.reduce((acc, curr) => {
-                acc[curr.path] = (acc[curr.path] || 0) + 1; return acc;
-            }, {});
-            const topPage = Object.keys(pageCounts).reduce((a, b) =>
-                pageCounts[a] > pageCounts[b] ? a : b
-            );
-
-            // Previous period for trend comparison
-            const prev = getPreviousPeriodData();
-            const prevViews    = prev.length;
-            const prevVisitors = new Set(prev.map(r => r.visitor_hash)).size;
+            const pageCounts = viewData.reduce((acc, r) => { acc[r.path] = (acc[r.path]||0)+1; return acc; }, {});
+            const topPage = Object.keys(pageCounts).reduce((a,b) => pageCounts[a]>pageCounts[b]?a:b);
 
             animateCount('kpiTotalViews',    totalViews);
             animateCount('kpiUniqueVisitors', uniqueVisitors);
             document.getElementById('kpiTopCountry').innerHTML =
-                `${flagImg(topCountry, 24)}<span style="vertical-align:middle">${topCountry}</span>`;
+                `${flagImg(topCountry, 24)}<span style="vertical-align:middle">${countryName(topCountry)}</span>`;
             document.getElementById('kpiTopPage').innerText = formatPath(topPage).label;
 
-            // Trend badges
+            // Trend badges — use cached prev data
+            const prev = window._prevData || [];
+            const prevViews    = prev.length;
+            const prevVisitors = new Set(prev.map(r => r.visitor_hash)).size;
             document.getElementById('trendViews').innerHTML    = trendHTML(totalViews, prevViews);
             document.getElementById('trendVisitors').innerHTML = trendHTML(uniqueVisitors, prevVisitors);
             document.getElementById('trendCountry').innerHTML  =
@@ -1011,13 +1413,29 @@
             document.getElementById('trendPage').innerHTML =
                 `<span class="trend-flat">${pageCounts[topPage]} views this period</span>`;
 
-            // 2. Populate Table
-            renderTable(data);
-            window._lastData = data;
+            // Spike detection
+            const spike = computeSpike(viewData);
+            const spikEl = document.getElementById('spikeBadge');
+            if (spike && spike.ratio >= 2) {
+                spikEl.innerHTML = `<span class="spike-badge spike-up">⚡ ${spike.ratio}× above avg up to ${spike.hour}:00 IL</span>`;
+            } else if (spike && spike.ratio <= 0.4 && spike.todayCount > 0) {
+                spikEl.innerHTML = `<span class="spike-badge spike-down">↓ ${spike.ratio}× below avg up to ${spike.hour}:00 IL</span>`;
+            } else { spikEl.innerHTML = ''; }
 
-            // 3. Render Chart
-            const sortedForChart = [...data].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-            renderChart(sortedForChart);
+            // Returning visitors
+            const retV = computeReturning(data); // use full unfiltered data
+            const retEl = document.getElementById('returningVisitors');
+            if (retV && retV.total > 0) {
+                const pct = Math.round((retV.returning / retV.total) * 100);
+                retEl.innerHTML = `~<span class="ret">${retV.returning}</span> returning · ${retV.total - retV.returning} new`;
+            } else { retEl.innerHTML = ''; }
+
+            // Insights
+            buildInsights(viewData);
+
+            // 2. Table & Chart
+            renderTable(viewData);
+            renderChart(viewData);
         }
 
         // ─── Group-by state ───────────────────────────────────────────────────────
@@ -1183,76 +1601,286 @@
             URL.revokeObjectURL(url);
         }
 
+        // ─── Chart tab state ───────────────────────────────────────────────────────
+        let activeChartView = 'pages';
+
+        function setChartView(view) {
+            if (view === activeChartView) return;
+            activeChartView = view;
+            document.querySelectorAll('.chart-tab').forEach(btn =>
+                btn.classList.toggle('active', btn.dataset.chart === view)
+            );
+            // Show timezone note only for Hours view
+            document.getElementById('tzNote').style.display =
+                view === 'hours' ? 'inline-flex' : 'none';
+            // Show weekday toggle only for Over Time view
+            const otToggle = document.getElementById('otToggle');
+            if (otToggle) otToggle.style.display = view === 'overtime' ? 'flex' : 'none';
+            if (window._lastData) renderChart(window._lastData);
+        }
+
+        // ─── Shared chart helpers ──────────────────────────────────────────────────
+        const CHART_COLORS = [
+            'rgba(59,130,246,0.8)',  'rgba(139,92,246,0.8)',  'rgba(16,185,129,0.8)',
+            'rgba(245,158,11,0.8)', 'rgba(236,72,153,0.8)',  'rgba(20,184,166,0.8)',
+            'rgba(249,115,22,0.8)', 'rgba(99,102,241,0.8)',
+        ];
+        const CHART_BORDERS = CHART_COLORS.map(c => c.replace('0.8', '1'));
+
+        const TOOLTIP_DEFAULTS = {
+            backgroundColor: '#1e2437',
+            titleColor: '#f0f4ff',
+            bodyColor: '#8b96b0',
+            borderColor: 'rgba(255,255,255,0.1)',
+            borderWidth: 1,
+            padding: 12,
+            cornerRadius: 8,
+        };
+
+        function xTickDefaults() {
+            return {
+                color: '#c4cfe8',
+                font: { family: 'Inter', size: 12, weight: '500' },
+                maxRotation: 0, minRotation: 0, align: 'center',
+                autoSkip: false,
+                callback: function(value) {
+                    const label = this.getLabelForValue(value);
+                    if (label.length <= 14) return label;
+                    const mid = Math.floor(label.length / 2);
+                    let splitAt = label.lastIndexOf(' ', mid);
+                    if (splitAt === -1) splitAt = label.indexOf(' ', mid);
+                    return splitAt === -1 ? label : [label.slice(0, splitAt), label.slice(splitAt + 1)];
+                }
+            };
+        }
+
+        function yScaleDefaults() {
+            return {
+                beginAtZero: true,
+                ticks: { color: '#4e5a72', stepSize: 1 },
+                grid: { color: 'rgba(255,255,255,0.05)' },
+                border: { color: 'rgba(255,255,255,0.05)' }
+            };
+        }
+
+        function destroyChart() {
+            if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+        }
+
+        // ─── renderChart dispatcher ────────────────────────────────────────────────
         function renderChart(data) {
+            window._lastData = window._lastData || data;
             const ctx = document.getElementById('trafficChart').getContext('2d');
+            destroyChart();
+            const views = { pages: chartPages, overtime: chartOverTime,
+                            referrers: chartReferrers, countries: chartCountries, hours: chartHours };
+            (views[activeChartView] || chartPages)(ctx, data);
+        }
 
-            // Group by path for chart — use friendly labels
-            const pathCounts = data.reduce((acc, curr) => {
-                const label = formatPath(curr.path).label;
-                acc[label] = (acc[label] || 0) + 1;
-                return acc;
-            }, {});
-
-            if (chartInstance) chartInstance.destroy();
-
+        // ─── View 1: Pages (click-to-filter) ─────────────────────────────────────────
+        function chartPages(ctx, data) {
+            const counts = {};
+            data.forEach(r => {
+                const l = formatPath(r.path).label;
+                counts[l] = (counts[l] || 0) + 1;
+            });
+            const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
             chartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: Object.keys(pathCounts),
-                    datasets: [{
-                        label: 'Views per Page',
-                        data: Object.values(pathCounts),
-                        backgroundColor: [
-                            'rgba(59,130,246,0.75)',
-                            'rgba(139,92,246,0.75)',
-                            'rgba(16,185,129,0.75)',
-                            'rgba(245,158,11,0.75)',
-                            'rgba(236,72,153,0.75)',
-                        ],
-                        borderColor: [
-                            'rgba(59,130,246,1)',
-                            'rgba(139,92,246,1)',
-                            'rgba(16,185,129,1)',
-                            'rgba(245,158,11,1)',
-                            'rgba(236,72,153,1)',
-                        ],
-                        borderWidth: 1,
-                        borderRadius: 8,
-                        borderSkipped: false,
-                        barThickness: 36,
-                    }]
+                    labels: sorted.map(e => e[0]),
+                    datasets: [{ label: 'Views', data: sorted.map(e => e[1]),
+                        backgroundColor: CHART_COLORS, borderColor: CHART_BORDERS,
+                        borderWidth: 1, borderRadius: 8, borderSkipped: false, barThickness: 36 }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: { duration: 700, easing: 'easeOutQuart' },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#1e2437',
-                            titleColor: '#f0f4ff',
-                            bodyColor: '#8b96b0',
-                            borderColor: 'rgba(255,255,255,0.1)',
-                            borderWidth: 1,
-                            padding: 12,
-                            cornerRadius: 8,
-                        }
+                options: { ...chartBarOptions(),
+                    onClick: (evt, els) => {
+                        if (!els.length) return;
+                        const label = sorted[els[0].index][0];
+                        setChartFilter('path', label, `Page = "${label}"`);
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { color: '#4e5a72', stepSize: 1 },
-                            grid: { color: 'rgba(255,255,255,0.05)' },
-                            border: { color: 'rgba(255,255,255,0.05)' }
-                        },
-                        x: {
-                            ticks: { color: '#8b96b0', font: { family: 'Courier New', size: 12 } },
-                            grid: { display: false },
-                            border: { color: 'rgba(255,255,255,0.05)' }
-                        }
+                    plugins: { ...chartBarOptions().plugins,
+                        tooltip: { ...TOOLTIP_DEFAULTS, callbacks: {
+                            afterLabel: () => 'Click to filter dashboard'
+                        }}
                     }
                 }
             });
+        }
+
+        // ─── View 2: Traffic Over Time (with weekday toggle) ───────────────────────
+        let overtimeMode = 'daily'; // 'daily' | 'weekday'
+
+        function setOvertimeMode(mode) {
+            overtimeMode = mode;
+            document.querySelectorAll('.ot-btn').forEach(b =>
+                b.classList.toggle('active', b.dataset.mode === mode));
+            if (window._lastData) renderChart(window._lastData);
+        }
+        function chartOverTime(ctx, data) {
+            if (overtimeMode === 'weekday') {
+                // Average views per weekday
+                const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+                const sums = Array(7).fill(0);
+                const occurrences = {};
+                data.forEach(r => {
+                    const d = ilDateStr(r.created_at);
+                    const dow = new Date(d).getDay();
+                    sums[dow]++;
+                    occurrences[d] = dow;
+                });
+                const dayOccurCount = Array(7).fill(0);
+                Object.values(occurrences).forEach(dow => dayOccurCount[dow]++);
+                const avgs = sums.map((s,i) => dayOccurCount[i] ? Math.round((s/dayOccurCount[i])*10)/10 : 0);
+                chartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: DAYS,
+                        datasets: [{ label: 'Avg visits', data: avgs,
+                            backgroundColor: CHART_COLORS, borderColor: CHART_BORDERS,
+                            borderWidth: 1, borderRadius: 8, borderSkipped: false, barThickness: 36 }]
+                    },
+                    options: chartBarOptions()
+                });
+                return;
+            }
+            // Daily line chart
+            const dayCounts = {};
+            data.forEach(r => {
+                const day = ilDateStr(r.created_at);
+                dayCounts[day] = (dayCounts[day] || 0) + 1;
+            });
+            const days = Object.keys(dayCounts).sort();
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: days.map(d => new Date(d).toLocaleDateString('en-GB', { day:'2-digit', month:'short' })),
+                    datasets: [{ label: 'Views', data: days.map(d => dayCounts[d]),
+                        borderColor: 'rgba(59,130,246,1)',
+                        backgroundColor: 'rgba(59,130,246,0.12)',
+                        borderWidth: 2, pointRadius: 4,
+                        pointBackgroundColor: 'rgba(59,130,246,1)',
+                        tension: 0.35, fill: true }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    animation: { duration: 600, easing: 'easeOutQuart' },
+                    plugins: { legend: { display: false }, tooltip: TOOLTIP_DEFAULTS },
+                    scales: {
+                        y: yScaleDefaults(),
+                        x: { ticks: { color: '#c4cfe8', font: { family: 'Inter', size: 12 }, maxRotation: 30 },
+                             grid: { display: false }, border: { color: 'rgba(255,255,255,0.05)' } }
+                    }
+                }
+            });
+        }
+
+        // ─── View 3: Referrers (click-to-filter) ─────────────────────────────────────
+        function chartReferrers(ctx, data) {
+            const counts = {};
+            data.forEach(r => {
+                let label = 'Direct';
+                if (r.referrer) {
+                    try { label = new URL(r.referrer).hostname.replace(/^www\./, ''); } catch { label = r.referrer; }
+                }
+                counts[label] = (counts[label] || 0) + 1;
+            });
+            const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sorted.map(e => e[0]),
+                    datasets: [{ label: 'Visits', data: sorted.map(e => e[1]),
+                        backgroundColor: CHART_COLORS, borderColor: CHART_BORDERS,
+                        borderWidth: 1, borderRadius: 8, borderSkipped: false, barThickness: 32 }]
+                },
+                options: { ...chartBarOptions(),
+                    onClick: (evt, els) => {
+                        if (!els.length) return;
+                        const label = sorted[els[0].index][0];
+                        setChartFilter('referrer', label, `Source = "${label}"`);
+                    }
+                }
+            });
+        }
+
+        // ─── View 4: Countries (click-to-filter) ────────────────────────────────────
+        function chartCountries(ctx, data) {
+            const counts = {};
+            data.forEach(r => {
+                const label = countryName(r.country);
+                counts[label] = (counts[label] || 0) + 1;
+            });
+            const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 12);
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sorted.map(e => e[0]),
+                    datasets: [{ label: 'Visits', data: sorted.map(e => e[1]),
+                        backgroundColor: CHART_COLORS, borderColor: CHART_BORDERS,
+                        borderWidth: 1, borderRadius: 8, borderSkipped: false, barThickness: 32 }]
+                },
+                options: { ...chartBarOptions(),
+                    onClick: (evt, els) => {
+                        if (!els.length) return;
+                        const label = sorted[els[0].index][0];
+                        setChartFilter('country', label, `Country = "${label}"`);
+                    }
+                }
+            });
+        }
+
+        // ─── View 5: Hours (Israel Time — Asia/Jerusalem) ───────────────────────────
+        function chartHours(ctx, data) {
+            // Extract hour in Israel local time (Asia/Jerusalem handles DST automatically)
+            const ilHourFmt = new Intl.DateTimeFormat('en-IL', {
+                timeZone: 'Asia/Jerusalem',
+                hour: 'numeric',
+                hour12: false
+            });
+            const counts = Array(24).fill(0);
+            data.forEach(r => {
+                const hour = parseInt(ilHourFmt.format(new Date(r.created_at)), 10);
+                if (hour >= 0 && hour < 24) counts[hour]++;
+            });
+            const labels = Array.from({ length: 24 }, (_, i) =>
+                `${String(i).padStart(2, '0')}:00`);
+            const maxVal = Math.max(...counts);
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{ label: 'Visits (IL)', data: counts,
+                        backgroundColor: counts.map(v =>
+                            v === maxVal && maxVal > 0 ? 'rgba(245,158,11,0.85)' : 'rgba(59,130,246,0.6)'),
+                        borderRadius: 5, borderSkipped: false, barThickness: 'flex' }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    animation: { duration: 600, easing: 'easeOutQuart' },
+                    plugins: { legend: { display: false }, tooltip: {
+                        ...TOOLTIP_DEFAULTS,
+                        callbacks: { title: items => `${items[0].label} Israel Time` }
+                    }},
+                    scales: {
+                        y: yScaleDefaults(),
+                        x: { ticks: { color: '#c4cfe8', font: { family: 'Inter', size: 11 },
+                                      maxRotation: 45, autoSkip: true, maxTicksLimit: 12 },
+                             grid: { display: false }, border: { color: 'rgba(255,255,255,0.05)' } }
+                    }
+                }
+            });
+        }
+
+        // ─── Shared bar chart options ──────────────────────────────────────────────
+        function chartBarOptions() {
+            return {
+                responsive: true, maintainAspectRatio: false,
+                animation: { duration: 700, easing: 'easeOutQuart' },
+                plugins: { legend: { display: false }, tooltip: TOOLTIP_DEFAULTS },
+                scales: { y: yScaleDefaults(), x: { ticks: xTickDefaults(),
+                    grid: { display: false }, border: { color: 'rgba(255,255,255,0.05)' } } }
+            };
         }
 
         // Smooth count-up animation

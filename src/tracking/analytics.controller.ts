@@ -3,7 +3,7 @@ import { Request } from 'express';
 import { AnalyticsService, AnalyticsPeriod } from './analytics.service';
 import { TrackPageViewDto } from './analytics.dto';
 
-const VALID_PERIODS: AnalyticsPeriod[] = ['today', '7d', '14d', '30d', 'all'];
+const VALID_PERIODS: AnalyticsPeriod[] = ['today', '2d', '4d', '7d', '14d', '30d', '60d', '6m', '1y', 'all'];
 
 @Controller('analytics')
 export class AnalyticsController {
@@ -37,7 +37,7 @@ export class AnalyticsController {
      * Returns page_view rows sorted newest-first (max 500).
      */
     @Get('views')
-    async getViews(@Query('period') period: string = '7d') {
+    async getViews(@Query('period') period: string = 'today') {
         if (!VALID_PERIODS.includes(period as AnalyticsPeriod)) {
             throw new BadRequestException(
                 `Invalid period "${period}". Use one of: ${VALID_PERIODS.join(', ')}`

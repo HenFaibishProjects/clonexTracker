@@ -13,7 +13,7 @@ export interface TrackingData {
 }
 
 /** Allowed period values for the analytics read endpoint */
-export type AnalyticsPeriod = 'today' | '7d' | '14d' | '30d' | 'all';
+export type AnalyticsPeriod = 'today' | '2d' | '4d' | '7d' | '14d' | '30d' | '60d' | '6m' | '1y' | 'all';
 
 @Injectable()
 export class AnalyticsService {
@@ -28,8 +28,14 @@ export class AnalyticsService {
     }
 
     async recordPageView(data: TrackingData): Promise<void> {
-        // 1. Bot filtering
+        // 1. Bot & Localhost filtering
         if (/bot|crawler|spider|crawling|curl|postman/i.test(data.userAgent)) {
+            return;
+        }
+        if (data.ip === '127.0.0.1' || data.ip === '::1' || data.ip === '::ffff:127.0.0.1') {
+            return;
+        }
+        if (data.referrer && (data.referrer.includes('127.0.0.1') || data.referrer.includes('localhost'))) {
             return;
         }
 
@@ -62,26 +68,33 @@ export class AnalyticsService {
      * Rows are returned newest-first, capped at 500 rows to avoid
      * overwhelming the dashboard on busy sites.
      */
-    async getViews(period: AnalyticsPeriod = '7d'): Promise<any[]> {
+    async getViews(period: AnalyticsPeriod = 'today'): Promise<any[]> {
         // Map period key → Postgres interval expression
         const intervalMap: Record<AnalyticsPeriod, string | null> = {
             today: "date_trunc('day', NOW())",   // midnight today (server TZ)
+            '2d':  "NOW() - INTERVAL '2 days'",
+            '4d':  "NOW() - INTERVAL '4 days'",
             '7d':  "NOW() - INTERVAL '7 days'",
             '14d': "NOW() - INTERVAL '14 days'",
             '30d': "NOW() - INTERVAL '30 days'",
+            '60d': "NOW() - INTERVAL '60 days'",
+            '6m':  "NOW() - INTERVAL '6 months'",
+            '1y':  "NOW() - INTERVAL '1 year'",
             all:   null,                          // no date filter
         };
 
-        const since = intervalMap[period] ?? intervalMap['7d'];
+        const since = intervalMap[period] ?? intervalMap['today'];
 
         const query = since
             ? `SELECT id, path, referrer, country, visitor_hash, anonymous_visitor_id, created_at
                FROM page_views
                WHERE created_at >= ${since}
+               AND (referrer IS NULL OR (referrer NOT LIKE '%127.0.0.1%' AND referrer NOT LIKE '%localhost%'))
                ORDER BY created_at DESC
                LIMIT 500`
             : `SELECT id, path, referrer, country, visitor_hash, anonymous_visitor_id, created_at
                FROM page_views
+               WHERE (referrer IS NULL OR (referrer NOT LIKE '%127.0.0.1%' AND referrer NOT LIKE '%localhost%'))
                ORDER BY created_at DESC
                LIMIT 500`;
 

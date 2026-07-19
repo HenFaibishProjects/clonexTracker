@@ -1,39 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analytics Dashboard | Lida Website</title>
-    <meta name="description" content="Real-time analytics dashboard for Lida Website – monitor traffic, visitors, and top pages.">
+    <meta name="description"
+        content="Real-time analytics dashboard for Lida Website – monitor traffic, visitors, and top pages.">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root {
-            --bg-base:        #0a0d14;
-            --bg-surface:     #111520;
-            --bg-card:        rgba(255,255,255,0.04);
-            --bg-card-hover:  rgba(255,255,255,0.07);
-            --border:         rgba(255,255,255,0.08);
-            --border-bright:  rgba(255,255,255,0.14);
-            --text-primary:   #f0f4ff;
-            --text-secondary: #8b96b0;
-            --text-muted:     #f0f4ff;
-            --accent-blue:    #3b82f6;
-            --accent-blue-glow: rgba(59,130,246,0.25);
-            --accent-emerald: #10b981;
-            --accent-purple:  #8b5cf6;
-            --accent-amber:   #f59e0b;
-            --radius-lg:      16px;
-            --radius-xl:      22px;
-            --shadow-card:    0 4px 24px rgba(0,0,0,0.4);
-            --transition:     0.22s cubic-bezier(0.4,0,0.2,1);
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
-        html { scroll-behavior: smooth; }
+        :root {
+            --bg-base: #0a0d14;
+            --bg-surface: #111520;
+            --bg-card: rgba(255, 255, 255, 0.04);
+            --bg-card-hover: rgba(255, 255, 255, 0.07);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-bright: rgba(255, 255, 255, 0.14);
+            --text-primary: #f0f4ff;
+            --text-secondary: #8b96b0;
+            --text-muted: #f0f4ff;
+            --accent-blue: #3b82f6;
+            --accent-blue-glow: rgba(59, 130, 246, 0.25);
+            --accent-emerald: #10b981;
+            --accent-purple: #8b5cf6;
+            --accent-amber: #f59e0b;
+            --radius-lg: 16px;
+            --radius-xl: 22px;
+            --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+            --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -51,8 +62,8 @@
             position: fixed;
             inset: 0;
             background-image:
-                linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
+                linear-gradient(rgba(59, 130, 246, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.04) 1px, transparent 1px);
             background-size: 48px 48px;
             pointer-events: none;
             z-index: 0;
@@ -62,17 +73,24 @@
         body::after {
             content: '';
             position: fixed;
-            top: -200px; left: -200px;
-            width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%);
+            top: -200px;
+            left: -200px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
             pointer-events: none;
             z-index: 0;
             animation: orbFloat 8s ease-in-out infinite alternate;
         }
 
         @keyframes orbFloat {
-            from { transform: translate(0,0); }
-            to   { transform: translate(80px, 60px); }
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(80px, 60px);
+            }
         }
 
         /* ─── NAV ─── */
@@ -85,7 +103,7 @@
             justify-content: space-between;
             padding: 0 32px;
             height: 68px;
-            background: rgba(10,13,20,0.85);
+            background: rgba(10, 13, 20, 0.85);
             backdrop-filter: blur(24px) saturate(180%);
             border-bottom: 1px solid var(--border);
         }
@@ -97,13 +115,16 @@
         }
 
         .nav-icon {
-            width: 38px; height: 38px;
+            width: 38px;
+            height: 38px;
             border-radius: 10px;
             background: linear-gradient(135deg, #2563eb, #7c3aed);
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: #fff;
             font-size: 15px;
-            box-shadow: 0 0 18px rgba(59,130,246,0.45);
+            box-shadow: 0 0 18px rgba(59, 130, 246, 0.45);
         }
 
         .nav-title {
@@ -113,7 +134,9 @@
             color: var(--text-primary);
         }
 
-        .nav-title span { color: var(--accent-blue); }
+        .nav-title span {
+            color: var(--accent-blue);
+        }
 
         .nav-right {
             display: flex;
@@ -130,7 +153,8 @@
         }
 
         .pulse-dot {
-            width: 7px; height: 7px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             background: var(--accent-emerald);
             box-shadow: 0 0 8px var(--accent-emerald);
@@ -138,8 +162,17 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50%       { opacity: 0.5; transform: scale(0.75); }
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(0.75);
+            }
         }
 
         .refresh-btn {
@@ -163,9 +196,15 @@
             color: var(--text-primary);
         }
 
-        .refresh-btn.spinning i { animation: spin 0.6s linear infinite; }
+        .refresh-btn.spinning i {
+            animation: spin 0.6s linear infinite;
+        }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
         /* ─── MAIN ─── */
         main {
@@ -229,14 +268,32 @@
             border-radius: inherit;
         }
 
-        .kpi-card.blue::before   { background: linear-gradient(135deg, rgba(59,130,246,0.08), transparent); }
-        .kpi-card.emerald::before { background: linear-gradient(135deg, rgba(16,185,129,0.08), transparent); }
-        .kpi-card.purple::before  { background: linear-gradient(135deg, rgba(139,92,246,0.08), transparent); }
+        .kpi-card.blue::before {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), transparent);
+        }
 
-        .kpi-card:hover { transform: translateY(-3px); border-color: var(--border-bright); box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
-        .kpi-card:hover::before { opacity: 1; }
+        .kpi-card.emerald::before {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), transparent);
+        }
 
-        .kpi-info { position: relative; z-index: 1; }
+        .kpi-card.purple::before {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), transparent);
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--border-bright);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .kpi-card:hover::before {
+            opacity: 1;
+        }
+
+        .kpi-info {
+            position: relative;
+            z-index: 1;
+        }
 
         .kpi-label {
             font-size: 0.75rem;
@@ -244,7 +301,7 @@
             letter-spacing: 0.6px;
             text-transform: uppercase;
             color: white';
-            margin-bottom: 10px;
+ margin-bottom: 10px;
         }
 
         .kpi-value {
@@ -256,23 +313,46 @@
             transition: var(--transition);
         }
 
-        .kpi-value.counting { color: var(--accent-blue); }
-
-        .kpi-icon {
-            width: 48px; height: 48px;
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px;
-            flex-shrink: 0;
-            position: relative; z-index: 1;
+        .kpi-value.counting {
+            color: var(--accent-blue);
         }
 
-        .kpi-card.blue .kpi-icon    { background: rgba(59,130,246,0.15);  color: var(--accent-blue); }
-        .kpi-card.emerald .kpi-icon { background: rgba(16,185,129,0.15);  color: var(--accent-emerald); }
-        .kpi-card.purple .kpi-icon  { background: rgba(139,92,246,0.15);  color: var(--accent-purple); }
-        .kpi-card.amber .kpi-icon   { background: rgba(245,158,11,0.15);  color: var(--accent-amber); }
+        .kpi-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+        }
 
-        .kpi-card.amber::before { background: linear-gradient(135deg, rgba(245,158,11,0.08), transparent); }
+        .kpi-card.blue .kpi-icon {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+        }
+
+        .kpi-card.emerald .kpi-icon {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-emerald);
+        }
+
+        .kpi-card.purple .kpi-icon {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-purple);
+        }
+
+        .kpi-card.amber .kpi-icon {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-amber);
+        }
+
+        .kpi-card.amber::before {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), transparent);
+        }
 
 
         /* ─── CHART CARD ─── */
@@ -301,16 +381,19 @@
             gap: 8px;
         }
 
-        .card-title i { color: var(--accent-blue); font-size: 14px; }
+        .card-title i {
+            color: var(--accent-blue);
+            font-size: 14px;
+        }
 
         .card-badge {
             font-size: 0.72rem;
             font-weight: 500;
             padding: 3px 10px;
             border-radius: 20px;
-            background: rgba(59,130,246,0.12);
+            background: rgba(59, 130, 246, 0.12);
             color: var(--accent-blue);
-            border: 1px solid rgba(59,130,246,0.2);
+            border: 1px solid rgba(59, 130, 246, 0.2);
         }
 
         .chart-wrapper {
@@ -340,7 +423,7 @@
         }
 
         thead {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         thead th {
@@ -351,17 +434,21 @@
             text-transform: uppercase;
             color: #c4cfe8;
             text-align: left;
-            border-bottom: 2px solid rgba(255,255,255,0.12);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.12);
         }
 
         tbody tr {
-            border-bottom: 1px solid rgba(255,255,255,0.10);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.10);
             transition: background var(--transition);
         }
 
-        tbody tr:last-child { border-bottom: none; }
+        tbody tr:last-child {
+            border-bottom: none;
+        }
 
-        tbody tr:hover { background: rgba(255,255,255,0.06); }
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
 
         tbody td {
             padding: 16px 24px;
@@ -388,7 +475,9 @@
             text-decoration: none;
         }
 
-        .referrer-link:hover { text-decoration: underline; }
+        .referrer-link:hover {
+            text-decoration: underline;
+        }
 
         .direct-label {
             color: #8b96b0;
@@ -402,8 +491,8 @@
             gap: 6px;
             padding: 4px 12px;
             border-radius: 6px;
-            background: rgba(255,255,255,0.07);
-            border: 1px solid rgba(255,255,255,0.14);
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.14);
             font-family: 'Inter', sans-serif;
             font-size: 0.88rem;
             font-weight: 600;
@@ -424,7 +513,9 @@
             font-size: 0.9rem;
         }
 
-        .error-text { color: #f87171; }
+        .error-text {
+            color: #f87171;
+        }
 
         /* ─── Group-by bar ─── */
         .group-bar {
@@ -458,18 +549,23 @@
         }
 
         .group-btn:hover {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text-secondary);
         }
 
         .group-btn.active {
-            background: rgba(59,130,246,0.15);
-            border-color: rgba(59,130,246,0.35);
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.35);
             color: var(--accent-blue);
         }
 
         /* ─── Count bar (grouped view) ─── */
-        .count-bar-wrap { display: flex; align-items: center; gap: 10px; }
+        .count-bar-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .count-bar {
             height: 6px;
             border-radius: 3px;
@@ -477,21 +573,50 @@
             min-width: 4px;
             transition: width 0.4s ease;
         }
-        .count-num { font-size: 0.8rem; font-weight: 700; color: var(--text-primary); min-width: 20px; }
+
+        .count-num {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            min-width: 20px;
+        }
 
         /* ─── Fade-in animation ─── */
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(18px); }
-            to   { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .kpi-card { animation: fadeUp 0.5s ease both; }
-        .kpi-card:nth-child(1) { animation-delay: 0.05s; }
-        .kpi-card:nth-child(2) { animation-delay: 0.12s; }
-        .kpi-card:nth-child(3) { animation-delay: 0.19s; }
+        .kpi-card {
+            animation: fadeUp 0.5s ease both;
+        }
 
-        .chart-card  { animation: fadeUp 0.5s 0.25s ease both; }
-        .table-card  { animation: fadeUp 0.5s 0.35s ease both; }
+        .kpi-card:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .kpi-card:nth-child(2) {
+            animation-delay: 0.12s;
+        }
+
+        .kpi-card:nth-child(3) {
+            animation-delay: 0.19s;
+        }
+
+        .chart-card {
+            animation: fadeUp 0.5s 0.25s ease both;
+        }
+
+        .table-card {
+            animation: fadeUp 0.5s 0.35s ease both;
+        }
 
         /* ─── Chart tab buttons ─── */
         .chart-tabs {
@@ -500,6 +625,7 @@
             gap: 4px;
             flex-wrap: wrap;
         }
+
         .chart-tab {
             font-family: 'Inter', sans-serif;
             font-size: 0.78rem;
@@ -516,29 +642,44 @@
             gap: 6px;
             white-space: nowrap;
         }
+
         .chart-tab:hover {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text-secondary);
         }
+
         .chart-tab.active {
             background: linear-gradient(135deg, #2563eb, #7c3aed);
             border-color: transparent;
             color: #fff;
-            box-shadow: 0 2px 10px rgba(59,130,246,0.3);
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
         }
 
         /* ─── Scrollbar ─── */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
 
         /* ─── Period Selector ─── */
         .period-bar {
             display: flex;
             align-items: center;
             gap: 6px;
-            background: rgba(255,255,255,0.04);
+            background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 5px;
@@ -561,13 +702,13 @@
 
         .period-btn:hover {
             color: var(--text-secondary);
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .period-btn.active {
             background: linear-gradient(135deg, #2563eb, #7c3aed);
             color: #fff;
-            box-shadow: 0 2px 12px rgba(59,130,246,0.35);
+            box-shadow: 0 2px 12px rgba(59, 130, 246, 0.35);
         }
 
         .header-row {
@@ -588,9 +729,18 @@
             align-items: center;
             gap: 4px;
         }
-        .trend-up   { color: #10b981; }
-        .trend-down { color: #f87171; }
-        .trend-flat { color: var(--text-muted); }
+
+        .trend-up {
+            color: #10b981;
+        }
+
+        .trend-down {
+            color: #f87171;
+        }
+
+        .trend-flat {
+            color: var(--text-muted);
+        }
 
         /* ─── Table toolbar ─── */
         .table-toolbar {
@@ -599,14 +749,14 @@
             gap: 10px;
             padding: 12px 24px;
             border-bottom: 1px solid var(--border);
-            background: rgba(255,255,255,0.01);
+            background: rgba(255, 255, 255, 0.01);
             flex-wrap: wrap;
         }
 
         .search-input {
             flex: 1;
             min-width: 180px;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border);
             border-radius: 8px;
             padding: 7px 12px 7px 34px;
@@ -616,11 +766,31 @@
             outline: none;
             transition: var(--transition);
         }
-        .search-input::placeholder { color: var(--text-muted); }
-        .search-input:focus { border-color: var(--border-bright); background: rgba(255,255,255,0.07); }
 
-        .search-wrap { position: relative; flex: 1; min-width: 180px; }
-        .search-wrap i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 12px; pointer-events: none; }
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-input:focus {
+            border-color: var(--border-bright);
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .search-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .search-wrap i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 12px;
+            pointer-events: none;
+        }
 
         .export-btn {
             font-family: 'Inter', sans-serif;
@@ -638,10 +808,18 @@
             white-space: nowrap;
             transition: var(--transition);
         }
-        .export-btn:hover { background: rgba(255,255,255,0.06); border-color: var(--border-bright); color: var(--text-primary); }
+
+        .export-btn:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--border-bright);
+            color: var(--text-primary);
+        }
 
         /* ─── Flag emoji ─── */
-        .flag { font-size: 1.1em; margin-right: 4px; }
+        .flag {
+            font-size: 1.1em;
+            margin-right: 4px;
+        }
 
         /* ─── Referrer domain chip ─── */
         .referrer-chip {
@@ -652,14 +830,41 @@
             font-size: 0.82rem;
             text-decoration: none;
         }
-        .referrer-chip:hover { text-decoration: underline; }
-        .referrer-favicon { width: 14px; height: 14px; border-radius: 2px; }
+
+        .referrer-chip:hover {
+            text-decoration: underline;
+        }
+
+        .referrer-favicon {
+            width: 14px;
+            height: 14px;
+            border-radius: 2px;
+        }
 
         /* ─── Empty state ─── */
-        .empty-state { text-align:center; padding: 56px 24px; }
-        .empty-state i { font-size: 2rem; color: var(--text-muted); margin-bottom: 12px; display:block; }
-        .empty-state p { color: var(--text-muted); font-size: 0.88rem; }
-        .empty-state strong { color: var(--text-secondary); display:block; margin-bottom:4px; font-size:1rem; }
+        .empty-state {
+            text-align: center;
+            padding: 56px 24px;
+        }
+
+        .empty-state i {
+            font-size: 2rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+        }
+
+        .empty-state strong {
+            color: var(--text-secondary);
+            display: block;
+            margin-bottom: 4px;
+            font-size: 1rem;
+        }
 
         /* ─── Active filter banner ─── */
         .filter-banner {
@@ -669,19 +874,27 @@
             padding: 10px 18px;
             margin-bottom: 16px;
             border-radius: 10px;
-            background: rgba(245,158,11,0.08);
-            border: 1px solid rgba(245,158,11,0.28);
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.28);
             font-size: 0.83rem;
             color: #f59e0b;
             font-weight: 500;
             flex-wrap: wrap;
         }
-        .filter-banner.visible { display: flex; }
-        .filter-banner strong { color: #fbbf24; font-weight: 700; }
+
+        .filter-banner.visible {
+            display: flex;
+        }
+
+        .filter-banner strong {
+            color: #fbbf24;
+            font-weight: 700;
+        }
+
         .filter-clear-btn {
             margin-left: auto;
             background: transparent;
-            border: 1px solid rgba(245,158,11,0.4);
+            border: 1px solid rgba(245, 158, 11, 0.4);
             color: #f59e0b;
             border-radius: 6px;
             padding: 3px 10px;
@@ -692,7 +905,10 @@
             white-space: nowrap;
             transition: var(--transition);
         }
-        .filter-clear-btn:hover { background: rgba(245,158,11,0.12); }
+
+        .filter-clear-btn:hover {
+            background: rgba(245, 158, 11, 0.12);
+        }
 
         /* ─── Insights card ─── */
         .insights-card {
@@ -703,6 +919,7 @@
             margin-bottom: 32px;
             animation: fadeUp 0.5s 0.18s ease both;
         }
+
         .insights-title {
             font-size: 0.72rem;
             font-weight: 700;
@@ -714,14 +931,16 @@
             align-items: center;
             gap: 7px;
         }
+
         .insights-list {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
         }
+
         .insight-chip {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.09);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.09);
             border-radius: 8px;
             padding: 8px 14px;
             font-size: 0.83rem;
@@ -730,7 +949,11 @@
             align-items: center;
             gap: 7px;
         }
-        .insight-chip .ic-em { color: #f0f4ff; font-weight: 600; }
+
+        .insight-chip .ic-em {
+            color: #f0f4ff;
+            font-weight: 600;
+        }
 
         /* ─── Spike badge on KPI card ─── */
         .spike-badge {
@@ -743,8 +966,18 @@
             border-radius: 20px;
             margin-top: 4px;
         }
-        .spike-up   { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
-        .spike-down { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+
+        .spike-up {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .spike-down {
+            background: rgba(248, 113, 113, 0.12);
+            color: #f87171;
+            border: 1px solid rgba(248, 113, 113, 0.3);
+        }
 
         /* ─── Weekday toggle ─── */
         .overtime-toggle {
@@ -752,6 +985,7 @@
             gap: 4px;
             margin-bottom: 10px;
         }
+
         .ot-btn {
             font-family: 'Inter', sans-serif;
             font-size: 0.74rem;
@@ -764,7 +998,12 @@
             cursor: pointer;
             transition: var(--transition);
         }
-        .ot-btn.active { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.35); color: var(--accent-blue); }
+
+        .ot-btn.active {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.35);
+            color: var(--accent-blue);
+        }
 
         /* ─── Returning visitors sub-label ─── */
         .kpi-sub {
@@ -772,18 +1011,38 @@
             color: var(--text-muted);
             margin-top: 3px;
         }
-        .kpi-sub .ret { color: #10b981; font-weight: 600; }
+
+        .kpi-sub .ret {
+            color: #10b981;
+            font-weight: 600;
+        }
 
         /* ─── Responsive ─── */
         @media (max-width: 640px) {
-            nav { padding: 0 16px; }
-            main { padding: 24px 14px 40px; }
-            .kpi-value { font-size: 1.9rem; }
-            .nav-title span { display: none; }
-            .period-btn { padding: 5px 10px; font-size: 0.72rem; }
+            nav {
+                padding: 0 16px;
+            }
+
+            main {
+                padding: 24px 14px 40px;
+            }
+
+            .kpi-value {
+                font-size: 1.9rem;
+            }
+
+            .nav-title span {
+                display: none;
+            }
+
+            .period-btn {
+                padding: 5px 10px;
+                font-size: 0.72rem;
+            }
         }
     </style>
 </head>
+
 <body>
 
     <nav>
@@ -810,10 +1069,15 @@
                 <p>Real-time visitor activity and page performance metrics</p>
             </div>
             <div class="period-bar" id="periodBar">
-                <button class="period-btn" data-period="today" onclick="setPeriod('today')">Today</button>
-                <button class="period-btn active" data-period="7d" onclick="setPeriod('7d')">7 Days</button>
+                <button class="period-btn active" data-period="today" onclick="setPeriod('today')">Today</button>
+                <button class="period-btn" data-period="2d" onclick="setPeriod('2d')">2 Days</button>
+                <button class="period-btn" data-period="4d" onclick="setPeriod('4d')">4 Days</button>
+                <button class="period-btn" data-period="7d" onclick="setPeriod('7d')">7 Days</button>
                 <button class="period-btn" data-period="14d" onclick="setPeriod('14d')">14 Days</button>
                 <button class="period-btn" data-period="30d" onclick="setPeriod('30d')">30 Days</button>
+                <button class="period-btn" data-period="60d" onclick="setPeriod('60d')">60 Days</button>
+                <button class="period-btn" data-period="6m" onclick="setPeriod('6m')">6 Months</button>
+                <button class="period-btn" data-period="1y" onclick="setPeriod('1y')">1 Year</button>
                 <button class="period-btn" data-period="all" onclick="setPeriod('all')">All Time</button>
             </div>
         </div>
@@ -876,10 +1140,10 @@
         <div class="chart-card">
             <div class="card-header" style="flex-wrap:wrap;gap:12px;">
                 <div class="chart-tabs" id="chartTabs">
-                    <button class="chart-tab active" data-chart="pages"    onclick="setChartView('pages')">
+                    <button class="chart-tab active" data-chart="pages" onclick="setChartView('pages')">
                         <i class="fa-solid fa-chart-bar"></i> Pages
                     </button>
-                    <button class="chart-tab" data-chart="overtime"  onclick="setChartView('overtime')">
+                    <button class="chart-tab" data-chart="overtime" onclick="setChartView('overtime')">
                         <i class="fa-solid fa-chart-line"></i> Over Time
                     </button>
                     <button class="chart-tab" data-chart="referrers" onclick="setChartView('referrers')">
@@ -888,12 +1152,12 @@
                     <button class="chart-tab" data-chart="countries" onclick="setChartView('countries')">
                         <i class="fa-solid fa-globe"></i> Countries
                     </button>
-                    <button class="chart-tab" data-chart="hours"     onclick="setChartView('hours')">
+                    <button class="chart-tab" data-chart="hours" onclick="setChartView('hours')">
                         <i class="fa-solid fa-clock"></i> Hours
                     </button>
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;">
-                    <span class="card-badge" id="chartBadge">7 Days</span>
+                    <span class="card-badge" id="chartBadge">Today</span>
                     <span id="tzNote" style="display:none;font-size:0.72rem;font-weight:600;
                         padding:3px 10px;border-radius:20px;
                         background:rgba(245,158,11,0.15);color:#f59e0b;
@@ -905,8 +1169,8 @@
             </div>
             <div class="chart-wrapper">
                 <div id="otToggle" class="overtime-toggle" style="display:none;">
-                    <button class="ot-btn active" data-mode="daily"   onclick="setOvertimeMode('daily')">By Day</button>
-                    <button class="ot-btn"        data-mode="weekday" onclick="setOvertimeMode('weekday')">By Weekday</button>
+                    <button class="ot-btn active" data-mode="daily" onclick="setOvertimeMode('daily')">By Day</button>
+                    <button class="ot-btn" data-mode="weekday" onclick="setOvertimeMode('weekday')">By Weekday</button>
                 </div>
                 <canvas id="trafficChart"></canvas>
             </div>
@@ -919,10 +1183,10 @@
                 <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
                     <div class="group-bar">
                         <span class="group-label">Group by:</span>
-                        <button class="group-btn active" data-group="none"     onclick="setGroup('none')">Raw</button>
-                        <button class="group-btn"        data-group="path"     onclick="setGroup('path')">Path</button>
-                        <button class="group-btn"        data-group="referrer" onclick="setGroup('referrer')">Referrer</button>
-                        <button class="group-btn"        data-group="country"  onclick="setGroup('country')">Country</button>
+                        <button class="group-btn active" data-group="none" onclick="setGroup('none')">Raw</button>
+                        <button class="group-btn" data-group="path" onclick="setGroup('path')">Path</button>
+                        <button class="group-btn" data-group="referrer" onclick="setGroup('referrer')">Referrer</button>
+                        <button class="group-btn" data-group="country" onclick="setGroup('country')">Country</button>
                     </div>
                     <span class="card-badge" id="rowCount">0 entries</span>
                 </div>
@@ -932,8 +1196,7 @@
                 <div class="search-wrap">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input class="search-input" id="tableSearch" type="text"
-                           placeholder="Filter by path, referrer, country…"
-                           oninput="applySearch()">
+                        placeholder="Filter by path, referrer, country…" oninput="applySearch()">
                 </div>
                 <button class="export-btn" onclick="exportCSV()">
                     <i class="fa-solid fa-download"></i> Export CSV
@@ -952,7 +1215,8 @@
                     <tbody id="tableBody">
                         <tr class="state-row">
                             <td colspan="4">
-                                <i class="fa-solid fa-circle-notch fa-spin" style="margin-right:8px;color:var(--accent-blue)"></i>
+                                <i class="fa-solid fa-circle-notch fa-spin"
+                                    style="margin-right:8px;color:var(--accent-blue)"></i>
                                 Loading analytics data…
                             </td>
                         </tr>
@@ -965,52 +1229,48 @@
 
     <script>
         // ─── Config ───────────────────────────────────────────────────────────────
-        const API_ENDPOINT = '/api/analytics/views';
-        const USE_MOCK = false; // Set to false when your NestJS API is ready
+        const API_ENDPOINT = window.location.port === '5500' || window.location.port === '4200'
+            ? 'http://localhost:3000/api/analytics/views'
+            : '/api/analytics/views';
 
         let chartInstance = null;
-        let activePeriod  = '7d';
-
-        // ─── Mock dataset — spread across realistic date ranges ───────────────────
-        const MOCK_ALL = [
-            { id:1,  path:'/',           referrer:'https://google.com',  country:'IL', visitor_hash:'a1b2', created_at: daysAgo(0)  },
-            { id:2,  path:'/tools/json', referrer:'https://google.com',  country:'IL', visitor_hash:'a1b2', created_at: daysAgo(0)  },
-            { id:3,  path:'/about',      referrer:null,                  country:'US', visitor_hash:'c3d4', created_at: daysAgo(1)  },
-            { id:4,  path:'/',           referrer:'https://github.com',  country:'GB', visitor_hash:'e5f6', created_at: daysAgo(3)  },
-            { id:5,  path:'/dashboard',  referrer:'https://t.co',        country:'IL', visitor_hash:'g7h8', created_at: daysAgo(5)  },
-            { id:6,  path:'/tools/json', referrer:'https://bing.com',    country:'DE', visitor_hash:'i9j0', created_at: daysAgo(8)  },
-            { id:7,  path:'/about',      referrer:null,                  country:'FR', visitor_hash:'k1l2', created_at: daysAgo(10) },
-            { id:8,  path:'/',           referrer:'https://reddit.com',  country:'US', visitor_hash:'m3n4', created_at: daysAgo(12) },
-            { id:9,  path:'/dashboard',  referrer:'https://google.com',  country:'IL', visitor_hash:'o5p6', created_at: daysAgo(16) },
-            { id:10, path:'/tools/json', referrer:null,                  country:'CA', visitor_hash:'q7r8', created_at: daysAgo(20) },
-            { id:11, path:'/',           referrer:'https://github.com',  country:'AU', visitor_hash:'s9t0', created_at: daysAgo(25) },
-            { id:12, path:'/about',      referrer:'https://google.com',  country:'IL', visitor_hash:'u1v2', created_at: daysAgo(28) },
-            { id:13, path:'/',           referrer:null,                  country:'US', visitor_hash:'w3x4', created_at: daysAgo(35) },
-            { id:14, path:'/dashboard',  referrer:'https://t.co',        country:'GB', visitor_hash:'y5z6', created_at: daysAgo(45) },
-        ];
-
-        function daysAgo(n) {
-            const d = new Date();
-            d.setDate(d.getDate() - n);
-            return d.toISOString();
-        }
+        let activePeriod = 'today';
 
         // ─── Period label map ─────────────────────────────────────────────────────
-        const PERIOD_LABELS = { today:'Today', '7d':'Last 7 Days', '14d':'Last 14 Days', '30d':'Last 30 Days', all:'All Time' };
+        const PERIOD_LABELS = { today: 'Today', '2d': 'Last 2 Days', '4d': 'Last 4 Days', '7d': 'Last 7 Days', '14d': 'Last 14 Days', '30d': 'Last 30 Days', '60d': 'Last 60 Days', '6m': 'Last 6 Months', '1y': 'Last Year', all: 'All Time' };
 
         // ─── Path label map & formatter ──────────────────────────────────────────
         // Add known routes here for instant friendly names.
         // Anything not listed is auto-prettified (segments capitalised, joined with ›).
         const PATH_LABELS = {
-            '/':             'Home',
-            '/about':        'About',
-            '/dashboard':    'Dashboard',
-            '/tools':        'Tools',
-            '/tools/json':   'Tools › JSON',
-            '/tools/base64': 'Tools › Base64',
-            '/contact':      'Contact',
-            '/blog':         'Blog',
-            '/pricing':      'Pricing',
+            '/': 'Home',
+            '/dashboard': 'Dashboard',
+            '/powers-your-business/you-business': 'You & Your Business',
+            '/guides': 'Guides',
+            '/interview-prep': 'Interview Prep',
+            '/engineering': 'Engineering',
+            '/pricing': 'Pricing',
+            '/dev-news': 'Dev News',
+            '/palette-forge': 'Palette Forge',
+            '/tools/envValidator': 'Tools › Env Validator',
+            '/tools/jsonToZod/json-to-zod-converter': 'Tools › JSON to Zod Converter',
+            '/tools/jsonToProtobuf': 'Tools › JSON to Protobuf',
+            '/tools/jsonBeautifier/json-beautifier': 'Tools › JSON Beautifier',
+            '/tools/docker-lens': 'Tools › Docker Lens',
+            '/tools/aiCodeDiff/the-code-diff-viewer': 'Tools › AI Code Diff Viewer',
+            '/tools/ai-hallucination-spotter/ai-hallucination-spotter': 'Tools › AI Hallucination Spotter',
+            '/tools/ai-selector': 'Tools › AI Selector',
+            '/tools/mcp-blueprint-generator/mcp-blueprint-generator': 'Tools › MCP Blueprint Generator',
+            '/tools/promptPilot': 'Tools › Prompt Pilot',
+            '/tools/ai-status': 'Tools › AI Status',
+            '/tools/toolSList/tools': 'Tools › Tools Hub',
+            '/book': 'Book',
+            '/tools/jenkinsPipelineVisualizer': 'Tools › Jenkins Pipeline Visualizer',
+            '/tools/graphVisualizer/graph-app': 'Tools › Graph Visualizer',
+            '/tools/gitCheat/git-cheat': 'Tools › Git Cheat Sheet',
+            '/tools/timeStampConvert/time-stamp-convert': 'Tools › Timestamp Converter',
+            '/tools/architecture-compatibility-tool/architecture-compatibility': 'Tools › Architecture Compatibility',
+            '/lida-mix-play': 'LiDa Mix Play',
         };
 
         function formatPath(raw) {
@@ -1045,26 +1305,18 @@
             fetchAnalyticsData();
         }
 
-        // ─── Fetch (real API or mock) ─────────────────────────────────────────────
+        // ─── Fetch ────────────────────────────────────────────────────────────────
         async function fetchAnalyticsData() {
             setTableLoading();
             try {
-                let data;
-                if (USE_MOCK) {
-                    const cutoff = periodCutoff(activePeriod);
-                    data = cutoff
-                        ? MOCK_ALL.filter(r => new Date(r.created_at) >= cutoff)
-                        : MOCK_ALL;
-                    window._prevData = [];
-                } else {
-                    const [response, prevData] = await Promise.all([
-                        fetch(`${API_ENDPOINT}?period=${activePeriod}`),
-                        fetchPreviousPeriodData()
-                    ]);
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    data = await response.json();
-                    window._prevData = prevData;
-                }
+                const [response, prevData] = await Promise.all([
+                    fetch(`${API_ENDPOINT}?period=${activePeriod}`),
+                    fetchPreviousPeriodData()
+                ]);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                window._prevData = prevData;
+
                 renderDashboard(data);
             } catch (error) {
                 console.error('Error fetching analytics data:', error);
@@ -1076,10 +1328,15 @@
         /** Returns the Date cutoff for a period, or null for "all" */
         function periodCutoff(period) {
             const now = new Date();
-            if (period === 'today') { const s = new Date(now); s.setHours(0,0,0,0); return s; }
-            if (period === '7d')  { const d = new Date(now); d.setDate(d.getDate()-7);  return d; }
-            if (period === '14d') { const d = new Date(now); d.setDate(d.getDate()-14); return d; }
-            if (period === '30d') { const d = new Date(now); d.setDate(d.getDate()-30); return d; }
+            if (period === 'today') { const s = new Date(now); s.setHours(0, 0, 0, 0); return s; }
+            if (period === '2d') { const d = new Date(now); d.setDate(d.getDate() - 2); return d; }
+            if (period === '4d') { const d = new Date(now); d.setDate(d.getDate() - 4); return d; }
+            if (period === '7d') { const d = new Date(now); d.setDate(d.getDate() - 7); return d; }
+            if (period === '14d') { const d = new Date(now); d.setDate(d.getDate() - 14); return d; }
+            if (period === '30d') { const d = new Date(now); d.setDate(d.getDate() - 30); return d; }
+            if (period === '60d') { const d = new Date(now); d.setDate(d.getDate() - 60); return d; }
+            if (period === '6m') { const d = new Date(now); d.setMonth(d.getMonth() - 6); return d; }
+            if (period === '1y') { const d = new Date(now); d.setFullYear(d.getFullYear() - 1); return d; }
             return null; // 'all'
         }
 
@@ -1090,51 +1347,51 @@
 
         // ─── ISO 3166-1 alpha-2 → Full country name ───────────────────────────────
         const COUNTRY_NAMES = {
-            AF:'Afghanistan', AL:'Albania', DZ:'Algeria', AD:'Andorra', AO:'Angola',
-            AG:'Antigua & Barbuda', AR:'Argentina', AM:'Armenia', AU:'Australia',
-            AT:'Austria', AZ:'Azerbaijan', BS:'Bahamas', BH:'Bahrain', BD:'Bangladesh',
-            BB:'Barbados', BY:'Belarus', BE:'Belgium', BZ:'Belize', BJ:'Benin',
-            BT:'Bhutan', BO:'Bolivia', BA:'Bosnia & Herzegovina', BW:'Botswana',
-            BR:'Brazil', BN:'Brunei', BG:'Bulgaria', BF:'Burkina Faso', BI:'Burundi',
-            CV:'Cape Verde', KH:'Cambodia', CM:'Cameroon', CA:'Canada',
-            CF:'Central African Republic', TD:'Chad', CL:'Chile', CN:'China',
-            CO:'Colombia', KM:'Comoros', CG:'Congo', CD:'Congo (DRC)', CR:'Costa Rica',
-            HR:'Croatia', CU:'Cuba', CY:'Cyprus', CZ:'Czech Republic', DK:'Denmark',
-            DJ:'Djibouti', DM:'Dominica', DO:'Dominican Republic', EC:'Ecuador',
-            EG:'Egypt', SV:'El Salvador', GQ:'Equatorial Guinea', ER:'Eritrea',
-            EE:'Estonia', SZ:'Eswatini', ET:'Ethiopia', FJ:'Fiji', FI:'Finland',
-            FR:'France', GA:'Gabon', GM:'Gambia', GE:'Georgia', DE:'Germany',
-            GH:'Ghana', GR:'Greece', GD:'Grenada', GT:'Guatemala', GN:'Guinea',
-            GW:'Guinea-Bissau', GY:'Guyana', HT:'Haiti', HN:'Honduras', HU:'Hungary',
-            IS:'Iceland', IN:'India', ID:'Indonesia', IR:'Iran', IQ:'Iraq',
-            IE:'Ireland', IL:'Israel', IT:'Italy', JM:'Jamaica', JP:'Japan',
-            JO:'Jordan', KZ:'Kazakhstan', KE:'Kenya', KI:'Kiribati', KP:'North Korea',
-            KR:'South Korea', KW:'Kuwait', KG:'Kyrgyzstan', LA:'Laos', LV:'Latvia',
-            LB:'Lebanon', LS:'Lesotho', LR:'Liberia', LY:'Libya', LI:'Liechtenstein',
-            LT:'Lithuania', LU:'Luxembourg', MG:'Madagascar', MW:'Malawi',
-            MY:'Malaysia', MV:'Maldives', ML:'Mali', MT:'Malta', MH:'Marshall Islands',
-            MR:'Mauritania', MU:'Mauritius', MX:'Mexico', FM:'Micronesia',
-            MD:'Moldova', MC:'Monaco', MN:'Mongolia', ME:'Montenegro', MA:'Morocco',
-            MZ:'Mozambique', MM:'Myanmar', NA:'Namibia', NR:'Nauru', NP:'Nepal',
-            NL:'Netherlands', NZ:'New Zealand', NI:'Nicaragua', NE:'Niger',
-            NG:'Nigeria', MK:'North Macedonia', NO:'Norway', OM:'Oman', PK:'Pakistan',
-            PW:'Palau', PS:'Palestine', PA:'Panama', PG:'Papua New Guinea',
-            PY:'Paraguay', PE:'Peru', PH:'Philippines', PL:'Poland', PT:'Portugal',
-            QA:'Qatar', RO:'Romania', RU:'Russia', RW:'Rwanda',
-            KN:'Saint Kitts & Nevis', LC:'Saint Lucia',
-            VC:'Saint Vincent & Grenadines', WS:'Samoa', SM:'San Marino',
-            ST:'São Tomé & Príncipe', SA:'Saudi Arabia', SN:'Senegal', RS:'Serbia',
-            SC:'Seychelles', SL:'Sierra Leone', SG:'Singapore', SK:'Slovakia',
-            SI:'Slovenia', SB:'Solomon Islands', SO:'Somalia', ZA:'South Africa',
-            SS:'South Sudan', ES:'Spain', LK:'Sri Lanka', SD:'Sudan',
-            SR:'Suriname', SE:'Sweden', CH:'Switzerland', SY:'Syria',
-            TW:'Taiwan', TJ:'Tajikistan', TZ:'Tanzania', TH:'Thailand',
-            TL:'Timor-Leste', TG:'Togo', TO:'Tonga', TT:'Trinidad & Tobago',
-            TN:'Tunisia', TR:'Turkey', TM:'Turkmenistan', TV:'Tuvalu',
-            UG:'Uganda', UA:'Ukraine', AE:'United Arab Emirates',
-            GB:'United Kingdom', US:'United States', UY:'Uruguay', UZ:'Uzbekistan',
-            VU:'Vanuatu', VE:'Venezuela', VN:'Vietnam', YE:'Yemen',
-            ZM:'Zambia', ZW:'Zimbabwe',
+            AF: 'Afghanistan', AL: 'Albania', DZ: 'Algeria', AD: 'Andorra', AO: 'Angola',
+            AG: 'Antigua & Barbuda', AR: 'Argentina', AM: 'Armenia', AU: 'Australia',
+            AT: 'Austria', AZ: 'Azerbaijan', BS: 'Bahamas', BH: 'Bahrain', BD: 'Bangladesh',
+            BB: 'Barbados', BY: 'Belarus', BE: 'Belgium', BZ: 'Belize', BJ: 'Benin',
+            BT: 'Bhutan', BO: 'Bolivia', BA: 'Bosnia & Herzegovina', BW: 'Botswana',
+            BR: 'Brazil', BN: 'Brunei', BG: 'Bulgaria', BF: 'Burkina Faso', BI: 'Burundi',
+            CV: 'Cape Verde', KH: 'Cambodia', CM: 'Cameroon', CA: 'Canada',
+            CF: 'Central African Republic', TD: 'Chad', CL: 'Chile', CN: 'China',
+            CO: 'Colombia', KM: 'Comoros', CG: 'Congo', CD: 'Congo (DRC)', CR: 'Costa Rica',
+            HR: 'Croatia', CU: 'Cuba', CY: 'Cyprus', CZ: 'Czech Republic', DK: 'Denmark',
+            DJ: 'Djibouti', DM: 'Dominica', DO: 'Dominican Republic', EC: 'Ecuador',
+            EG: 'Egypt', SV: 'El Salvador', GQ: 'Equatorial Guinea', ER: 'Eritrea',
+            EE: 'Estonia', SZ: 'Eswatini', ET: 'Ethiopia', FJ: 'Fiji', FI: 'Finland',
+            FR: 'France', GA: 'Gabon', GM: 'Gambia', GE: 'Georgia', DE: 'Germany',
+            GH: 'Ghana', GR: 'Greece', GD: 'Grenada', GT: 'Guatemala', GN: 'Guinea',
+            GW: 'Guinea-Bissau', GY: 'Guyana', HT: 'Haiti', HN: 'Honduras', HU: 'Hungary',
+            IS: 'Iceland', IN: 'India', ID: 'Indonesia', IR: 'Iran', IQ: 'Iraq',
+            IE: 'Ireland', IL: 'Israel', IT: 'Italy', JM: 'Jamaica', JP: 'Japan',
+            JO: 'Jordan', KZ: 'Kazakhstan', KE: 'Kenya', KI: 'Kiribati', KP: 'North Korea',
+            KR: 'South Korea', KW: 'Kuwait', KG: 'Kyrgyzstan', LA: 'Laos', LV: 'Latvia',
+            LB: 'Lebanon', LS: 'Lesotho', LR: 'Liberia', LY: 'Libya', LI: 'Liechtenstein',
+            LT: 'Lithuania', LU: 'Luxembourg', MG: 'Madagascar', MW: 'Malawi',
+            MY: 'Malaysia', MV: 'Maldives', ML: 'Mali', MT: 'Malta', MH: 'Marshall Islands',
+            MR: 'Mauritania', MU: 'Mauritius', MX: 'Mexico', FM: 'Micronesia',
+            MD: 'Moldova', MC: 'Monaco', MN: 'Mongolia', ME: 'Montenegro', MA: 'Morocco',
+            MZ: 'Mozambique', MM: 'Myanmar', NA: 'Namibia', NR: 'Nauru', NP: 'Nepal',
+            NL: 'Netherlands', NZ: 'New Zealand', NI: 'Nicaragua', NE: 'Niger',
+            NG: 'Nigeria', MK: 'North Macedonia', NO: 'Norway', OM: 'Oman', PK: 'Pakistan',
+            PW: 'Palau', PS: 'Palestine', PA: 'Panama', PG: 'Papua New Guinea',
+            PY: 'Paraguay', PE: 'Peru', PH: 'Philippines', PL: 'Poland', PT: 'Portugal',
+            QA: 'Qatar', RO: 'Romania', RU: 'Russia', RW: 'Rwanda',
+            KN: 'Saint Kitts & Nevis', LC: 'Saint Lucia',
+            VC: 'Saint Vincent & Grenadines', WS: 'Samoa', SM: 'San Marino',
+            ST: 'São Tomé & Príncipe', SA: 'Saudi Arabia', SN: 'Senegal', RS: 'Serbia',
+            SC: 'Seychelles', SL: 'Sierra Leone', SG: 'Singapore', SK: 'Slovakia',
+            SI: 'Slovenia', SB: 'Solomon Islands', SO: 'Somalia', ZA: 'South Africa',
+            SS: 'South Sudan', ES: 'Spain', LK: 'Sri Lanka', SD: 'Sudan',
+            SR: 'Suriname', SE: 'Sweden', CH: 'Switzerland', SY: 'Syria',
+            TW: 'Taiwan', TJ: 'Tajikistan', TZ: 'Tanzania', TH: 'Thailand',
+            TL: 'Timor-Leste', TG: 'Togo', TO: 'Tonga', TT: 'Trinidad & Tobago',
+            TN: 'Tunisia', TR: 'Turkey', TM: 'Turkmenistan', TV: 'Tuvalu',
+            UG: 'Uganda', UA: 'Ukraine', AE: 'United Arab Emirates',
+            GB: 'United Kingdom', US: 'United States', UY: 'Uruguay', UZ: 'Uzbekistan',
+            VU: 'Vanuatu', VE: 'Venezuela', VN: 'Vietnam', YE: 'Yemen',
+            ZM: 'Zambia', ZW: 'Zimbabwe',
         };
 
         /** Returns the full country name for an ISO 3166-1 alpha-2 code, or the code itself as fallback */
@@ -1166,11 +1423,11 @@
             const m = Math.floor(diff / 60000);
             const h = Math.floor(diff / 3600000);
             const d = Math.floor(diff / 86400000);
-            if (m < 1)  return '<span style="color:var(--accent-emerald);font-weight:600">just now</span>';
+            if (m < 1) return '<span style="color:var(--accent-emerald);font-weight:600">just now</span>';
             if (m < 60) return `${m}m ago`;
             if (h < 24) return `${h}h ago`;
-            if (d < 7)  return `${d}d ago`;
-            return new Date(isoStr).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+            if (d < 7) return `${d}d ago`;
+            return new Date(isoStr).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
         }
 
         // ─── Referrer chip (domain + favicon) ───────────────────────────────────────
@@ -1193,8 +1450,8 @@
                 ? '<span class="trend-up">↑ New</span>'
                 : '<span class="trend-flat">→ No data</span>';
             const pct = Math.round(((current - previous) / previous) * 100);
-            if (pct > 0)  return `<span class="trend-up">↑ ${pct}% vs prev period</span>`;
-            if (pct < 0)  return `<span class="trend-down">↓ ${Math.abs(pct)}% vs prev period</span>`;
+            if (pct > 0) return `<span class="trend-up">↑ ${pct}% vs prev period</span>`;
+            if (pct < 0) return `<span class="trend-down">↓ ${Math.abs(pct)}% vs prev period</span>`;
             return `<span class="trend-flat">→ No change vs prev period</span>`;
         }
 
@@ -1245,8 +1502,10 @@
             return parseInt(IL_HOUR_FMT.format(new Date(isoStr)), 10);
         }
         function ilDateStr(isoStr) {
-            return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jerusalem',
-                year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(isoStr));
+            return new Intl.DateTimeFormat('en-CA', {
+                timeZone: 'Asia/Jerusalem',
+                year: 'numeric', month: '2-digit', day: '2-digit'
+            }).format(new Date(isoStr));
         }
 
         // ─── Avg pages per session ────────────────────────────────────────────────
@@ -1255,10 +1514,10 @@
             data.forEach(r => { (byHash[r.visitor_hash] = byHash[r.visitor_hash] || []).push(new Date(r.created_at).getTime()); });
             let totalPages = 0, totalSessions = 0;
             Object.values(byHash).forEach(times => {
-                times.sort((a,b) => a-b);
+                times.sort((a, b) => a - b);
                 let sessionPages = 1;
                 for (let i = 1; i < times.length; i++) {
-                    if (times[i] - times[i-1] > windowMs) {
+                    if (times[i] - times[i - 1] > windowMs) {
                         totalSessions++; totalPages += sessionPages; sessionPages = 1;
                     } else { sessionPages++; }
                 }
@@ -1284,7 +1543,7 @@
             });
             const prevDays = Object.values(prevDayCounts);
             if (prevDays.length === 0) return null;
-            const avg = prevDays.reduce((s,v) => s+v, 0) / prevDays.length;
+            const avg = prevDays.reduce((s, v) => s + v, 0) / prevDays.length;
             if (avg === 0) return null;
             return { ratio: Math.round((todayCount / avg) * 10) / 10, todayCount, avg: Math.round(avg * 10) / 10, hour: nowIL };
         }
@@ -1313,9 +1572,9 @@
             // Best day
             const dayCounts = {};
             data.forEach(r => { const d = ilDateStr(r.created_at); dayCounts[d] = (dayCounts[d] || 0) + 1; });
-            const bestDay = Object.entries(dayCounts).sort((a,b) => b[1]-a[1])[0];
+            const bestDay = Object.entries(dayCounts).sort((a, b) => b[1] - a[1])[0];
             if (bestDay) {
-                const label = new Date(bestDay[0]).toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' });
+                const label = new Date(bestDay[0]).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
                 chips.push(`<div class="insight-chip">📅 Peak day: <span class="ic-em">${label}</span> &nbsp;(${bestDay[1]} views)</div>`);
             }
 
@@ -1323,10 +1582,10 @@
             const refCounts = {};
             data.forEach(r => {
                 let l = 'Direct';
-                if (r.referrer) { try { l = new URL(r.referrer).hostname.replace(/^www\./,''); } catch {} }
+                if (r.referrer) { try { l = new URL(r.referrer).hostname.replace(/^www\./, ''); } catch { } }
                 refCounts[l] = (refCounts[l] || 0) + 1;
             });
-            const topRef = Object.entries(refCounts).sort((a,b)=>b[1]-a[1])[0];
+            const topRef = Object.entries(refCounts).sort((a, b) => b[1] - a[1])[0];
             if (topRef) chips.push(`<div class="insight-chip">🔗 Top source: <span class="ic-em">${topRef[0]}</span> &nbsp;(${topRef[1]} visits)</div>`);
 
             // Avg session
@@ -1342,12 +1601,12 @@
         }
 
         async function fetchPreviousPeriodData() {
-            if (USE_MOCK || activePeriod === 'all') return [];
-            const periodDays = { today: 1, '7d': 7, '14d': 14, '30d': 30 };
+            if (activePeriod === 'all') return [];
+            const periodDays = { today: 1, '2d': 2, '4d': 4, '7d': 7, '14d': 14, '30d': 30, '60d': 60, '6m': 180, '1y': 365 };
             const days = periodDays[activePeriod];
             if (!days) return [];
             // Fetch twice the period, then take the older half
-            const doubleMap = { today: '14d', '7d': '14d', '14d': '30d', '30d': 'all' };
+            const doubleMap = { today: '2d', '2d': '4d', '4d': '14d', '7d': '14d', '14d': '30d', '30d': '60d', '60d': '6m', '6m': '1y', '1y': 'all' };
             try {
                 const res = await fetch(`${API_ENDPOINT}?period=${doubleMap[activePeriod]}`);
                 if (!res.ok) return [];
@@ -1367,13 +1626,13 @@
             const viewData = applyActiveFilter(data);
 
             if (!viewData || viewData.length === 0) {
-                document.getElementById('kpiTotalViews').innerText    = '0';
+                document.getElementById('kpiTotalViews').innerText = '0';
                 document.getElementById('kpiUniqueVisitors').innerText = '0';
-                document.getElementById('kpiTopCountry').innerText     = '—';
-                document.getElementById('kpiTopPage').innerText        = '—';
+                document.getElementById('kpiTopCountry').innerText = '—';
+                document.getElementById('kpiTopPage').innerText = '—';
                 document.getElementById('returningVisitors').innerHTML = '';
                 document.getElementById('spikeBadge').innerHTML = '';
-                ['trendViews','trendVisitors','trendCountry','trendPage'].forEach(id =>
+                ['trendViews', 'trendVisitors', 'trendCountry', 'trendPage'].forEach(id =>
                     document.getElementById(id).innerHTML = '');
                 document.getElementById('tableBody').innerHTML =
                     `<tr><td colspan="4"><div class="empty-state">
@@ -1387,16 +1646,16 @@
             }
 
             // 1. KPIs
-            const totalViews     = viewData.length;
+            const totalViews = viewData.length;
             const uniqueVisitors = new Set(viewData.map(r => r.visitor_hash)).size;
 
-            const countryCounts = viewData.reduce((acc, r) => { acc[r.country] = (acc[r.country]||0)+1; return acc; }, {});
-            const topCountry = Object.keys(countryCounts).reduce((a,b) => countryCounts[a]>countryCounts[b]?a:b);
+            const countryCounts = viewData.reduce((acc, r) => { acc[r.country] = (acc[r.country] || 0) + 1; return acc; }, {});
+            const topCountry = Object.keys(countryCounts).reduce((a, b) => countryCounts[a] > countryCounts[b] ? a : b);
 
-            const pageCounts = viewData.reduce((acc, r) => { acc[r.path] = (acc[r.path]||0)+1; return acc; }, {});
-            const topPage = Object.keys(pageCounts).reduce((a,b) => pageCounts[a]>pageCounts[b]?a:b);
+            const pageCounts = viewData.reduce((acc, r) => { acc[r.path] = (acc[r.path] || 0) + 1; return acc; }, {});
+            const topPage = Object.keys(pageCounts).reduce((a, b) => pageCounts[a] > pageCounts[b] ? a : b);
 
-            animateCount('kpiTotalViews',    totalViews);
+            animateCount('kpiTotalViews', totalViews);
             animateCount('kpiUniqueVisitors', uniqueVisitors);
             document.getElementById('kpiTopCountry').innerHTML =
                 `${flagImg(topCountry, 24)}<span style="vertical-align:middle">${countryName(topCountry)}</span>`;
@@ -1404,11 +1663,11 @@
 
             // Trend badges — use cached prev data
             const prev = window._prevData || [];
-            const prevViews    = prev.length;
+            const prevViews = prev.length;
             const prevVisitors = new Set(prev.map(r => r.visitor_hash)).size;
-            document.getElementById('trendViews').innerHTML    = trendHTML(totalViews, prevViews);
+            document.getElementById('trendViews').innerHTML = trendHTML(totalViews, prevViews);
             document.getElementById('trendVisitors').innerHTML = trendHTML(uniqueVisitors, prevVisitors);
-            document.getElementById('trendCountry').innerHTML  =
+            document.getElementById('trendCountry').innerHTML =
                 `<span class="trend-flat">${Object.keys(countryCounts).length} countries reached</span>`;
             document.getElementById('trendPage').innerHTML =
                 `<span class="trend-flat">${pageCounts[topPage]} views this period</span>`;
@@ -1499,7 +1758,7 @@
                 }
                 groups[key].views++;
                 groups[key].visitors.add(row.visitor_hash);
-                groups[key].paths[row.path]       = (groups[key].paths[row.path] || 0) + 1;
+                groups[key].paths[row.path] = (groups[key].paths[row.path] || 0) + 1;
                 groups[key].countries[row.country] = (groups[key].countries[row.country] || 0) + 1;
                 groups[key].referrers[row.referrer || '(Direct)'] =
                     (groups[key].referrers[row.referrer || '(Direct)'] || 0) + 1;
@@ -1511,9 +1770,9 @@
 
             // Column headers per group mode
             const colHeaders = {
-                path:     ['Page Path',   'Views', 'Unique Visitors', 'Top Country'],
-                referrer: ['Referrer',    'Views', 'Unique Visitors', 'Top Page'],
-                country:  ['Country',     'Views', 'Unique Visitors', 'Top Page'],
+                path: ['Page Path', 'Views', 'Unique Visitors', 'Top Country'],
+                referrer: ['Referrer', 'Views', 'Unique Visitors', 'Top Page'],
+                country: ['Country', 'Views', 'Unique Visitors', 'Top Page'],
             };
 
             const thead = document.querySelector('#trafficTable thead tr');
@@ -1538,15 +1797,15 @@
                 let col1, col4;
                 if (groupField === 'path') {
                     col1 = pathCell(key);
-                    const topCo = Object.entries(agg.countries).sort((a,b) => b[1]-a[1])[0]?.[0] || 'N/A';
+                    const topCo = Object.entries(agg.countries).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
                     col4 = countryCell(topCo);
                 } else if (groupField === 'referrer') {
                     col1 = referrerChip(key === '(Direct)' ? null : key);
-                    const topPg = Object.entries(agg.paths).sort((a,b) => b[1]-a[1])[0]?.[0] || 'N/A';
+                    const topPg = Object.entries(agg.paths).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
                     col4 = pathCell(topPg);
                 } else { // country
                     col1 = countryCell(key);
-                    const topPg2 = Object.entries(agg.paths).sort((a,b) => b[1]-a[1])[0]?.[0] || 'N/A';
+                    const topPg2 = Object.entries(agg.paths).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
                     col4 = pathCell(topPg2);
                 }
 
@@ -1566,7 +1825,7 @@
                     (r.path || '').toLowerCase().includes(q) ||
                     (r.referrer || '').toLowerCase().includes(q) ||
                     (r.country || '').toLowerCase().includes(q)
-                  )
+                )
                 : window._lastData;
 
             renderRawTable(filtered);
@@ -1593,10 +1852,10 @@
                 row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')
             ).join('\n');
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url  = URL.createObjectURL(blob);
-            const a    = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
             a.href = url;
-            a.download = `analytics_${activePeriod}_${new Date().toISOString().slice(0,10)}.csv`;
+            a.download = `analytics_${activePeriod}_${new Date().toISOString().slice(0, 10)}.csv`;
             a.click();
             URL.revokeObjectURL(url);
         }
@@ -1621,8 +1880,8 @@
 
         // ─── Shared chart helpers ──────────────────────────────────────────────────
         const CHART_COLORS = [
-            'rgba(59,130,246,0.8)',  'rgba(139,92,246,0.8)',  'rgba(16,185,129,0.8)',
-            'rgba(245,158,11,0.8)', 'rgba(236,72,153,0.8)',  'rgba(20,184,166,0.8)',
+            'rgba(59,130,246,0.8)', 'rgba(139,92,246,0.8)', 'rgba(16,185,129,0.8)',
+            'rgba(245,158,11,0.8)', 'rgba(236,72,153,0.8)', 'rgba(20,184,166,0.8)',
             'rgba(249,115,22,0.8)', 'rgba(99,102,241,0.8)',
         ];
         const CHART_BORDERS = CHART_COLORS.map(c => c.replace('0.8', '1'));
@@ -1643,7 +1902,7 @@
                 font: { family: 'Inter', size: 12, weight: '500' },
                 maxRotation: 0, minRotation: 0, align: 'center',
                 autoSkip: false,
-                callback: function(value) {
+                callback: function (value) {
                     const label = this.getLabelForValue(value);
                     if (label.length <= 14) return label;
                     const mid = Math.floor(label.length / 2);
@@ -1672,8 +1931,10 @@
             window._lastData = window._lastData || data;
             const ctx = document.getElementById('trafficChart').getContext('2d');
             destroyChart();
-            const views = { pages: chartPages, overtime: chartOverTime,
-                            referrers: chartReferrers, countries: chartCountries, hours: chartHours };
+            const views = {
+                pages: chartPages, overtime: chartOverTime,
+                referrers: chartReferrers, countries: chartCountries, hours: chartHours
+            };
             (views[activeChartView] || chartPages)(ctx, data);
         }
 
@@ -1684,25 +1945,31 @@
                 const l = formatPath(r.path).label;
                 counts[l] = (counts[l] || 0) + 1;
             });
-            const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+            const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5);
             chartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: sorted.map(e => e[0]),
-                    datasets: [{ label: 'Views', data: sorted.map(e => e[1]),
+                    datasets: [{
+                        label: 'Views', data: sorted.map(e => e[1]),
                         backgroundColor: CHART_COLORS, borderColor: CHART_BORDERS,
-                        borderWidth: 1, borderRadius: 8, borderSkipped: false, barThickness: 36 }]
+                        borderWidth: 1, borderRadius: 8, borderSkipped: false, barThickness: 36
+                    }]
                 },
-                options: { ...chartBarOptions(),
+                options: {
+                    ...chartBarOptions(),
                     onClick: (evt, els) => {
                         if (!els.length) return;
                         const label = sorted[els[0].index][0];
                         setChartFilter('path', label, `Page = "${label}"`);
                     },
-                    plugins: { ...chartBarOptions().plugins,
-                        tooltip: { ...TOOLTIP_DEFAULTS, callbacks: {
-                            afterLabel: () => 'Click to filter dashboard'
-                        }}
+                    plugins: {
+                        ...chartBarOptions().plugins,
+                        tooltip: {
+                            ...TOOLTIP_DEFAULTS, callbacks: {
+                                afterLabel: () => 'Click to filter dashboard'
+                            }
+                        }
                     }
                 }
             });
@@ -1720,7 +1987,7 @@
         function chartOverTime(ctx, data) {
             if (overtimeMode === 'weekday') {
                 // Average views per weekday
-                const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+                const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
                 const sums = Array(7).fill(0);
                 const occurrences = {};
                 data.forEach(r => {
@@ -1731,14 +1998,16 @@
                 });
                 const dayOccurCount = Array(7).fill(0);
                 Object.values(occurrences).forEach(dow => dayOccurCount[dow]++);
-                const avgs = sums.map((s,i) => dayOccurCount[i] ? Math.round((s/dayOccurCount[i])*10)/10 : 0);
+                const avgs = sums.map((s, i) => dayOccurCount[i] ? Math.round((s / dayOccurCount[i]) * 10) / 10 : 0);
                 chartInstance = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: DAYS,
-                        datasets: [{ label: 'Avg visits', data: avgs,
+                        datasets: [{
+                            label: 'Avg visits', data: avgs,
                             backgroundColor: CHART_COLORS, borderColor: CHART_BORDERS,
-                            borderWidth: 1, borderRadius: 8, borderSkipped: false, barThickness: 36 }]
+                            borderWidth: 1, borderRadius: 8, borderSkipped: false, barThickness: 36
+                        }]
                     },
                     options: chartBarOptions()
                 });
@@ -1754,13 +2023,15 @@
             chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: days.map(d => new Date(d).toLocaleDateString('en-GB', { day:'2-digit', month:'short' })),
-                    datasets: [{ label: 'Views', data: days.map(d => dayCounts[d]),
+                    labels: days.map(d => new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })),
+                    datasets: [{
+                        label: 'Views', data: days.map(d => dayCounts[d]),
                         borderColor: 'rgba(59,130,246,1)',
                         backgroundColor: 'rgba(59,130,246,0.12)',
                         borderWidth: 2, pointRadius: 4,
                         pointBackgroundColor: 'rgba(59,130,246,1)',
-                        tension: 0.35, fill: true }]
+                        tension: 0.35, fill: true
+                    }]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
@@ -1768,8 +2039,10 @@
                     plugins: { legend: { display: false }, tooltip: TOOLTIP_DEFAULTS },
                     scales: {
                         y: yScaleDefaults(),
-                        x: { ticks: { color: '#c4cfe8', font: { family: 'Inter', size: 12 }, maxRotation: 30 },
-                             grid: { display: false }, border: { color: 'rgba(255,255,255,0.05)' } }
+                        x: {
+                            ticks: { color: '#c4cfe8', font: { family: 'Inter', size: 12 }, maxRotation: 30 },
+                            grid: { display: false }, border: { color: 'rgba(255,255,255,0.05)' }
+                        }
                     }
                 }
             });
@@ -1790,11 +2063,14 @@
                 type: 'bar',
                 data: {
                     labels: sorted.map(e => e[0]),
-                    datasets: [{ label: 'Visits', data: sorted.map(e => e[1]),
+                    datasets: [{
+                        label: 'Visits', data: sorted.map(e => e[1]),
                         backgroundColor: CHART_COLORS, borderColor: CHART_BORDERS,
-                        borderWidth: 1, borderRadius: 8, borderSkipped: false, barThickness: 32 }]
+                        borderWidth: 1, borderRadius: 8, borderSkipped: false, barThickness: 32
+                    }]
                 },
-                options: { ...chartBarOptions(),
+                options: {
+                    ...chartBarOptions(),
                     onClick: (evt, els) => {
                         if (!els.length) return;
                         const label = sorted[els[0].index][0];
@@ -1816,11 +2092,14 @@
                 type: 'bar',
                 data: {
                     labels: sorted.map(e => e[0]),
-                    datasets: [{ label: 'Visits', data: sorted.map(e => e[1]),
+                    datasets: [{
+                        label: 'Visits', data: sorted.map(e => e[1]),
                         backgroundColor: CHART_COLORS, borderColor: CHART_BORDERS,
-                        borderWidth: 1, borderRadius: 8, borderSkipped: false, barThickness: 32 }]
+                        borderWidth: 1, borderRadius: 8, borderSkipped: false, barThickness: 32
+                    }]
                 },
-                options: { ...chartBarOptions(),
+                options: {
+                    ...chartBarOptions(),
                     onClick: (evt, els) => {
                         if (!els.length) return;
                         const label = sorted[els[0].index][0];
@@ -1850,23 +2129,31 @@
                 type: 'bar',
                 data: {
                     labels,
-                    datasets: [{ label: 'Visits (IL)', data: counts,
+                    datasets: [{
+                        label: 'Visits (IL)', data: counts,
                         backgroundColor: counts.map(v =>
                             v === maxVal && maxVal > 0 ? 'rgba(245,158,11,0.85)' : 'rgba(59,130,246,0.6)'),
-                        borderRadius: 5, borderSkipped: false, barThickness: 'flex' }]
+                        borderRadius: 5, borderSkipped: false, barThickness: 'flex'
+                    }]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     animation: { duration: 600, easing: 'easeOutQuart' },
-                    plugins: { legend: { display: false }, tooltip: {
-                        ...TOOLTIP_DEFAULTS,
-                        callbacks: { title: items => `${items[0].label} Israel Time` }
-                    }},
+                    plugins: {
+                        legend: { display: false }, tooltip: {
+                            ...TOOLTIP_DEFAULTS,
+                            callbacks: { title: items => `${items[0].label} Israel Time` }
+                        }
+                    },
                     scales: {
                         y: yScaleDefaults(),
-                        x: { ticks: { color: '#c4cfe8', font: { family: 'Inter', size: 11 },
-                                      maxRotation: 45, autoSkip: true, maxTicksLimit: 12 },
-                             grid: { display: false }, border: { color: 'rgba(255,255,255,0.05)' } }
+                        x: {
+                            ticks: {
+                                color: '#c4cfe8', font: { family: 'Inter', size: 11 },
+                                maxRotation: 45, autoSkip: true, maxTicksLimit: 12
+                            },
+                            grid: { display: false }, border: { color: 'rgba(255,255,255,0.05)' }
+                        }
                     }
                 }
             });
@@ -1878,8 +2165,12 @@
                 responsive: true, maintainAspectRatio: false,
                 animation: { duration: 700, easing: 'easeOutQuart' },
                 plugins: { legend: { display: false }, tooltip: TOOLTIP_DEFAULTS },
-                scales: { y: yScaleDefaults(), x: { ticks: xTickDefaults(),
-                    grid: { display: false }, border: { color: 'rgba(255,255,255,0.05)' } } }
+                scales: {
+                    y: yScaleDefaults(), x: {
+                        ticks: xTickDefaults(),
+                        grid: { display: false }, border: { color: 'rgba(255,255,255,0.05)' }
+                    }
+                }
             };
         }
 
@@ -1922,4 +2213,5 @@
         updateTimestamp();
     </script>
 </body>
+
 </html>

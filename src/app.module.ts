@@ -21,6 +21,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { AiStatusModule } from './ai-status/ai-status.module';
 import { VectorModule } from './vector/vector.module';
 import { AnalyticsModule } from './tracking/analytics.module';
+import { InterviewPrepModule } from './interview-prep/interview-prep.module';
 
 @Module({
     imports: [
@@ -43,7 +44,8 @@ import { AnalyticsModule } from './tracking/analytics.module';
         TypeOrmModule.forFeature([BenzosEntry, User, AccessToken, LearningProgress]),
         NotesModule,
         VectorModule,
-        AnalyticsModule
+        AnalyticsModule,
+        InterviewPrepModule
     ],
     controllers: [AppController, BenzosController, ContactController, TokenController, LearningProgressController],
     providers: [AppService, BenzosService, ContactService, MailService],

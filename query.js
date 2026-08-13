@@ -6,10 +6,8 @@ const client = new Client({
 
 async function run() {
   await client.connect();
-  const res = await client.query("SELECT * FROM news.news_item_topics WHERE news_item_id = '2'");
-  console.log('news_item_topics:', res.rows);
-  const item = await client.query("SELECT id, feed_id FROM news.news_items WHERE id = '2'");
-  console.log('news_item feed_id:', item.rows[0].feed_id);
+  const dbVerify = await client.query(`SELECT id, title_he, summary_he FROM news.news_items ORDER BY created_at DESC LIMIT 1`);
+  console.log('Latest Record:', dbVerify.rows[0]);
   await client.end();
 }
 run();

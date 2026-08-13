@@ -14,6 +14,6 @@
     "rootDir": "./src",
     "baseUrl": "./",
     "strict": true
-
-  }
+  },
+  "exclude": ["mcp-test.ts", "query.js"]
 }

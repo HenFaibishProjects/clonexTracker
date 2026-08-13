@@ -23,9 +23,11 @@ import { VectorModule } from './vector/vector.module';
 import { AnalyticsModule } from './tracking/analytics.module';
 import { InterviewPrepModule } from './interview-prep/interview-prep.module';
 import { NewsModule } from './news/news.module';
+import { McpModule } from './mcp/mcp.module';
 
 @Module({
     imports: [
+        McpModule,
         ScheduleModule.forRoot(),
         AiStatusModule,
         AuthModule,

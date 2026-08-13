@@ -12,5 +12,6 @@ import { Topic } from './entities/topic.entity';
   ],
   controllers: [NewsController],
   providers: [NewsService],
+  exports: [NewsService],
 })
 export class NewsModule {}

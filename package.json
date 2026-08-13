@@ -17,6 +17,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "@nestjs/axios": "^4.0.1",
     "@nestjs/common": "^11.1.0",
     "@nestjs/core": "^11.1.0",
@@ -41,7 +42,8 @@
     "rxjs": "^7.8.2",
     "sqlite3": "^5.1.7",
     "typeorm": "^0.3.22",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/express": "^5.0.1",

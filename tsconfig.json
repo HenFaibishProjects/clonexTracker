@@ -11,9 +11,7 @@
     "target": "es2017",
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "./src",
-    "baseUrl": "./",
     "strict": true
   },
-  "exclude": ["mcp-test.ts", "query.js"]
+  "exclude": ["node_modules", "dist", "mcp-test.ts", "query.js", "test-sheets.ts", "test-importer.ts", "test-cron.ts"]
 }

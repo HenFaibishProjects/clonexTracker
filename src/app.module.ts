@@ -24,10 +24,12 @@ import { AnalyticsModule } from './tracking/analytics.module';
 import { InterviewPrepModule } from './interview-prep/interview-prep.module';
 import { NewsModule } from './news/news.module';
 import { McpModule } from './mcp/mcp.module';
+import { NewsImportModule } from './news-import/news-import.module';
 
 @Module({
     imports: [
         McpModule,
+        NewsImportModule,
         ScheduleModule.forRoot(),
         AiStatusModule,
         AuthModule,

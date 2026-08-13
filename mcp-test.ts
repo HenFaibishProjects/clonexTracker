@@ -2,7 +2,7 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 
 async function test() {
-  const transport = new StreamableHTTPClientTransport(new URL("http://localhost:3000/api/mcp"));
+  const transport = new StreamableHTTPClientTransport(new URL("https://lidabenzotracker.onrender.com/api/mcp"));
   const client = new Client({ name: "test-client", version: "1.0.0" }, { capabilities: {} });
   
   await client.connect(transport);
@@ -14,10 +14,10 @@ async function test() {
     name: "create_news_item",
     arguments: {
       feedCode: "technology",
-      titleHe: "בדיקת MCP",
-      summaryHe: "בדיקה ליצירת רשומה דרך סוכן MCP.",
-      sourceName: "MCP Test Modern",
-      sourceUrl: "https://example.com/mcp-test-modern-20260813",
+      titleHe: "בדיקת MCP מרוחק",
+      summaryHe: "בדיקה ליצירת רשומה דרך סוכן MCP מרוחק.",
+      sourceName: "MCP Test Remote",
+      sourceUrl: "https://example.com/mcp-test-remote-" + Date.now(),
       displayWeekStart: "2026-08-09"
     }
   });

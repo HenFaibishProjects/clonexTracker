@@ -6,8 +6,17 @@ const client = new Client({
 
 async function run() {
   await client.connect();
-  const dbVerify = await client.query(`SELECT id, title_he, summary_he FROM news.news_items ORDER BY created_at DESC LIMIT 1`);
-  console.log('Latest Record:', dbVerify.rows[0]);
+    const result = await client.query(`
+SELECT
+    id,
+    published_at,
+    display_week_start,
+    pg_typeof(display_week_start)
+FROM news.news_items
+ORDER BY id DESC
+LIMIT 10;
+    `);
+    console.log('Result:', result.rows);
   await client.end();
 }
 run();

@@ -22,6 +22,7 @@ import { AiStatusModule } from './ai-status/ai-status.module';
 import { VectorModule } from './vector/vector.module';
 import { AnalyticsModule } from './tracking/analytics.module';
 import { InterviewPrepModule } from './interview-prep/interview-prep.module';
+import { NewsModule } from './news/news.module';
 
 @Module({
     imports: [
@@ -45,7 +46,8 @@ import { InterviewPrepModule } from './interview-prep/interview-prep.module';
         NotesModule,
         VectorModule,
         AnalyticsModule,
-        InterviewPrepModule
+        InterviewPrepModule,
+        NewsModule
     ],
     controllers: [AppController, BenzosController, ContactController, TokenController, LearningProgressController],
     providers: [AppService, BenzosService, ContactService, MailService],

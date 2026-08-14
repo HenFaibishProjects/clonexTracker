@@ -28,6 +28,10 @@ export class CreateNewsItemDto {
   @IsString()
   summaryHe!: string;
 
+  @IsOptional()
+  @IsString()
+  articleHe?: string;
+
   @IsNotEmpty()
   @IsString()
   sourceName!: string;

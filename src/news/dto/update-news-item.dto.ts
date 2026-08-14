@@ -31,6 +31,10 @@ export class UpdateNewsItemDto {
 
   @IsOptional()
   @IsString()
+  articleHe?: string;
+
+  @IsOptional()
+  @IsString()
   sourceName?: string;
 
   @IsOptional()

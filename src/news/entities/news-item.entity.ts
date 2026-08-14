@@ -19,6 +19,9 @@ export class NewsItem {
   @Column({ name: 'summary_he', type: 'text' })
   summaryHe!: string;
 
+  @Column({ name: 'article_he', type: 'text', nullable: true })
+  articleHe?: string | null;
+
   @Column({ name: 'source_name', type: 'varchar', length: 150 })
   sourceName!: string;
 

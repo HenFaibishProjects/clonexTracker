@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { GoogleSheetsService } from './google-sheets.service';
 import { NewsService } from '../news/news.service';
@@ -13,13 +13,29 @@ interface ImportSummary {
 }
 
 @Injectable()
-export class NewsImportService {
+export class NewsImportService implements OnApplicationBootstrap {
   private readonly logger = new Logger(NewsImportService.name);
 
   constructor(
     private readonly googleSheetsService: GoogleSheetsService,
     private readonly newsService: NewsService,
   ) {}
+
+  async onApplicationBootstrap() {
+    if (process.env.NEWS_IMPORT_ENABLED !== 'true') {
+      this.logger.log('News import disabled: NEWS_IMPORT_ENABLED is not true');
+      return;
+    }
+
+    try {
+      const { romania, technology } = await this.importAllNews();
+      this.logger.log(`Startup news import completed:
+Romania: ${romania.imported} imported, ${romania.skippedExisting} existing, ${romania.failed} failed
+Technology: ${technology.imported} imported, ${technology.skippedExisting} existing, ${technology.failed} failed`);
+    } catch (error: any) {
+      this.logger.error(`Startup news import failed: ${error.message}`);
+    }
+  }
 
   @Cron('30 9,12,15,18,21,0 * * *', {
     timeZone: 'Asia/Jerusalem',

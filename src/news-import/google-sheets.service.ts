@@ -20,6 +20,7 @@ export class GoogleSheetsService {
     }
     return this.readSheet(sheetId);
   }
+  
 
   private async readSheet(spreadsheetId: string): Promise<Record<string, string>[]> {
     const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;

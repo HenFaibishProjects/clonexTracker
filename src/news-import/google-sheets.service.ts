@@ -20,6 +20,14 @@ export class GoogleSheetsService {
     }
     return this.readSheet(sheetId);
   }
+
+  async readIsraelNews(): Promise<Record<string, string>[]> {
+    const sheetId = process.env.ISRAEL_NEWS_SHEET_ID;
+    if (!sheetId) {
+      throw new Error('ISRAEL_NEWS_SHEET_ID is missing');
+    }
+    return this.readSheet(sheetId);
+  }
   
 
   private async readSheet(spreadsheetId: string): Promise<Record<string, string>[]> {

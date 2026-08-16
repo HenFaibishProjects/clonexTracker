@@ -29,9 +29,7 @@ export class NewsImportService implements OnApplicationBootstrap {
 
     try {
       const { romania, technology } = await this.importAllNews();
-      this.logger.log(`Startup news import completed:
-Romania: ${romania.imported} imported, ${romania.skippedExisting} existing, ${romania.failed} failed
-Technology: ${technology.imported} imported, ${technology.skippedExisting} existing, ${technology.failed} failed`);
+      this.logger.log(`Startup news import completed:\nRomania: ${romania.imported} imported, ${romania.skippedExisting} existing, ${romania.failed} failed\nTechnology: ${technology.imported} imported, ${technology.skippedExisting} existing, ${technology.failed} failed`);
     } catch (error: any) {
       this.logger.error(`Startup news import failed: ${error.message}`);
     }
@@ -47,11 +45,25 @@ Technology: ${technology.imported} imported, ${technology.skippedExisting} exist
 
     try {
       const { romania, technology } = await this.importAllNews();
-      this.logger.log(`News import completed:
-Romania: ${romania.imported} imported, ${romania.skippedExisting} existing, ${romania.failed} failed
-Technology: ${technology.imported} imported, ${technology.skippedExisting} existing, ${technology.failed} failed`);
+      this.logger.log(`News import completed:\nRomania: ${romania.imported} imported, ${romania.skippedExisting} existing, ${romania.failed} failed\nTechnology: ${technology.imported} imported, ${technology.skippedExisting} existing, ${technology.failed} failed`);
     } catch (error: any) {
       this.logger.error(`Scheduled news import failed: ${error.message}`);
+    }
+  }
+
+  @Cron('10 6,7,10,13,17 * * *', {
+    timeZone: 'Asia/Jerusalem',
+  })
+  async handleScheduledIsraelImport() {
+    if (process.env.NEWS_IMPORT_ENABLED !== 'true') {
+      return;
+    }
+
+    try {
+      const israel = await this.importIsraelNews();
+      this.logger.log(`Israel news import completed: ${israel.imported} imported, ${israel.skippedExisting} existing, ${israel.skippedIncomplete} incomplete, ${israel.failed} failed`);
+    } catch (error: any) {
+      this.logger.error(`Scheduled Israel news import failed: ${error.message}`);
     }
   }
 
@@ -117,6 +129,34 @@ Technology: ${technology.imported} imported, ${technology.skippedExisting} exist
     return summary;
   }
 
+  async importIsraelNews(): Promise<ImportSummary> {
+    const summary: ImportSummary = {
+      total: 0,
+      imported: 0,
+      skippedExisting: 0,
+      skippedIncomplete: 0,
+      failed: 0,
+    };
+
+    try {
+      const rows = await this.googleSheetsService.readIsraelNews();
+      summary.total = rows.length;
+      for (const row of rows) {
+        if (!this.isValidRow(row)) {
+          summary.skippedIncomplete++;
+          continue;
+        }
+
+        const dto = this.mapIsraelRow(row);
+        await this.importRow(dto, summary);
+      }
+    } catch (error: any) {
+      this.logger.error(`Failed to import Israel news: ${error.message}`);
+    }
+
+    return summary;
+  }
+
   private isValidRow(row: Record<string, string>): boolean {
     const required = [
       'Article URL',
@@ -163,6 +203,25 @@ Technology: ${technology.imported} imported, ${technology.skippedExisting} exist
       sourceUrl: row['Article URL'].trim(),
       category: row['Category']?.trim() || undefined,
       companyTopic: row['Company / Topic']?.trim() || undefined,
+      importanceScore: this.parseScore(row['Importance Score']),
+      personalScore: this.parseScore(row['Personal Score']),
+      publishedAt: this.parseDate(row['Publication Date & Time']),
+      displayWeekStart: this.getDisplayWeekStart(row['Publication Date & Time']),
+      topicCodes: this.parseTopicCodes(row['Topic Codes']),
+    };
+  }
+
+  private mapIsraelRow(row: Record<string, string>): CreateNewsItemDto {
+    return {
+      feedCode: 'israel',
+      titleHe: row['Hebrew Title'].trim(),
+      originalTitle: row['Original Hebrew Headline']?.trim() || undefined,
+      summaryHe: row['Hebrew Summary'].trim(),
+      articleHe: row['Hebrew Article']?.trim() || undefined,
+      sourceName: row['Source'].trim(),
+      sourceUrl: row['Article URL'].trim(),
+      category: row['Category']?.trim() || undefined,
+      location: row['Location']?.trim() || 'Israel',
       importanceScore: this.parseScore(row['Importance Score']),
       personalScore: this.parseScore(row['Personal Score']),
       publishedAt: this.parseDate(row['Publication Date & Time']),

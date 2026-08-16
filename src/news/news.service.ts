@@ -55,6 +55,37 @@ export class NewsService {
   ) {}
 
   async findCurrentWeek(filters: FindCurrentWeekFilters = {}): Promise<NewsItem[]> {
+    if (filters.feedCode === 'technology') {
+      const feed = await this.feedRepo.findOne({ where: { code: filters.feedCode } });
+      if (!feed) {
+        throw new NotFoundException(`Feed with code ${filters.feedCode} not found`);
+      }
+
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+      const qb = this.newsItemRepo
+        .createQueryBuilder('newsItem')
+        .leftJoinAndSelect('newsItem.feed', 'feed')
+        .leftJoinAndSelect('newsItem.topics', 'topics')
+        .where('newsItem.isActive = :isActive', { isActive: true })
+        .andWhere('newsItem.feedId = :feedId', { feedId: feed.id })
+        .andWhere('newsItem.publishedAt >= :sevenDaysAgo', { sevenDaysAgo });
+
+      if (filters.category) {
+        qb.andWhere('newsItem.category = :category', { category: filters.category });
+      }
+      if (filters.location) {
+        qb.andWhere('newsItem.location = :location', { location: filters.location });
+      }
+
+      return qb
+        .orderBy('newsItem.isFeatured', 'DESC')
+        .addOrderBy('newsItem.importanceScore', 'DESC')
+        .addOrderBy('newsItem.publishedAt', 'DESC')
+        .getMany();
+    }
+
     const sunday = getJerusalemSunday();
     const where: FindOptionsWhere<NewsItem> = {
       isActive: true,

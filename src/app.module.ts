@@ -25,11 +25,13 @@ import { InterviewPrepModule } from './interview-prep/interview-prep.module';
 import { NewsModule } from './news/news.module';
 import { McpModule } from './mcp/mcp.module';
 import { NewsImportModule } from './news-import/news-import.module';
+import { MarketDataModule } from './market-data/market-data.module';
 
 @Module({
     imports: [
         McpModule,
         NewsImportModule,
+        MarketDataModule,
         ScheduleModule.forRoot(),
         AiStatusModule,
         AuthModule,

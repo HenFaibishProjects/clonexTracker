@@ -54,6 +54,33 @@ export class NewsService {
     private readonly topicRepo: Repository<Topic>,
   ) {}
 
+  async ensureFeed(code: string, name: string, description?: string): Promise<Feed> {
+    const existing = await this.feedRepo.findOne({ where: { code } });
+    if (existing) {
+      return existing;
+    }
+
+    const feed = this.feedRepo.create({
+      code,
+      name,
+      description,
+      isActive: true,
+    });
+
+    try {
+      return await this.feedRepo.save(feed);
+    } catch (error: any) {
+      // Another instance may have created the same feed concurrently during startup.
+      if (error?.code === '23505' || error?.message?.includes('duplicate key value')) {
+        const concurrentFeed = await this.feedRepo.findOne({ where: { code } });
+        if (concurrentFeed) {
+          return concurrentFeed;
+        }
+      }
+      throw error;
+    }
+  }
+
   async findCurrentWeek(filters: FindCurrentWeekFilters = {}): Promise<NewsItem[]> {
     if (filters.feedCode === 'technology') {
       const feed = await this.feedRepo.findOne({ where: { code: filters.feedCode } });

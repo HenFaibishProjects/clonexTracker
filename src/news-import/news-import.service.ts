@@ -148,6 +148,12 @@ export class NewsImportService implements OnApplicationBootstrap {
     };
 
     try {
+      await this.newsService.ensureFeed(
+        'israel',
+        'Israel',
+        'Israeli daily news',
+      );
+
       const rows = await this.googleSheetsService.readIsraelNews();
       summary.total = rows.length;
       for (const row of rows) {

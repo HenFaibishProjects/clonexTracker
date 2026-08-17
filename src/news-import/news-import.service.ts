@@ -33,6 +33,15 @@ export class NewsImportService implements OnApplicationBootstrap {
     } catch (error: any) {
       this.logger.error(`Startup news import failed: ${error.message}`);
     }
+
+    // Import Israel on every application startup as well. This makes startup a
+    // catch-up path when a scheduled Israel run was missed while the service was down.
+    try {
+      const israel = await this.importIsraelNews();
+      this.logger.log(`Startup Israel news import completed: ${israel.imported} imported, ${israel.skippedExisting} existing, ${israel.skippedIncomplete} incomplete, ${israel.failed} failed`);
+    } catch (error: any) {
+      this.logger.error(`Startup Israel news import failed: ${error.message}`);
+    }
   }
 
   @Cron('30 9,12,15,18,21,0 * * *', {
@@ -152,6 +161,7 @@ export class NewsImportService implements OnApplicationBootstrap {
       }
     } catch (error: any) {
       this.logger.error(`Failed to import Israel news: ${error.message}`);
+      throw error;
     }
 
     return summary;

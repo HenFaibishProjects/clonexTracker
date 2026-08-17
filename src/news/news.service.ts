@@ -13,11 +13,11 @@ function getJerusalemSunday(): string {
   jerusalemDate.setHours(0, 0, 0, 0);
   const day = jerusalemDate.getDay();
   jerusalemDate.setDate(jerusalemDate.getDate() - day);
-  
+
   const yyyy = jerusalemDate.getFullYear();
   const mm = String(jerusalemDate.getMonth() + 1).padStart(2, '0');
   const dd = String(jerusalemDate.getDate()).padStart(2, '0');
-  
+
   return `${yyyy}-${mm}-${dd}`;
 }
 
@@ -70,7 +70,6 @@ export class NewsService {
     try {
       return await this.feedRepo.save(feed);
     } catch (error: any) {
-      // Another instance may have created the same feed concurrently during startup.
       if (error?.code === '23505' || error?.message?.includes('duplicate key value')) {
         const concurrentFeed = await this.feedRepo.findOne({ where: { code } });
         if (concurrentFeed) {
@@ -106,11 +105,13 @@ export class NewsService {
         qb.andWhere('newsItem.location = :location', { location: filters.location });
       }
 
-      return qb
+      const items = await qb
         .orderBy('newsItem.isFeatured', 'DESC')
         .addOrderBy('newsItem.importanceScore', 'DESC')
         .addOrderBy('newsItem.publishedAt', 'DESC')
         .getMany();
+
+      return items.filter(item => this.isPublishableItem(item));
     }
 
     const sunday = getJerusalemSunday();
@@ -133,7 +134,7 @@ export class NewsService {
       where.location = filters.location;
     }
 
-    return this.newsItemRepo.find({
+    const items = await this.newsItemRepo.find({
       where,
       order: {
         isFeatured: 'DESC',
@@ -142,6 +143,8 @@ export class NewsService {
       },
       relations: ['feed', 'topics'],
     });
+
+    return items.filter(item => this.isPublishableItem(item));
   }
 
   async search(filters: SearchFilters): Promise<NewsItem[]> {
@@ -177,7 +180,8 @@ export class NewsService {
     }
 
     qb.orderBy('newsItem.publishedAt', 'DESC');
-    return qb.getMany();
+    const items = await qb.getMany();
+    return items.filter(item => this.isPublishableItem(item));
   }
 
   async create(data: CreateNewsItemDto): Promise<NewsItem> {
@@ -227,7 +231,7 @@ export class NewsService {
       where.displayWeekStart = filters.displayWeekStart;
     }
 
-    return this.newsItemRepo.find({
+    const items = await this.newsItemRepo.find({
       where,
       order: {
         isFeatured: 'DESC',
@@ -236,9 +240,24 @@ export class NewsService {
       },
       relations: ['feed', 'topics'],
     });
+
+    return items.filter(item => this.isPublishableItem(item));
   }
 
   async findOne(id: string): Promise<NewsItem> {
+    const item = await this.newsItemRepo.findOne({
+      where: { id },
+      relations: ['feed', 'topics'],
+    });
+
+    if (!item || !this.isPublishableItem(item)) {
+      throw new NotFoundException(`NewsItem with ID ${id} not found`);
+    }
+
+    return item;
+  }
+
+  async update(id: string, data: UpdateNewsItemDto): Promise<NewsItem> {
     const item = await this.newsItemRepo.findOne({
       where: { id },
       relations: ['feed', 'topics'],
@@ -248,11 +267,6 @@ export class NewsService {
       throw new NotFoundException(`NewsItem with ID ${id} not found`);
     }
 
-    return item;
-  }
-
-  async update(id: string, data: UpdateNewsItemDto): Promise<NewsItem> {
-    const item = await this.findOne(id);
     const { topicCodes, feedCode, ...scalarFields } = data;
 
     if (feedCode && feedCode !== item.feed?.code) {
@@ -286,8 +300,61 @@ export class NewsService {
   }
 
   async remove(id: string): Promise<NewsItem> {
-    const item = await this.findOne(id);
+    const item = await this.newsItemRepo.findOne({
+      where: { id },
+      relations: ['feed', 'topics'],
+    });
+
+    if (!item) {
+      throw new NotFoundException(`NewsItem with ID ${id} not found`);
+    }
+
     item.isActive = false;
     return this.newsItemRepo.save(item);
+  }
+
+  private isPublishableItem(item: NewsItem): boolean {
+    if (this.containsGenerationFailure(item.titleHe || '') ||
+        this.containsGenerationFailure(item.summaryHe || '') ||
+        this.containsGenerationFailure(item.articleHe || '')) {
+      return false;
+    }
+
+    // Romania and Technology are generated from extracted source text. A very
+    // short or missing generated article means extraction/generation failed.
+    const feedCode = item.feed?.code;
+    if ((feedCode === 'romania' || feedCode === 'technology') &&
+        (!item.articleHe || item.articleHe.trim().length < 200)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  private containsGenerationFailure(value: string): boolean {
+    if (!value) return false;
+
+    const normalized = value
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const failureMarkers = [
+      'לא סופק טקסט של כתבת מקור',
+      'לא התקבל טקסט של כתבת מקור',
+      'לא התקבל טקסט מקור',
+      'לא ניתן לעבד את הכתבה',
+      'לא ניתן לעבד את הטקסט',
+      'לא ניתן להפיק כתבה',
+      'לא ניתן לייצר כתבה',
+      'אין מספיק מידע כדי',
+      'ללא טקסט מקור',
+      'source article text was not provided',
+      'source text was not provided',
+      'no source article text',
+      'insufficient source text',
+    ];
+
+    return failureMarkers.some(marker => normalized.includes(marker));
   }
 }

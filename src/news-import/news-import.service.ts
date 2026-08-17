@@ -34,8 +34,6 @@ export class NewsImportService implements OnApplicationBootstrap {
       this.logger.error(`Startup news import failed: ${error.message}`);
     }
 
-    // Import Israel on every application startup as well. This makes startup a
-    // catch-up path when a scheduled Israel run was missed while the service was down.
     try {
       const israel = await this.importIsraelNews();
       this.logger.log(`Startup Israel news import completed: ${israel.imported} imported, ${israel.skippedExisting} existing, ${israel.skippedIncomplete} incomplete, ${israel.failed} failed`);
@@ -95,7 +93,7 @@ export class NewsImportService implements OnApplicationBootstrap {
       const rows = await this.googleSheetsService.readRomaniaNews();
       summary.total = rows.length;
       for (const row of rows) {
-        if (!this.isValidRow(row)) {
+        if (!this.isValidRow(row) || !this.hasUsableGeneratedContent(row, true)) {
           summary.skippedIncomplete++;
           continue;
         }
@@ -123,7 +121,7 @@ export class NewsImportService implements OnApplicationBootstrap {
       const rows = await this.googleSheetsService.readTechnologyNews();
       summary.total = rows.length;
       for (const row of rows) {
-        if (!this.isValidRow(row)) {
+        if (!this.isValidRow(row) || !this.hasUsableGeneratedContent(row, true)) {
           summary.skippedIncomplete++;
           continue;
         }
@@ -157,7 +155,7 @@ export class NewsImportService implements OnApplicationBootstrap {
       const rows = await this.googleSheetsService.readIsraelNews();
       summary.total = rows.length;
       for (const row of rows) {
-        if (!this.isValidRow(row)) {
+        if (!this.isValidRow(row) || !this.hasUsableGeneratedContent(row, false)) {
           summary.skippedIncomplete++;
           continue;
         }
@@ -187,6 +185,58 @@ export class NewsImportService implements OnApplicationBootstrap {
       }
     }
     return true;
+  }
+
+  private hasUsableGeneratedContent(
+    row: Record<string, string>,
+    requireFullArticle: boolean,
+  ): boolean {
+    const title = row['Hebrew Title']?.trim() || '';
+    const summary = row['Hebrew Summary']?.trim() || '';
+    const article = row['Hebrew Article']?.trim() || '';
+
+    if (this.containsGenerationFailure(title) || this.containsGenerationFailure(summary)) {
+      return false;
+    }
+
+    if (article && this.containsGenerationFailure(article)) {
+      return false;
+    }
+
+    // Romania and Technology are translated/rewritten feeds. If the full source
+    // article could not be extracted, do not publish a fake or placeholder article.
+    if (requireFullArticle && article.length < 200) {
+      return false;
+    }
+
+    return true;
+  }
+
+  private containsGenerationFailure(value: string): boolean {
+    if (!value) return false;
+
+    const normalized = value
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const failureMarkers = [
+      'לא סופק טקסט של כתבת מקור',
+      'לא התקבל טקסט של כתבת מקור',
+      'לא התקבל טקסט מקור',
+      'לא ניתן לעבד את הכתבה',
+      'לא ניתן לעבד את הטקסט',
+      'לא ניתן להפיק כתבה',
+      'לא ניתן לייצר כתבה',
+      'אין מספיק מידע כדי',
+      'ללא טקסט מקור',
+      'source article text was not provided',
+      'source text was not provided',
+      'no source article text',
+      'insufficient source text',
+    ];
+
+    return failureMarkers.some(marker => normalized.includes(marker));
   }
 
   private mapRomaniaRow(row: Record<string, string>): CreateNewsItemDto {
@@ -258,7 +308,7 @@ export class NewsImportService implements OnApplicationBootstrap {
   private parseDate(dateStr: string): string {
     const date = new Date(dateStr.trim());
     if (isNaN(date.getTime())) {
-      return new Date().toISOString(); // Fallback if strictly needed, but validation passed.
+      return new Date().toISOString();
     }
     return date.toISOString();
   }
@@ -271,11 +321,11 @@ export class NewsImportService implements OnApplicationBootstrap {
     date.setHours(0, 0, 0, 0);
     const day = date.getDay();
     date.setDate(date.getDate() - day);
-    
+
     const yyyy = date.getFullYear();
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const dd = String(date.getDate()).padStart(2, '0');
-    
+
     return `${yyyy}-${mm}-${dd}`;
   }
 
@@ -293,8 +343,6 @@ export class NewsImportService implements OnApplicationBootstrap {
       await this.newsService.create(dto);
       summary.imported++;
     } catch (error: any) {
-      // Handle PostgreSQL unique constraint violation
-      // Error code 23505 is PostgreSQL unique_violation
       if (error?.code === '23505' || error?.message?.includes('duplicate key value') || error?.message?.includes('Unique constraint')) {
         summary.skippedExisting++;
       } else {

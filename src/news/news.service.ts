@@ -6,6 +6,7 @@ import { Feed } from './entities/feed.entity';
 import { Topic } from './entities/topic.entity';
 import { CreateNewsItemDto } from './dto/create-news-item.dto';
 import { UpdateNewsItemDto } from './dto/update-news-item.dto';
+import { NewsImageService } from './news-image.service';
 
 function getJerusalemSunday(): string {
   const jerusalemStr = new Date().toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' });
@@ -52,6 +53,7 @@ export class NewsService {
     private readonly feedRepo: Repository<Feed>,
     @InjectRepository(Topic)
     private readonly topicRepo: Repository<Topic>,
+    private readonly newsImageService: NewsImageService,
   ) {}
 
   async ensureFeed(code: string, name: string, description?: string): Promise<Feed> {
@@ -185,6 +187,18 @@ export class NewsService {
   }
 
   async create(data: CreateNewsItemDto): Promise<NewsItem> {
+    // Avoid fetching source metadata for rows that are already in the archive.
+    // Preserve the same PostgreSQL-style duplicate signal expected by the importer.
+    const existing = await this.newsItemRepo.findOne({
+      where: { sourceUrl: data.sourceUrl },
+      select: ['id'],
+    });
+    if (existing) {
+      const duplicateError: any = new Error('duplicate key value violates unique constraint');
+      duplicateError.code = '23505';
+      throw duplicateError;
+    }
+
     const { topicCodes, feedCode, ...restData } = data;
 
     const feed = await this.feedRepo.findOne({ where: { code: feedCode } });
@@ -204,8 +218,13 @@ export class NewsService {
       }
     }
 
+    const resolvedImageUrl = restData.imageUrl ||
+      await this.newsImageService.resolveImageUrl(restData.sourceUrl);
+
     const newItem = this.newsItemRepo.create({
       ...restData,
+      imageUrl: resolvedImageUrl,
+      imageLookupAttemptedAt: new Date(),
       feed,
       topics,
     });
@@ -320,8 +339,6 @@ export class NewsService {
       return false;
     }
 
-    // Romania and Technology are generated from extracted source text. A very
-    // short or missing generated article means extraction/generation failed.
     const feedCode = item.feed?.code;
     if ((feedCode === 'romania' || feedCode === 'technology') &&
         (!item.articleHe || item.articleHe.trim().length < 200)) {

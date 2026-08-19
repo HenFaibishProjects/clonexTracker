@@ -32,6 +32,10 @@ export class CreateNewsItemDto {
   @IsString()
   articleHe?: string;
 
+  @IsOptional()
+  @IsUrl()
+  imageUrl?: string;
+
   @IsNotEmpty()
   @IsString()
   sourceName!: string;

@@ -22,6 +22,12 @@ export class NewsItem {
   @Column({ name: 'article_he', type: 'text', nullable: true })
   articleHe?: string | null;
 
+  @Column({ name: 'image_url', type: 'text', nullable: true })
+  imageUrl?: string | null;
+
+  @Column({ name: 'image_lookup_attempted_at', type: 'timestamptz', nullable: true, select: false })
+  imageLookupAttemptedAt?: Date | null;
+
   @Column({ name: 'source_name', type: 'varchar', length: 150 })
   sourceName!: string;
 

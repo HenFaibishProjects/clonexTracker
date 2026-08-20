@@ -83,6 +83,45 @@ export class NewsService {
   }
 
   async findCurrentWeek(filters: FindCurrentWeekFilters = {}): Promise<NewsItem[]> {
+    if (filters.feedCode === 'romania') {
+      const feed = await this.feedRepo.findOne({ where: { code: filters.feedCode } });
+      if (!feed) {
+        throw new NotFoundException(`Feed with code ${filters.feedCode} not found`);
+      }
+
+      const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
+
+      const qb = this.newsItemRepo
+        .createQueryBuilder('newsItem')
+        .leftJoinAndSelect('newsItem.feed', 'feed')
+        .leftJoinAndSelect('newsItem.topics', 'topics')
+        .where('newsItem.isActive = :isActive', { isActive: true })
+        .andWhere('newsItem.feedId = :feedId', { feedId: feed.id })
+        .andWhere('newsItem.publishedAt >= :fortyEightHoursAgo', { fortyEightHoursAgo })
+        .andWhere(
+          '(newsItem.importanceScore >= :minImportance OR newsItem.personalScore >= :minPersonal)',
+          { minImportance: 3, minPersonal: 4 },
+        );
+
+      if (filters.category) {
+        qb.andWhere('newsItem.category = :category', { category: filters.category });
+      }
+      if (filters.location) {
+        qb.andWhere('newsItem.location = :location', { location: filters.location });
+      }
+
+      const items = await qb
+        .orderBy('newsItem.isFeatured', 'DESC')
+        .addOrderBy('newsItem.importanceScore', 'DESC')
+        .addOrderBy('newsItem.personalScore', 'DESC')
+        .addOrderBy('newsItem.publishedAt', 'DESC')
+        .getMany();
+
+      return items
+        .filter(item => this.isPublishableItem(item))
+        .slice(0, 15);
+    }
+
     if (filters.feedCode === 'technology') {
       const feed = await this.feedRepo.findOne({ where: { code: filters.feedCode } });
       if (!feed) {

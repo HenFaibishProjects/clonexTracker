@@ -49,6 +49,11 @@ export class NewsController {
     return this.newsService.findCurrentWeek({ feedCode, category, location });
   }
 
+  @Get('dashboard')
+  async dashboard() {
+    return this.newsService.getDashboard();
+  }
+
   @Get('search')
   async search(
     @Query('q') q?: string,

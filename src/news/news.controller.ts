@@ -9,7 +9,6 @@ import {
   Query,
   UsePipes,
   ValidationPipe,
-  BadRequestException,
 } from '@nestjs/common';
 import { NewsService } from './news.service';
 import { CreateNewsItemDto } from './dto/create-news-item.dto';
@@ -52,17 +51,21 @@ export class NewsController {
 
   @Get('search')
   async search(
-    @Query('q') q: string,
+    @Query('q') q?: string,
     @Query('feedCode') feedCode?: string,
     @Query('category') category?: string,
     @Query('location') location?: string,
     @Query('from') from?: string,
     @Query('to') to?: string,
   ): Promise<NewsItem[]> {
-    if (!q) {
-      throw new BadRequestException('Search query "q" is required');
-    }
-    return this.newsService.search({ q, feedCode, category, location, from, to });
+    return this.newsService.search({
+      q: q || '',
+      feedCode,
+      category,
+      location,
+      from,
+      to,
+    });
   }
 
   @Get(':id')

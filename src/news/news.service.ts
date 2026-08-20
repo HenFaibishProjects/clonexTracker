@@ -188,6 +188,160 @@ export class NewsService {
     return items.filter(item => this.isPublishableItem(item));
   }
 
+  async getDashboard() {
+    const feedDefinitions = [
+      { code: 'romania', label: 'רומניה', freshnessTargetHours: 8 },
+      { code: 'israel', label: 'ישראל', freshnessTargetHours: 8 },
+      { code: 'technology', label: 'טכנולוגיה', freshnessTargetHours: 72 },
+    ];
+
+    const feedResults = await Promise.all(
+      feedDefinitions.map(async definition => {
+        try {
+          return {
+            ...definition,
+            items: await this.findCurrentWeek({ feedCode: definition.code }),
+          };
+        } catch {
+          return { ...definition, items: [] as NewsItem[] };
+        }
+      }),
+    );
+
+    const now = Date.now();
+    const allItems = feedResults.flatMap(result => result.items);
+    const timestampOf = (item: NewsItem) => {
+      const value = item.publishedAt || item.collectedAt || item.createdAt;
+      const timestamp = value ? new Date(value).getTime() : 0;
+      return Number.isFinite(timestamp) ? timestamp : 0;
+    };
+
+    const feeds = feedResults.map(result => {
+      const sourceCounts = new Map<string, number>();
+      for (const item of result.items) {
+        const source = (item.sourceName || 'Unknown').trim();
+        sourceCounts.set(source, (sourceCounts.get(source) || 0) + 1);
+      }
+
+      const rankedSources = [...sourceCounts.entries()].sort((a, b) => b[1] - a[1]);
+      const dominantSource = rankedSources[0]?.[0] || null;
+      const dominantCount = rankedSources[0]?.[1] || 0;
+      const dominantShare = result.items.length
+        ? Math.round((dominantCount / result.items.length) * 100)
+        : 0;
+      const latestPublishedAtMs = result.items.reduce(
+        (latest, item) => Math.max(latest, timestampOf(item)),
+        0,
+      );
+      const latestAgeHours = latestPublishedAtMs
+        ? (now - latestPublishedAtMs) / (60 * 60 * 1000)
+        : Number.POSITIVE_INFINITY;
+      const fresh3h = result.items.filter(
+        item => now - timestampOf(item) <= 3 * 60 * 60 * 1000,
+      ).length;
+
+      let health: 'good' | 'watch' | 'low' = 'low';
+      if (result.items.length > 0) {
+        const diversityHealthy = sourceCounts.size >= Math.min(3, result.items.length);
+        if (
+          latestAgeHours <= result.freshnessTargetHours &&
+          diversityHealthy &&
+          dominantShare <= 65
+        ) {
+          health = 'good';
+        } else if (
+          latestAgeHours <= result.freshnessTargetHours * 2 &&
+          sourceCounts.size >= Math.min(2, result.items.length) &&
+          dominantShare <= 82
+        ) {
+          health = 'watch';
+        }
+      }
+
+      return {
+        code: result.code,
+        label: result.label,
+        storyCount: result.items.length,
+        sourceCount: sourceCounts.size,
+        fresh3h,
+        latestPublishedAt: latestPublishedAtMs
+          ? new Date(latestPublishedAtMs).toISOString()
+          : null,
+        dominantSource,
+        dominantShare,
+        health,
+      };
+    });
+
+    const topicCounts = new Map<string, { code: string; name: string; count: number }>();
+    for (const item of allItems) {
+      const seen = new Set<string>();
+      const candidates = [
+        ...(item.topics || []).map(topic => ({ code: topic.code, name: topic.name })),
+        item.companyTopic
+          ? { code: item.companyTopic.toLowerCase().replace(/\s+/g, '-'), name: item.companyTopic }
+          : null,
+      ].filter(Boolean) as Array<{ code: string; name: string }>;
+
+      for (const candidate of candidates) {
+        const key = candidate.code.toLowerCase();
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        const current = topicCounts.get(key);
+        if (current) current.count += 1;
+        else topicCounts.set(key, { ...candidate, count: 1 });
+      }
+    }
+
+    const trending = [...topicCounts.values()]
+      .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+      .slice(0, 7);
+
+    const highlightScore = (item: NewsItem) => {
+      const publishedAt = timestampOf(item);
+      const ageHours = publishedAt ? Math.max(0, (now - publishedAt) / 3600000) : 96;
+      return (
+        Number(item.importanceScore || 0) * 7 +
+        Number(item.personalScore || 0) * 2.5 +
+        (item.isFeatured ? 10 : 0) +
+        Math.max(0, 18 - ageHours)
+      );
+    };
+
+    const highlights = [...allItems]
+      .sort((a, b) => highlightScore(b) - highlightScore(a))
+      .slice(0, 18)
+      .map(item => ({
+        id: item.id,
+        titleHe: item.titleHe,
+        summaryHe: item.summaryHe,
+        sourceName: item.sourceName,
+        imageUrl: item.imageUrl,
+        publishedAt: item.publishedAt || item.collectedAt || item.createdAt,
+        importanceScore: item.importanceScore,
+        personalScore: item.personalScore,
+        isFeatured: item.isFeatured,
+        feedCode: item.feed?.code || '',
+      }));
+
+    const uniqueSources = new Set(
+      allItems.map(item => (item.sourceName || '').trim().toLowerCase()).filter(Boolean),
+    );
+
+    return {
+      generatedAt: new Date().toISOString(),
+      totals: {
+        stories: allItems.length,
+        sources: uniqueSources.size,
+        fresh3h: allItems.filter(item => now - timestampOf(item) <= 3 * 60 * 60 * 1000).length,
+        stories24h: allItems.filter(item => now - timestampOf(item) <= 24 * 60 * 60 * 1000).length,
+      },
+      feeds,
+      trending,
+      highlights,
+    };
+  }
+
   async search(filters: SearchFilters): Promise<NewsItem[]> {
     const qb = this.newsItemRepo.createQueryBuilder('newsItem')
       .leftJoinAndSelect('newsItem.feed', 'feed')

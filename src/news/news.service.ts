@@ -212,7 +212,7 @@ export class NewsService {
     const allItems = feedResults.flatMap(result => result.items);
     const timestampOf = (item: NewsItem) => {
       const value = item.publishedAt || item.collectedAt || item.createdAt;
-      const timestamp = value ? new Date(value).getTime() : 0;
+      const timestamp = value ? value.getTime() : 0;
       return Number.isFinite(timestamp) ? timestamp : 0;
     };
 

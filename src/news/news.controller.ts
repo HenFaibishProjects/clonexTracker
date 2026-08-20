@@ -58,6 +58,10 @@ export class NewsController {
     @Query('from') from?: string,
     @Query('to') to?: string,
   ): Promise<NewsItem[]> {
+    if (!q && !feedCode && !category && !location && !from && !to) {
+      return [];
+    }
+
     return this.newsService.search({
       q: q || '',
       feedCode,

@@ -42,35 +42,40 @@ export class NewsImportService implements OnApplicationBootstrap {
     }
   }
 
-  @Cron('30 9,12,15,18,21,0 * * *', {
+  @Cron('0 2 * * *', {
     timeZone: 'Asia/Jerusalem',
   })
-  async handleScheduledImport() {
+  async handleScheduledImport0200() {
+    await this.handleScheduledFullImport();
+  }
+
+  @Cron('30 6,7,10,13,17 * * *', {
+    timeZone: 'Asia/Jerusalem',
+  })
+  async handleScheduledImportHalfPast() {
+    await this.handleScheduledFullImport();
+  }
+
+  @Cron('33 8,21 * * *', {
+    timeZone: 'Asia/Jerusalem',
+  })
+  async handleScheduledImportThirtyThree() {
+    await this.handleScheduledFullImport();
+  }
+
+  private async handleScheduledFullImport() {
     if (process.env.NEWS_IMPORT_ENABLED !== 'true') {
       return;
     }
 
     try {
       const { romania, technology } = await this.importAllNews();
-      this.logger.log(`News import completed:\nRomania: ${romania.imported} imported, ${romania.skippedExisting} existing, ${romania.failed} failed\nTechnology: ${technology.imported} imported, ${technology.skippedExisting} existing, ${technology.failed} failed`);
-    } catch (error: any) {
-      this.logger.error(`Scheduled news import failed: ${error.message}`);
-    }
-  }
-
-  @Cron('10 6,7,10,13,17 * * *', {
-    timeZone: 'Asia/Jerusalem',
-  })
-  async handleScheduledIsraelImport() {
-    if (process.env.NEWS_IMPORT_ENABLED !== 'true') {
-      return;
-    }
-
-    try {
       const israel = await this.importIsraelNews();
-      this.logger.log(`Israel news import completed: ${israel.imported} imported, ${israel.skippedExisting} existing, ${israel.skippedIncomplete} incomplete, ${israel.failed} failed`);
+      this.logger.log(
+        `News import completed:\nRomania: ${romania.imported} imported, ${romania.skippedExisting} existing, ${romania.failed} failed\nTechnology: ${technology.imported} imported, ${technology.skippedExisting} existing, ${technology.failed} failed\nIsrael: ${israel.imported} imported, ${israel.skippedExisting} existing, ${israel.skippedIncomplete} incomplete, ${israel.failed} failed`,
+      );
     } catch (error: any) {
-      this.logger.error(`Scheduled Israel news import failed: ${error.message}`);
+      this.logger.error(`Scheduled full news import failed: ${error.message}`);
     }
   }
 
